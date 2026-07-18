@@ -66,7 +66,7 @@ export default function PersonaGenerators() {
                     type="tel"
                     inputMode="tel"
                     placeholder="+91"
-                    pattern="[0-9+\-\s()]{7,15}"
+                    pattern="[0-9+\s\(\)\-]{7,15}"
                     title="Phone number with digits, spaces, +, -, or () only"
                     onInput={(e) => {
                       e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\-\s()]/g, '');
