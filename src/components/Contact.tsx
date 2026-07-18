@@ -1,0 +1,35 @@
+import { useState, type FormEvent } from 'react';
+import { submitContact } from '../lib/api';
+import type { ContactFormData } from '../types/forms';
+
+export default function Contact() {
+  const [sent, setSent] = useState(false);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const payload: ContactFormData = { email: String(data.get('email') ?? '') };
+    await submitContact(payload);
+    setSent(true);
+    form.reset();
+  }
+
+  return (
+    <section id="contact" className="contact">
+      <div className="wrap">
+        <span className="eyebrow">Get in touch</span>
+        <h2>Let's talk</h2>
+        <p>Questions about the platform, a partnership, or press? Leave your email and we'll get back to you.</p>
+        <form id="contactForm" onSubmit={handleSubmit}>
+          <div className="email-box">
+            <input type="email" id="contactEmail" name="email" required placeholder="you@company.com" />
+            <button type="submit" className="btn btn-solar">Get in touch</button>
+          </div>
+        </form>
+        <p className={`contact-success${sent ? ' show' : ''}`} id="contactSuccess">Thanks — we'll be in touch shortly.</p>
+        <p className="contact-alt">or write to us directly at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a></p>
+      </div>
+    </section>
+  );
+}
