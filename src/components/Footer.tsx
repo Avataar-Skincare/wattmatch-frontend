@@ -1,5 +1,4 @@
 import LogoMark from './icons/LogoMark';
-import { navLinks } from '../data/content';
 
 export default function Footer() {
   return (
@@ -9,11 +8,6 @@ export default function Footer() {
           <div className="logo" style={{ color: 'var(--white)' }}>
             <LogoMark />
             Wattmatch
-          </div>
-          <div className="foot-links">
-            {navLinks.map((link) => (
-              <a key={link.href} href={link.href}>{link.label}</a>
-            ))}
           </div>
         </div>
         <div className="foot-bottom">

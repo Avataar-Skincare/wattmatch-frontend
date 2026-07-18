@@ -36,6 +36,7 @@ export default function Header() {
         {navLinks.map((link) => (
           <a key={link.href} href={link.href} onClick={closeMenu}>{link.label}</a>
         ))}
+        <a href="#for-ci" className="btn btn-ghost" onClick={closeMenu}>I buy power</a>
         <a href="#for-generators" className="btn btn-solar" onClick={closeMenu}>I generate power</a>
       </div>
     </header>

@@ -13,16 +13,15 @@ export default function Team() {
         <div className="team-grid">
           {teamMembers.map((m) => (
             <Reveal className={`team-card${m.lead ? ' lead' : ''}`} key={m.name}>
-              {m.photo ? (
-                <img className="avatar-photo" src={m.photo} alt={m.name} />
-              ) : (
-                <div className="avatar">{m.initials}</div>
-              )}
-              <h3>{m.name}</h3>
-              <div className="role">{m.role}</div>
-              <div className="bg">{m.bg}</div>
-              <div className="why-label">WHY THIS FITS</div>
-              <p className="why">{m.why}</p>
+              {m.photo && <img className="team-photo" src={m.photo} alt={m.name} />}
+              <div className="team-card-body">
+                {!m.photo && <div className="avatar">{m.initials}</div>}
+                <h3>{m.name}</h3>
+                <div className="role">{m.role}</div>
+                <div className="bg">{m.bg}</div>
+                <div className="why-label">WHY THIS FITS</div>
+                <p className="why">{m.why}</p>
+              </div>
             </Reveal>
           ))}
         </div>

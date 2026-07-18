@@ -276,10 +276,11 @@ nav{display:flex; align-items:center; justify-content:space-between; padding:18p
 /* ---------- Team ---------- */
 .team-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
 @media (max-width:820px){.team-grid{grid-template-columns:1fr;}}
-.team-card{background:var(--white); border:1px solid var(--line); border-radius:16px; padding:26px;}
+.team-card{background:var(--white); border:1px solid var(--line); border-radius:16px; overflow:hidden;}
+.team-card .team-card-body{padding:22px 26px 26px;}
 .team-card .avatar{width:54px; height:54px; border-radius:12px; background:var(--porcelain-2); display:flex; align-items:center; justify-content:center; font-family:var(--display); font-weight:700; color:var(--muted); margin-bottom:16px;}
 .team-card.lead .avatar{background:var(--blueprint); color:var(--solar);}
-.team-card .avatar-photo{width:54px; height:54px; border-radius:12px; object-fit:cover; margin-bottom:16px;}
+.team-card .team-photo{width:100%; aspect-ratio:1/1; object-fit:cover; object-position:top; display:block;}
 .team-card h3{font-size:17px; margin-bottom:3px;}
 .team-card .role{font-family:var(--mono); font-size:11.5px; color:var(--solar-dark); margin-bottom:14px;}
 .team-card .bg{font-size:13px; font-style:italic; color:var(--ink); margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);}
@@ -308,9 +309,7 @@ nav{display:flex; align-items:center; justify-content:space-between; padding:18p
 
 /* ---------- Footer ---------- */
 footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
-.foot-top{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:24px; padding-bottom:28px; border-bottom:1px solid rgba(255,255,255,0.1);}
-.foot-links{display:flex; gap:26px; flex-wrap:wrap; font-size:13.5px;}
-.foot-links a:hover{color:var(--white);}
+.foot-top{padding-bottom:28px; border-bottom:1px solid rgba(255,255,255,0.1);}
 .foot-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-top:20px; font-size:12px;}
 
 /* reveal on scroll */
