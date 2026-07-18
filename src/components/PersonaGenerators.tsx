@@ -8,6 +8,7 @@ import type { GeneratorFormData } from '../types/forms';
 export default function PersonaGenerators() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -23,9 +24,14 @@ export default function PersonaGenerators() {
       message: String(data.get('message') ?? ''),
     };
     setSubmitting(true);
-    await submitGeneratorLead(payload);
+    setError(false);
+    const ok = await submitGeneratorLead(payload);
     setSubmitting(false);
-    setSubmitted(true);
+    if (ok) {
+      setSubmitted(true);
+    } else {
+      setError(true);
+    }
   }
 
   return (
@@ -53,7 +59,19 @@ export default function PersonaGenerators() {
                 </div>
                 <div className="field">
                   <label htmlFor="genPhone">Phone</label>
-                  <input id="genPhone" name="phone" required type="tel" placeholder="+91" />
+                  <input
+                    id="genPhone"
+                    name="phone"
+                    required
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="+91"
+                    pattern="[0-9+\-\s()]{7,15}"
+                    title="Phone number with digits, spaces, +, -, or () only"
+                    onInput={(e) => {
+                      e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\-\s()]/g, '');
+                    }}
+                  />
                 </div>
               </div>
               <div className="field-row">
@@ -78,6 +96,9 @@ export default function PersonaGenerators() {
               <button type="submit" className="btn btn-copper" disabled={submitting}>
                 {submitting ? 'Sending…' : 'Join as a generator'} <span className="btn-arrow">→</span>
               </button>
+              {error && (
+                <p className="form-error">Something went wrong sending your application. Please try again, or email hello@wattmatch.in.</p>
+              )}
               <p className="form-note">Every applicant goes through a technical and financial check.</p>
             </form>
           ) : (
