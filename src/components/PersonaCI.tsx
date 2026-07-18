@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import Reveal from './Reveal';
 import CheckIcon from './icons/CheckIcon';
-import { ciBenefits } from '../data/content';
+import { ciBenefits, indianStates } from '../data/content';
 import { submitCILead } from '../lib/api';
 import type { CIFormData } from '../types/forms';
 
@@ -76,7 +76,12 @@ export default function PersonaCI() {
               <div className="field-row">
                 <div className="field">
                   <label htmlFor="ciState">State</label>
-                  <input id="ciState" name="state" required type="text" placeholder="e.g. Maharashtra" />
+                  <select id="ciState" name="state" required defaultValue="">
+                    <option value="" disabled>Select state</option>
+                    {indianStates.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="field">
                   <label htmlFor="ciLoad">Monthly consumption</label>

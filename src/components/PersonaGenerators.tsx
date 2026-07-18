@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import Reveal from './Reveal';
 import CheckIcon from './icons/CheckIcon';
-import { generatorBenefits } from '../data/content';
+import { generatorBenefits, indianStates } from '../data/content';
 import { submitGeneratorLead } from '../lib/api';
 import type { GeneratorFormData } from '../types/forms';
 
@@ -58,8 +58,13 @@ export default function PersonaGenerators() {
               </div>
               <div className="field-row">
                 <div className="field">
-                  <label htmlFor="genState">State(s) of operation</label>
-                  <input id="genState" name="state" required type="text" placeholder="e.g. Gujarat, Rajasthan" />
+                  <label htmlFor="genState">Primary state of operation</label>
+                  <select id="genState" name="state" required defaultValue="">
+                    <option value="" disabled>Select state</option>
+                    {indianStates.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="field">
                   <label htmlFor="genCap">Capacity (MW)</label>
