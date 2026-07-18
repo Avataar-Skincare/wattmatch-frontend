@@ -3,13 +3,17 @@ const API_BASE = import.meta.env.VITE_API_URL as string | undefined;
 async function submit(path: string, payload: unknown): Promise<void> {
   if (!API_BASE) return;
   try {
-    await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(`${API_BASE}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-  } catch {
+    if (!res.ok) {
+      console.error(`API ${path} responded with ${res.status}:`, await res.text());
+    }
+  } catch (err) {
     // No backend configured/reachable — form still succeeds locally.
+    console.error(`API ${path} request failed:`, err);
   }
 }
 
