@@ -65,7 +65,7 @@ export default function PersonaGenerators() {
                     required
                     type="tel"
                     inputMode="tel"
-                    placeholder="+91"
+                    placeholder="9876543210"
                     pattern="[0-9+\s\(\)\-]{7,15}"
                     title="Phone number with digits, spaces, +, -, or () only"
                     onInput={(e) => {
@@ -86,7 +86,7 @@ export default function PersonaGenerators() {
                 </div>
                 <div className="field">
                   <label htmlFor="genCap">Capacity (MW)</label>
-                  <input id="genCap" name="capacity" type="text" placeholder="e.g. 5 MW installed" />
+                  <input id="genCap" name="capacity" type="number" />
                 </div>
               </div>
               <div className="field">
