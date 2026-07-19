@@ -1,42 +1,56 @@
-name: Deploy
+# Deploys the static Vite build in `dist/` to S3, fronted by CloudFront, via
+# GitHub OIDC. Mirrors tribute-charity's deploy pattern.
+#
+# Required repo configuration:
+#   Secrets:
+#     AWS_ROLE_ARN                 - IAM role ARN assumable via OIDC for this repo
+#   Variables:
+#     S3_BUCKET                    - target S3 bucket name
+#     CLOUDFRONT_DISTRIBUTION_ID   - CloudFront distribution ID to invalidate
+#     VITE_API_URL                 - site origin baked into the build (forms
+#                                    silently no-op in demo mode if unset)
+
+name: Deploy to S3 + CloudFront
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        required: true
-        type: choice
-        options:
-          - test
-          - prod
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Require VITE_API_URL
+        run: test -n "${{ vars.VITE_API_URL }}"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-south-1
 
-      - name: Resolve deploy folder
-        id: vars
-        run: |
-          if [ "${{ inputs.environment }}" = "prod" ]; then
-            echo "folder=wattmatch" >> $GITHUB_OUTPUT
-          else
-            echo "folder=test-wattmatch" >> $GITHUB_OUTPUT
-          fi
+      - run: aws s3 sync dist "s3://${{ vars.S3_BUCKET }}" --delete
 
-      - name: Sync build artifact to UI bucket
-        run: |
-          aws s3 sync s3://${{ secrets.S3_BUILD_BUCKET }}/${{ github.repository }}/${{ github.ref_name }} \
-            s3://${{ secrets.S3_UI_BUCKET }}/${{ steps.vars.outputs.folder }} --delete
-
-      - name: Invalidate CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ inputs.environment == 'prod' && secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD || secrets.CLOUDFRONT_DISTRIBUTION_ID_TEST }} \
-            --paths "/*"
+      - run: aws cloudfront create-invalidation --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"
