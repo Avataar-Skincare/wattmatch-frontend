@@ -82,7 +82,7 @@ export default function PersonaCI() {
                     required
                     type="tel"
                     inputMode="tel"
-                    placeholder="+91"
+                    placeholder="9876543210"
                     pattern="[0-9+\s\(\)\-]{7,15}"
                     title="Phone number with digits, spaces, +, -, or () only"
                     onInput={(e) => {
@@ -102,8 +102,8 @@ export default function PersonaCI() {
                   </select>
                 </div>
                 <div className="field">
-                  <label htmlFor="ciLoad">Monthly consumption</label>
-                  <input id="ciLoad" name="load" type="text" placeholder="e.g. 200,000 kWh" />
+                  <label htmlFor="ciLoad">Monthly consumption (kWh)</label>
+                  <input id="ciLoad" name="load" type="number" />
                 </div>
               </div>
               <div className="field">
