@@ -1,9 +1,10 @@
-# Deploys the static Vite build in `dist/` to S3, fronted by CloudFront, via
-# GitHub OIDC. Mirrors tribute-charity's deploy pattern.
+# Deploys the static Vite build in `dist/` to S3, fronted by CloudFront.
+# Anyone with push access to main can deploy - no AWS access needed; the
+# workflow authenticates with a scoped IAM user (wattmatch-deploy).
 #
 # Required repo configuration:
 #   Secrets:
-#     AWS_ROLE_ARN                 - IAM role ARN assumable via OIDC for this repo
+#     AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY - access key of wattmatch-deploy
 #   Variables:
 #     S3_BUCKET                    - target S3 bucket name
 #     CLOUDFRONT_DISTRIBUTION_ID   - CloudFront distribution ID to invalidate
@@ -21,10 +22,6 @@ on:
 concurrency:
   group: deploy
   cancel-in-progress: true
-
-permissions:
-  id-token: write
-  contents: read
 
 jobs:
   deploy:
@@ -48,7 +45,8 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
       - run: aws s3 sync dist "s3://${{ vars.S3_BUCKET }}" --delete
