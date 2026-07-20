@@ -149,7 +149,7 @@ export const teamMembers = [
     bg: 'Background with SECI and Power Grid Corporation of India',
     why: 'First-hand institutional experience at the organisations behind India’s largest renewable aggregation and grid-scale power trading model — direct credibility with DISCOMs, regulators and generators.',
     lead: false,
-    photo: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/img1.webp',
+    photo: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/final_img1.webp',
   },
   {
     initials: 'NS',
@@ -158,7 +158,7 @@ export const teamMembers = [
     bg: 'Background in the energy sector',
     why: 'Sector fluency across the power value chain, bringing the technical and market grounding to structure PPAs, price discovery and generator due-diligence.',
     lead: false,
-    photo: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/img2.webp',
+    photo: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/final_img2.webp',
   },
   {
     initials: 'SM',
