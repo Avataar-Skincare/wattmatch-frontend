@@ -35,17 +35,6 @@ export default function WhySwitch() {
               <span className="bs-label">typical cost saving vs. grid</span>
             </div>
 
-            <div className="example-box">
-              <span className="ex-icon">↳</span>
-              <div>
-                <p className="ex-headline">A 15 MW facility in Haryana signs a 25-year PPA for 5 MW of solar</p>
-                <p className="ex-body">
-                  Landed solar tariff ₹4.78/unit vs. their DISCOM rate of ₹7.32/unit — a{' '}
-                  <strong>35% saving</strong> that compounds every year grid tariffs keep rising.
-                </p>
-              </div>
-            </div>
-
             <p className="ws-footnote">
               DISCOM tariffs have risen as much as 15%/year in some states, largely on fuel and
               cross-subsidy costs. A solar PPA is fixed for the life of the contract — the gap only
