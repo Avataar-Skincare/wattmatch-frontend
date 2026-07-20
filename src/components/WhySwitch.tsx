@@ -7,7 +7,7 @@ export default function WhySwitch() {
       <div className="wrap">
         <Reveal className="sec-head">
           <span className="eyebrow">Why switch</span>
-          <h2>C&amp;I has every reason to switch to solar</h2>
+          <h2>C&amp;I has every reason to switch to renewables</h2>
           <p>The economics alone are compelling — but cost savings are just the beginning.</p>
         </Reveal>
 
@@ -26,7 +26,7 @@ export default function WhySwitch() {
 
             <div className="tariff-card solar-tariff">
               <span className="tc-label">Solar C&amp;I (open access)</span>
-              <span className="tc-value">₹3 – ₹6.5 <small>/ unit</small></span>
+              <span className="tc-value">₹3 – ₹6 <small>/ unit</small></span>
               <span className="tc-note">Landed cost incl. wheeling &amp; surcharges</span>
             </div>
 
