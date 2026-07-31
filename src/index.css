@@ -320,3 +320,39 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 .reveal.is-visible{opacity:1; transform:none;}
 
 ::selection{background:var(--solar); color:var(--ink);}
+
+/* ---------- Registration pages ---------- */
+.register-page main{padding:52px 0 80px;}
+.register-hero{text-align:center; max-width:640px; margin:0 auto 36px;}
+.register-hero h1{font-size:clamp(28px,4vw,38px); margin:10px 0 12px;}
+.register-hero p{color:var(--muted); font-size:15px;}
+.register-form-card{max-width:640px; margin:0 auto;}
+.register-form-card .form-success .check{background:rgba(242,169,59,0.18); color:var(--solar-dark);}
+.step-indicator{display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-bottom:28px; font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
+.step-indicator .step{padding:4px 10px; border-radius:999px; border:1px solid var(--line);}
+.step-indicator .step.active{border-color:var(--solar-dark); color:var(--ink); background:rgba(242,169,59,0.12);}
+.step-indicator .step.done{color:var(--solar-dark);}
+.otp-step h3{font-size:19px; margin-bottom:4px;}
+.otp-step .sub{font-size:13.5px; color:var(--muted); margin-bottom:20px;}
+.otp-channel{border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:14px; background:var(--porcelain);}
+.otp-channel label{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px;}
+.otp-verify-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.otp-verify-row input{width:120px; border:1.5px solid var(--line); border-radius:8px; padding:11px 12px; font-size:14px; background:var(--white);}
+.otp-resend{background:none; border:none; font-size:12.5px; color:var(--muted); text-decoration:underline; cursor:pointer;}
+.otp-hint{font-size:12px; color:var(--muted); margin:8px 0 0;}
+.otp-resend:disabled{opacity:0.6; cursor:not-allowed;}
+.otp-verified{display:flex; align-items:center; gap:8px; color:var(--solar-dark); font-size:13.5px; margin:0;}
+.otp-verified .check{width:22px; height:22px; border-radius:50%; background:rgba(242,169,59,0.18); display:flex; align-items:center; justify-content:center;}
+.form-nav{display:flex; justify-content:space-between; gap:12px; margin-top:8px;}
+.form-nav .btn{width:auto; margin-top:0;}
+.register-review-list{list-style:none; margin:0 0 20px; padding:14px; border:1px solid var(--line); border-radius:10px; background:var(--porcelain); font-size:13.5px;}
+.register-review-list li{margin-bottom:6px;}
+.register-review-list li:last-child{margin-bottom:0;}
+.consent-field{display:flex; align-items:flex-start; gap:10px; margin-bottom:16px; font-size:12.5px; color:var(--muted); cursor:pointer;}
+.consent-field input{margin-top:3px; flex:none;}
+@media (max-width:560px){
+  .register-page main{padding:36px 0 56px;}
+  .register-form-card{padding:22px;}
+  .register-hero{margin-bottom:24px;}
+  .otp-verify-row input{width:100%;}
+}
