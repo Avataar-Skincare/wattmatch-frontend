@@ -25,8 +25,7 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
     <header>
       <nav>
         <a href="#top" className="logo">
-          <LogoMark />
-          Wattmatch
+          <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-1.webp" />
         </a>
         <div className="nav-links">
           {navLinks.map((link) => (

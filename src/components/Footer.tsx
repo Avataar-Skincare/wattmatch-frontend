@@ -6,8 +6,7 @@ export default function Footer() {
       <div className="wrap">
         <div className="foot-top">
           <div className="logo" style={{ color: 'var(--white)' }}>
-            <LogoMark />
-            Wattmatch
+            <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-2.webp" />
           </div>
         </div>
         <div className="foot-bottom">
