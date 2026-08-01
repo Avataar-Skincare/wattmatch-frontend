@@ -94,10 +94,10 @@ export default function GeneratorRegisterPage() {
                     <label htmlFor="genRegPhone">Phone</label>
                     <input
                       id="genRegPhone" name="phone" required type="tel" inputMode="tel"
-                      defaultValue={form.phone} placeholder="9876543210" maxLength={13}
-                      pattern="(\+?91[\-\s]?)?[6-9]\d{9}"
+                      defaultValue={form.phone} placeholder="10-digit mobile number" maxLength={13}
+                      pattern="(\+?91\s?)?[6-9]\d{9}"
                       title="Enter a valid 10-digit Indian mobile number"
-                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\-\s]/g, ''); }}
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\s]/g, ''); }}
                     />
                   </div>
                 </div>

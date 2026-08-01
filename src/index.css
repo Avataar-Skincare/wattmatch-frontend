@@ -262,6 +262,7 @@ header .logo-mark{width:160px; height:32px;}
   background:var(--porcelain); color:var(--ink); transition:border-color .15s;
 }
 .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--ink);}
+.field input:invalid:not(:focus):not(:placeholder-shown){border-color:#B53A3A;}
 .field textarea{resize:vertical; min-height:70px;}
 .field input[type=number]{-moz-appearance:textfield;}
 .field input[type=number]::-webkit-inner-spin-button,

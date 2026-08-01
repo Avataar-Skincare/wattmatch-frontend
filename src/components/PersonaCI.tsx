@@ -118,7 +118,7 @@ export default function PersonaCI() {
                 <p className="form-error">Something went wrong sending your request. Please try again, or email hello@wattmatch.in.</p>
               )}
               <p className="form-note">No spam. We'll only reach out about your solar options.</p>
-              <p className="form-note"><Link to="/consumerForm">Prefer a full registration form? →</Link></p>
+              <p className="form-note"><Link to="/ciBuyer">Prefer a full registration form? →</Link></p>
             </form>
           ) : (
             <div className="form-success show" id="ciSuccess">

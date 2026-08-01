@@ -16,6 +16,13 @@ function OtpChannelVerifier({
   const [status, setStatus] = useState<Status>('idle');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   async function handleSend() {
     setStatus('sending');
@@ -23,9 +30,14 @@ function OtpChannelVerifier({
     const result = await sendOtp(channel, identifier);
     if (result.ok) {
       setStatus('sent');
+      setCooldown(60);
     } else {
-      setStatus('idle');
-      setError(result.error ?? 'Failed to send code.');
+      setStatus(status === 'idle' || status === 'sending' ? 'idle' : 'sent');
+      if (result.retryAfterSeconds) {
+        setCooldown(result.retryAfterSeconds);
+      } else {
+        setError(result.error ?? 'Failed to send code.');
+      }
     }
   }
 
@@ -52,8 +64,8 @@ function OtpChannelVerifier({
           <span className="check"><CheckIcon size={14} /></span> Verified
         </p>
       ) : status === 'idle' || status === 'sending' ? (
-        <button type="button" className="btn btn-ghost" disabled={status === 'sending' || !identifier} onClick={handleSend}>
-          {status === 'sending' ? 'Sending code…' : `Send code to ${label.toLowerCase()}`}
+        <button type="button" className="btn btn-ghost" disabled={status === 'sending' || !identifier || cooldown > 0} onClick={handleSend}>
+          {cooldown > 0 ? `Resend in ${cooldown}s` : status === 'sending' ? 'Sending code…' : `Send code to ${label.toLowerCase()}`}
         </button>
       ) : (
         <div className="otp-verify-row">
@@ -68,8 +80,8 @@ function OtpChannelVerifier({
           <button type="button" className="btn btn-ghost" disabled={status === 'verifying' || code.length !== 4} onClick={handleVerify}>
             {status === 'verifying' ? 'Verifying…' : 'Verify'}
           </button>
-          <button type="button" className="otp-resend" disabled={status === 'verifying'} onClick={handleSend}>
-            Resend
+          <button type="button" className="otp-resend" disabled={status === 'verifying' || cooldown > 0} onClick={handleSend}>
+            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend'}
           </button>
         </div>
       )}

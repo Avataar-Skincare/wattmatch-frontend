@@ -95,10 +95,10 @@ export default function ConsumerRegisterPage() {
                     <label htmlFor="ciRegPhone">Phone</label>
                     <input
                       id="ciRegPhone" name="phone" required type="tel" inputMode="tel"
-                      defaultValue={form.phone} placeholder="9876543210" maxLength={13}
-                      pattern="(\+?91[\-\s]?)?[6-9]\d{9}"
+                      defaultValue={form.phone} placeholder="10-digit mobile number" maxLength={13}
+                      pattern="(\+?91\s?)?[6-9]\d{9}"
                       title="Enter a valid 10-digit Indian mobile number"
-                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\-\s]/g, ''); }}
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\s]/g, ''); }}
                     />
                   </div>
                 </div>
@@ -126,8 +126,8 @@ export default function ConsumerRegisterPage() {
                   </div>
                 </div>
                 <div className="field">
-                  <label htmlFor="ciRegTenure">Preferred deal tenure</label>
-                  <input id="ciRegTenure" name="tenurePreference" type="text" maxLength={255} defaultValue={form.tenurePreference} placeholder="e.g. 10 years" />
+                  <label htmlFor="ciRegTenure">Preferred deal tenure (years)</label>
+                  <input id="ciRegTenure" name="tenurePreference" type="number" min="1" step="1" defaultValue={form.tenurePreference} placeholder="e.g. 10" />
                 </div>
                 <div className="field">
                   <label htmlFor="ciRegMsg">Anything else?</label>

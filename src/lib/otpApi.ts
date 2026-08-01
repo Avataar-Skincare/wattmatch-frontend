@@ -5,6 +5,7 @@ export type OtpChannel = 'email' | 'phone';
 interface OtpResult {
   ok: boolean;
   error?: string;
+  retryAfterSeconds?: number;
 }
 
 async function postOtp(path: string, payload: unknown): Promise<OtpResult> {
@@ -17,7 +18,7 @@ async function postOtp(path: string, payload: unknown): Promise<OtpResult> {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      return { ok: false, error: data.error ?? 'Something went wrong. Please try again.' };
+      return { ok: false, error: data.error ?? 'Something went wrong. Please try again.', retryAfterSeconds: data.retryAfterSeconds };
     }
     return { ok: true };
   } catch {

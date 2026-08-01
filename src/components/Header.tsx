@@ -13,8 +13,7 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
       <header>
         <nav>
           <Link to="/" className="logo">
-            <LogoMark />
-            Wattmatch
+            <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-1.webp" />
           </Link>
         </nav>
       </header>

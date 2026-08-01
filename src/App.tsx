@@ -8,8 +8,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/generatorForm" element={<GeneratorRegisterPage />} />
-        <Route path="/consumerForm" element={<ConsumerRegisterPage />} />
+        <Route path="/renewablesGenerator" element={<GeneratorRegisterPage />} />
+        <Route path="/ciBuyer" element={<ConsumerRegisterPage />} />
       </Routes>
     </BrowserRouter>
   );
