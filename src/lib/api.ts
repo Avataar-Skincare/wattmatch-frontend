@@ -30,3 +30,11 @@ export function submitGeneratorLead(payload: unknown) {
 export function submitContact(payload: unknown) {
   return submit('/api/contact', payload);
 }
+
+export function submitGeneratorRegistration(payload: unknown) {
+  return submit('/api/registrations/generator', payload);
+}
+
+export function submitCiRegistration(payload: unknown) {
+  return submit('/api/registrations/ci', payload);
+}

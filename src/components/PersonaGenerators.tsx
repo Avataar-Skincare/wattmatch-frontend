@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import Reveal from './Reveal';
 import CheckIcon from './icons/CheckIcon';
 import { generatorBenefits, indianStates } from '../data/content';
@@ -100,6 +101,7 @@ export default function PersonaGenerators() {
                 <p className="form-error">Something went wrong sending your application. Please try again, or email hello@wattmatch.in.</p>
               )}
               <p className="form-note">Every applicant goes through a technical and financial check.</p>
+              <p className="form-note"><Link to="/renewablesGenerator">Prefer a full registration form? →</Link></p>
             </form>
           ) : (
             <div className="form-success show" id="genSuccess">
