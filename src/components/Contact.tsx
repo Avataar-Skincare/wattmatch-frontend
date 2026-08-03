@@ -47,7 +47,7 @@ export default function Contact({
             <button type="submit" className="btn btn-solar">Get in touch</button>
           </div>
         </form>
-        <p className={`contact-success${sent ? ' show' : ''}`} id="contactSuccess">Message sent — we'll get back to you shortly.</p>
+        <p className={`contact-success${sent ? ' show' : ''}`} id="contactSuccess">Message sent: we'll get back to you shortly.</p>
         {error && <p className="form-error">Something went wrong. Please try again, or email hello@wattmatch.in directly.</p>}
         <p className="contact-alt">or write to us directly at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a></p>
       </div>

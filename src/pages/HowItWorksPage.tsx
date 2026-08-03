@@ -15,7 +15,7 @@ export default function HowItWorksPage() {
             <span className="eyebrow">The mechanism</span>
             <h1>Here's exactly what happens, step by step</h1>
             <p>
-              From your first requirement to fifteen years, any agreed term of managed power delivery — one platform
+              From your first requirement to fifteen years, any agreed term of managed power delivery, one platform
               runs the whole relationship.
             </p>
           </div>

@@ -6,8 +6,8 @@ import Reveal from '../components/Reveal';
 
 const infoCards = [
   { title: 'Grid tariffs vary a lot by state', body: 'Industrial and commercial DISCOM tariffs currently range roughly ₹6–₹15 per unit across India, depending on the state and consumer category.' },
-  { title: 'So do open-access renewables tariffs', body: 'Landed open-access renewables costs — including wheeling and surcharges — typically run ₹3–₹6.5 per unit, again varying by state and structure.' },
-  { title: 'The gap only widens', body: "Grid tariffs have historically risen 5–8% a year (up to 15% in some states), while a renewables PPA locks your rate in for the contract term — so today's saving tends to grow, not shrink, over time." },
+  { title: 'So do open-access renewables tariffs', body: 'Landed open-access renewables costs, including wheeling and surcharges, typically run ₹3–₹6.5 per unit, again varying by state and structure.' },
+  { title: 'The gap only widens', body: "Grid tariffs have historically risen 5–8% a year (up to 15% in some states), while a renewables PPA locks your rate in for the contract term, so today's saving tends to grow, not shrink, over time." },
 ];
 
 export default function SavingsCalculatorPage() {
@@ -33,7 +33,7 @@ export default function SavingsCalculatorPage() {
             <h1>How much could you save by switching?</h1>
             <p>
               A quick estimate based on published industry cost ranges. For a precise number specific
-              to your load, request a match — it costs nothing to find out.
+              to your load, request a match: it costs nothing to find out.
             </p>
           </div>
         </div>
@@ -53,7 +53,7 @@ export default function SavingsCalculatorPage() {
             <Reveal className="calc-grid">
               <div className="form-card">
                 <h3>Your consumption</h3>
-                <p className="sub">Estimate is for illustration only — not a quote.</p>
+                <p className="sub">Estimate is for illustration only, not a quote.</p>
                 <div className="field">
                   <label htmlFor="calcConsumption">Current monthly consumption (kWh)</label>
                   <input
@@ -89,8 +89,8 @@ export default function SavingsCalculatorPage() {
               </div>
             </Reveal>
             <p className="calc-note">
-              This is an estimate for illustration only, based on published state-level tariff ranges
-              — not a quote. Actual savings depend on your state, load profile, connected voltage, and
+              This is an estimate for illustration only, based on published state-level tariff ranges,
+              not a quote. Actual savings depend on your state, load profile, connected voltage, and
               contract structure.
             </p>
           </div>
@@ -112,7 +112,7 @@ export default function SavingsCalculatorPage() {
                 <div className="ex-headline">A real deal, for scale</div>
                 <div className="ex-body">
                   A 15 MW facility in Haryana signed a PPA at <strong>₹4.78/unit</strong> against a
-                  DISCOM rate of <strong>₹7.32/unit</strong> — a 35% saving, on a real deal.
+                  DISCOM rate of <strong>₹7.32/unit</strong>, a 35% saving, on a real deal.
                 </div>
               </div>
             </Reveal>
@@ -122,7 +122,7 @@ export default function SavingsCalculatorPage() {
         <section className="contact">
           <div className="wrap">
             <h2>Want the real number for your load?</h2>
-            <p>No cost, no obligation — we'll come back with matched generator options and their actual quoted tariffs.</p>
+            <p>No cost, no obligation: we'll come back with matched generator options and their actual quoted tariffs.</p>
             <Link to="/for-ci" className="btn btn-solar">Request a match <span className="btn-arrow">→</span></Link>
           </div>
         </section>

@@ -23,7 +23,7 @@ export default function PrivacyTermsPage() {
             <div className="legal-notice">
               <strong>Template notice:</strong> This page is a working draft structured around
               India's Digital Personal Data Protection Act, 2023 (DPDP Act) and standard commercial
-              terms. It is not a substitute for review by qualified legal counsel — please have a
+              terms. It is not a substitute for review by qualified legal counsel: please have a
               lawyer review and finalise this before publishing it live, particularly the
               data-processing, liability and dispute-resolution sections.
             </div>
@@ -35,7 +35,7 @@ export default function PrivacyTermsPage() {
               <h3>1. What we collect</h3>
               <p>
                 When you use our lead-capture forms or contact us, we collect personal data you
-                provide directly — including your name, company name, work email, phone number,
+                provide directly, including your name, company name, work email, phone number,
                 state/location, and details about your electricity consumption or generation
                 capacity. We do not collect more than is needed to evaluate and process your enquiry.
               </p>
@@ -114,8 +114,8 @@ export default function PrivacyTermsPage() {
 
               <h3>4. Platform fees</h3>
               <p>
-                Wattmatch's fee structure — including processing fee and the per-unit transaction
-                fee — will be disclosed in full prior to any contract execution.
+                Wattmatch's fee structure, including processing fee and the per-unit transaction
+                fee, will be disclosed in full prior to any contract execution.
               </p>
 
               <h3>5. Limitation of liability</h3>

@@ -13,7 +13,7 @@ export default function ContactPage() {
           <div className="wrap">
             <span className="eyebrow">Contact</span>
             <h1>Let's talk</h1>
-            <p>Questions about the platform, a partnership, or press? Reach out — we read every message.</p>
+            <p>Questions about the platform, a partnership, or press? Reach out, we read every message.</p>
           </div>
         </div>
 

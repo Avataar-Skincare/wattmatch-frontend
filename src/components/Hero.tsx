@@ -6,7 +6,7 @@ export default function Hero() {
         <h1>Two sides of energy.<br />One trusted <em>match</em>.</h1>
         <p className="lead">
           Wattmatch sources, vets, negotiates, contracts and monitors your entire renewable energy
-          transition — the best generator, the best terms, the best quality — so you never need an
+          transition: the best generator, the best terms, the best quality, so you never need an
           in-house energy team, a consultant, or your own benchmarking exercise.
         </p>
         <div className="hero-ctas">

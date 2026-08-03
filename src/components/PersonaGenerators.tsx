@@ -122,7 +122,7 @@ export default function PersonaGenerators() {
           <div className="market-note">
             <div className="mn-bar"><div className="mn-fill"></div></div>
             <p>
-              <strong>Today, a handful of players</strong> dominate C&amp;I generator relationships —
+              <strong>Today, a handful of players</strong> dominate C&amp;I generator relationships,
               not because they build better plants, but because they already have the access and
               trust that new entrants lack.
             </p>

@@ -10,7 +10,7 @@ const whyChoose = [
   { title: 'Best-in-market pricing', body: 'Competitive auction across multiple generators replaces one-to-one bargaining.' },
   { title: 'PPA, simplified', body: 'Standardised, pre-vetted contracts remove clause-by-clause legal hassle.' },
   { title: 'Pre-vetted, credible partners', body: 'Every generator is technically and financially screened before it can bid.' },
-  { title: 'Access to better-priced niche players', body: 'Smaller, high-quality generators — often unable to reach clients on their own — are opened up, expanding the pool and sharpening pricing.' },
+  { title: 'Access to better-priced niche players', body: 'Smaller, high-quality generators, often unable to reach clients on their own, are opened up, expanding the pool and sharpening pricing.' },
   { title: 'ESG, carbon credit & RE-goal support', body: 'Documented clean energy transactions that feed sustainability reporting and RCO compliance.' },
 ];
 
@@ -25,7 +25,7 @@ export default function ForCIPage() {
             <h1>Run your business. We'll run your renewables.</h1>
             <p>
               Wattmatch sources, vets, negotiates, contracts and monitors your entire renewable
-              energy transition — the best generator, the best terms, the best quality — so you
+              energy transition: the best generator, the best terms, the best quality, so you
               never need an in-house energy team, a consultant, or your own benchmarking exercise.
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function ForCIPage() {
                 <div>
                   <div className="ex-headline">25–50% typical cost saving</div>
                   <div className="ex-body">
-                    A 15 MW facility in Haryana signed a 25-year PPA for 5 MW of solar — landed
+                    A 15 MW facility in Haryana signed a 25-year PPA for 5 MW of solar, landed
                     tariff <strong>₹4.78/unit</strong> vs. their DISCOM rate of <strong>₹7.32/unit</strong>,
                     a 35% saving that compounds every year grid tariffs keep rising.
                   </div>

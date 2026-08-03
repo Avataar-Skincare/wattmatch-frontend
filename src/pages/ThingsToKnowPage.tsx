@@ -14,7 +14,7 @@ export default function ThingsToKnowPage() {
             <span className="eyebrow">Resources</span>
             <h1>Things to know before switching to renewable power</h1>
             <p>
-              A plain-language primer on the decisions and terminology you'll encounter — whether or
+              A plain-language primer on the decisions and terminology you'll encounter, whether or
               not you use Wattmatch.
             </p>
           </div>
