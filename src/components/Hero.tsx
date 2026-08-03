@@ -3,7 +3,7 @@ export default function Hero() {
     <section className="hero">
       <div className="wrap hero-inner">
         <span className="eyebrow">The full-service renewables partner for C&amp;I</span>
-        <h1>Run your business.<br />We'll run your <em>renewables</em>.</h1>
+        <h1>Two sides of energy.<br />One trusted <em>match</em>.</h1>
         <p className="lead">
           Wattmatch sources, vets, negotiates, contracts and monitors your entire renewable energy
           transition — the best generator, the best terms, the best quality — so you never need an
