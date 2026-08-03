@@ -114,7 +114,7 @@ export default function PrivacyTermsPage() {
 
               <h3>4. Platform fees</h3>
               <p>
-                Wattmatch's fee structure — including any enrollment fee and the per-unit transaction
+                Wattmatch's fee structure — including processing fee and the per-unit transaction
                 fee — will be disclosed in full prior to any contract execution.
               </p>
 

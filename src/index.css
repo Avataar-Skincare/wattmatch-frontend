@@ -285,7 +285,7 @@ header .logo-mark{width:160px; height:32px;}
 .form-success p{font-size:13.5px; color:var(--muted);}
 
 /* ---------- Team ---------- */
-.team-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+.team-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px;}
 @media (max-width:820px){.team-grid{grid-template-columns:1fr;}}
 .team-card{background:var(--white); border:1px solid var(--line); border-radius:16px; overflow:hidden;}
 .team-card .team-card-body{padding:22px 26px 26px;}

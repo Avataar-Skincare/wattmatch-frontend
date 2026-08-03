@@ -23,7 +23,7 @@ export default function ForGeneratorsPage() {
             <span className="eyebrow">For generators</span>
             <h1>Access, not expertise, is the barrier. We remove it.</h1>
             <p>
-              Building a solar plant takes relatively little specialised expertise. What keeps new
+              Building a renewables plant takes relatively little specialised expertise. What keeps new
               entrants out is access to customers, and someone backing their credibility. Wattmatch
               is that backing. Today, a handful of players dominate C&amp;I generator relationships —
               not because they build better plants, but because they already have the client access
