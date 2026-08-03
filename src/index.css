@@ -329,6 +329,92 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 
 ::selection{background:var(--solar); color:var(--ink);}
 
+/* ---------- Interior content pages ---------- */
+.page-hero{
+  background:radial-gradient(1100px 460px at 82% -20%, #1A3C56 0%, var(--blueprint) 46%, var(--blueprint-2) 100%);
+  color:var(--white); padding:64px 0 56px; text-align:center;
+}
+.page-hero .wrap{max-width:720px;}
+.page-hero h1{font-size:clamp(30px,4.6vw,46px); margin:16px 0 14px;}
+.page-hero p{font-size:16px; color:var(--muted-dark); line-height:1.5;}
+.page-hero .source-note{margin-top:18px; font-family:var(--mono); font-size:11px; color:var(--muted-dark); opacity:0.7;}
+
+.content-page main{padding-bottom:0;}
+.prose{max-width:760px; margin:0 auto;}
+.prose h2{font-size:22px; margin:0 0 12px;}
+.prose h3{font-size:16px; margin:28px 0 8px;}
+.prose h3:first-child{margin-top:0;}
+.prose p{font-size:14.5px; color:var(--muted); line-height:1.6; margin-bottom:14px;}
+.prose p:last-child{margin-bottom:0;}
+.legal-block{margin-bottom:40px;}
+.legal-block:last-child{margin-bottom:0;}
+.legal-notice{background:rgba(242,169,59,0.1); border:1px solid rgba(242,169,59,0.3); border-radius:12px; padding:18px 20px; margin-bottom:32px; font-size:13.5px; color:var(--ink); line-height:1.5;}
+.legal-updated{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:20px;}
+
+/* stat cards (numbers-with-label trio, e.g. About/Cost-case) */
+.stat-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+@media (max-width:760px){.stat-cards{grid-template-columns:1fr;}}
+.stat-card{background:var(--white); border:1px solid var(--line); border-radius:16px; padding:26px 22px; text-align:center;}
+.stat-card .sc-value{display:block; font-family:var(--display); font-weight:700; font-size:34px; color:var(--solar-dark);}
+.stat-card .sc-label{display:block; margin-top:8px; font-size:13px; color:var(--muted); line-height:1.4;}
+
+/* vertical numbered journey (used for longer step sequences) */
+.journey-list{display:flex; flex-direction:column; max-width:760px; margin:0 auto;}
+.journey-item{display:flex; gap:20px; padding:22px 0; border-bottom:1px solid var(--line);}
+.journey-item:last-child{border-bottom:none;}
+.journey-num{flex-shrink:0; width:38px; height:38px; border-radius:10px; background:var(--porcelain-2); color:var(--solar-dark); font-family:var(--display); font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center;}
+.journey-item h3{font-size:16px; margin-bottom:6px;}
+.journey-item p{font-size:13.5px; color:var(--muted); line-height:1.5;}
+
+/* over-15-years management cards */
+.mgmt-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px;}
+.mgmt-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px 20px;}
+.mgmt-card .num{font-family:var(--mono); font-size:13px; color:var(--solar-dark); font-weight:500;}
+.mgmt-card h3{font-size:15.5px; margin-bottom:8px;}
+.mgmt-card p{font-size:13px; color:var(--muted); line-height:1.5;}
+
+/* FAQ accordion */
+.faq-list{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:10px;}
+.faq-item{border:1px solid var(--line); border-radius:12px; background:var(--white); overflow:hidden;}
+.faq-q{width:100%; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 22px; background:none; border:none; text-align:left; font-family:var(--body); font-size:15px; font-weight:600; color:var(--ink); cursor:pointer;}
+.faq-q .faq-icon{flex-shrink:0; font-family:var(--display); font-size:18px; color:var(--solar-dark); transition:transform .15s ease;}
+.faq-item.open .faq-q .faq-icon{transform:rotate(45deg);}
+.faq-a{padding:0 22px; max-height:0; overflow:hidden; transition:max-height .2s ease, padding .2s ease;}
+.faq-item.open .faq-a{padding:0 22px 20px; max-height:400px;}
+.faq-a p{font-size:13.5px; color:var(--muted); line-height:1.6;}
+
+/* Glossary */
+.glossary-grid{max-width:800px; margin:0 auto; display:flex; flex-direction:column;}
+.glossary-item{padding:18px 0; border-bottom:1px solid var(--line);}
+.glossary-item:last-child{border-bottom:none;}
+.glossary-term{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+.glossary-term strong{font-family:var(--display); font-size:15.5px;}
+.glossary-term .abbr{font-family:var(--mono); font-size:11px; color:var(--solar-dark); background:rgba(242,169,59,0.12); padding:2px 7px; border-radius:5px;}
+.glossary-item p{font-size:13.5px; color:var(--muted); line-height:1.5;}
+
+/* Regulatory charges table */
+.reg-table-wrap{overflow-x:auto; max-width:820px; margin:0 auto;}
+.reg-table{width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+.reg-table th, .reg-table td{text-align:left; padding:14px 18px; font-size:13.5px; border-bottom:1px solid var(--line);}
+.reg-table th{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); background:var(--porcelain-2);}
+.reg-table td:first-child{font-weight:600; white-space:nowrap;}
+.reg-table td{color:var(--muted);}
+.reg-table tr:last-child td{border-bottom:none;}
+
+/* Savings calculator */
+.calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:26px; max-width:820px; margin:0 auto;}
+@media (max-width:760px){.calc-grid{grid-template-columns:1fr;}}
+.calc-result{background:var(--blueprint-2); color:var(--white); border-radius:18px; padding:28px; display:flex; flex-direction:column; justify-content:center;}
+.calc-result .cr-label{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-dark);}
+.calc-result .cr-value{font-family:var(--display); font-weight:700; font-size:38px; color:var(--solar); margin:10px 0 6px;}
+.calc-result .cr-range{font-size:13px; color:var(--muted-dark); line-height:1.5;}
+.calc-note{font-size:11.5px; color:var(--muted); font-style:italic; margin-top:16px; text-align:center; max-width:760px; margin-left:auto; margin-right:auto;}
+
+/* Footer resource links */
+.foot-links{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 28px; padding:28px 0; border-bottom:1px solid rgba(255,255,255,0.1);}
+.foot-links a{font-size:13px; color:var(--muted-dark); transition:color .15s;}
+.foot-links a:hover{color:var(--white);}
+
 /* ---------- Registration pages ---------- */
 .register-page main{padding:52px 0 80px;}
 .register-hero{text-align:center; max-width:640px; margin:0 auto 36px;}

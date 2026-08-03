@@ -1,4 +1,6 @@
+import { Link } from 'react-router-dom';
 import LogoMark from './icons/LogoMark';
+import { resourceLinks, legalLinks } from '../data/content';
 
 export default function Footer() {
   return (
@@ -8,6 +10,14 @@ export default function Footer() {
           <div className="logo" style={{ color: 'var(--white)' }}>
             <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-2.webp" />
           </div>
+        </div>
+        <div className="foot-links">
+          {resourceLinks.map((link) => (
+            <Link key={link.href} to={link.href}>{link.label}</Link>
+          ))}
+          {legalLinks.map((link) => (
+            <Link key={link.href} to={link.href}>{link.label}</Link>
+          ))}
         </div>
         <div className="foot-bottom">
           <span>© 2026 Wattmatch. All rights reserved.</span>

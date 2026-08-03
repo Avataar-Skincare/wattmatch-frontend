@@ -23,17 +23,17 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
   return (
     <header>
       <nav>
-        <a href="#top" className="logo">
+        <Link to="/" className="logo">
           <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-1.webp" />
-        </a>
+        </Link>
         <div className="nav-links">
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href}>{link.label}</a>
+            <Link key={link.href} to={link.href}>{link.label}</Link>
           ))}
         </div>
         <div className="nav-cta">
-          <a href="#for-ci" className="btn btn-ghost">I buy power</a>
-          <a href="#for-generators" className="btn btn-solar">I generate power</a>
+          <Link to="/for-ci" className="btn btn-ghost">I buy power</Link>
+          <Link to="/for-generators" className="btn btn-solar">I generate power</Link>
         </div>
         <button
           className="burger"
@@ -46,10 +46,10 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
       </nav>
       <div className={`mobile-menu${open ? ' open' : ''}`}>
         {navLinks.map((link) => (
-          <a key={link.href} href={link.href} onClick={closeMenu}>{link.label}</a>
+          <Link key={link.href} to={link.href} onClick={closeMenu}>{link.label}</Link>
         ))}
-        <a href="#for-ci" className="btn btn-ghost" onClick={closeMenu}>I buy power</a>
-        <a href="#for-generators" className="btn btn-solar" onClick={closeMenu}>I generate power</a>
+        <Link to="/for-ci" className="btn btn-ghost" onClick={closeMenu}>I buy power</Link>
+        <Link to="/for-generators" className="btn btn-solar" onClick={closeMenu}>I generate power</Link>
       </div>
     </header>
   );
