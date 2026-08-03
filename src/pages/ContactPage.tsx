@@ -17,7 +17,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <Contact />
+        <Contact hideHeading />
 
         <section>
           <div className="wrap">

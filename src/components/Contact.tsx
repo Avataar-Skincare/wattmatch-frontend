@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { submitContact } from '../lib/api';
 import type { ContactFormData } from '../types/forms';
 
-export default function Contact() {
+export default function Contact({ hideHeading = false }: { hideHeading?: boolean }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
 
@@ -24,9 +24,13 @@ export default function Contact() {
   return (
     <section id="contact" className="contact">
       <div className="wrap">
-        <span className="eyebrow">Get in touch</span>
-        <h2>Let's talk</h2>
-        <p>Questions about the platform, a partnership, or press? Leave your email and we'll get back to you.</p>
+        {!hideHeading && (
+          <>
+            <span className="eyebrow">Get in touch</span>
+            <h2>Let's talk</h2>
+            <p>Questions about the platform, a partnership, or press? Leave your email and we'll get back to you.</p>
+          </>
+        )}
         <form id="contactForm" onSubmit={handleSubmit}>
           <div className="email-box">
             <input type="email" id="contactEmail" name="email" required placeholder="you@company.com" />
