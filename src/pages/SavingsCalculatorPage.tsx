@@ -6,8 +6,8 @@ import Reveal from '../components/Reveal';
 
 const infoCards = [
   { title: 'Grid tariffs vary a lot by state', body: 'Industrial and commercial DISCOM tariffs currently range roughly ₹6–₹15 per unit across India, depending on the state and consumer category.' },
-  { title: 'So do open-access solar tariffs', body: 'Landed open-access solar costs — including wheeling and surcharges — typically run ₹3–₹6.5 per unit, again varying by state and structure.' },
-  { title: 'The gap only widens', body: "Grid tariffs have historically risen 5–8% a year (up to 15% in some states), while a solar PPA locks your rate in for the contract term — so today's saving tends to grow, not shrink, over time." },
+  { title: 'So do open-access renewables tariffs', body: 'Landed open-access renewables costs — including wheeling and surcharges — typically run ₹3–₹6.5 per unit, again varying by state and structure.' },
+  { title: 'The gap only widens', body: "Grid tariffs have historically risen 5–8% a year (up to 15% in some states), while a renewables PPA locks your rate in for the contract term — so today's saving tends to grow, not shrink, over time." },
 ];
 
 export default function SavingsCalculatorPage() {
@@ -29,7 +29,7 @@ export default function SavingsCalculatorPage() {
       <main>
         <div className="page-hero">
           <div className="wrap">
-            <span className="eyebrow">The cost case</span>
+            <span className="eyebrow">Resources</span>
             <h1>How much could you save by switching?</h1>
             <p>
               A quick estimate based on published industry cost ranges. For a precise number specific
@@ -41,12 +41,12 @@ export default function SavingsCalculatorPage() {
         <section>
           <div className="wrap">
             <Reveal className="sec-head center">
-              <span className="eyebrow">Estimate your savings</span>
-              <h2>Enter your load and current tariff</h2>
+              <span className="eyebrow">The cost case</span>
+              <h2>Estimate your savings</h2>
               <p>
-                We'll apply the typical 25–50% savings range seen by C&amp;I buyers switching to
-                open-access solar in India, based on current published grid (₹6–₹15/unit) and solar
-                (₹3–₹6.5/unit) tariff data.
+                Enter your current monthly electricity consumption and average tariff. We'll apply the
+                typical 25–50% savings range seen by C&amp;I buyers switching to open-access solar in
+                India, based on current published grid (₹6–₹15/unit) and solar (₹3–₹6.5/unit) tariff data.
               </p>
             </Reveal>
 

@@ -2,7 +2,17 @@ import { useState, type FormEvent } from 'react';
 import { submitContact } from '../lib/api';
 import type { ContactFormData } from '../types/forms';
 
-export default function Contact({ hideHeading = false }: { hideHeading?: boolean }) {
+export default function Contact({
+  hideHeading = false,
+  eyebrow = 'Get in touch',
+  heading = "Let's talk",
+  body = "Questions about the platform, a partnership, or press? Leave your email and we'll get back to you.",
+}: {
+  hideHeading?: boolean;
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+}) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
 
@@ -26,9 +36,9 @@ export default function Contact({ hideHeading = false }: { hideHeading?: boolean
       <div className="wrap">
         {!hideHeading && (
           <>
-            <span className="eyebrow">Get in touch</span>
-            <h2>Let's talk</h2>
-            <p>Questions about the platform, a partnership, or press? Leave your email and we'll get back to you.</p>
+            <span className="eyebrow">{eyebrow}</span>
+            <h2>{heading}</h2>
+            {body && <p>{body}</p>}
           </>
         )}
         <form id="contactForm" onSubmit={handleSubmit}>
@@ -37,7 +47,7 @@ export default function Contact({ hideHeading = false }: { hideHeading?: boolean
             <button type="submit" className="btn btn-solar">Get in touch</button>
           </div>
         </form>
-        <p className={`contact-success${sent ? ' show' : ''}`} id="contactSuccess">Thanks — we'll be in touch shortly.</p>
+        <p className={`contact-success${sent ? ' show' : ''}`} id="contactSuccess">Message sent — we'll get back to you shortly.</p>
         {error && <p className="form-error">Something went wrong. Please try again, or email hello@wattmatch.in directly.</p>}
         <p className="contact-alt">or write to us directly at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a></p>
       </div>

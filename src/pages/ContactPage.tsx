@@ -17,7 +17,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <Contact hideHeading />
+        <Contact eyebrow="Get in touch" heading="Send us a message" body="" />
 
         <section>
           <div className="wrap">
@@ -31,13 +31,13 @@ export default function ContactPage() {
               <div className="stat-card">
                 <span className="sc-label">For C&amp;I buyers</span>
                 <span className="sc-value" style={{ fontSize: 15 }}>
-                  <Link to="/for-ci">Request a match →</Link>
+                  Looking to switch to renewables? <Link to="/for-ci">Request a match →</Link>
                 </span>
               </div>
               <div className="stat-card">
                 <span className="sc-label">For generators</span>
                 <span className="sc-value" style={{ fontSize: 15 }}>
-                  <Link to="/for-generators">Join as a generator →</Link>
+                  Want access to C&amp;I demand? <Link to="/for-generators">Join as a generator →</Link>
                 </span>
               </div>
             </Reveal>

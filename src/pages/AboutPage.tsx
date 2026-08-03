@@ -26,8 +26,8 @@ export default function AboutPage() {
               <span className="eyebrow">Our story</span>
               <h2>Two sides of the same broken market</h2>
               <p>
-                India's commercial and industrial businesses want to switch to solar — the economics
-                have been compelling for years. Small and new solar generators are ready to build the
+                India's commercial and industrial businesses want to switch to renewables — the economics
+                have been compelling for years. Small and new renewable generators are ready to build the
                 capacity to serve them. Yet today, neither side can efficiently find or trust the other.
               </p>
             </Reveal>
@@ -60,15 +60,13 @@ export default function AboutPage() {
           <div className="wrap">
             <Reveal className="sec-head center">
               <span className="eyebrow">Our model</span>
-              <h2>What SECI proved for DISCOMs, we're building for C&amp;I</h2>
+              <h2>What Govt. platforms proved for DISCOMs, we're building for C&amp;I</h2>
             </Reveal>
             <Reveal className="prose">
               <p>
-                India doesn't need a new market mechanism invented from scratch. Its own national
-                solar aggregator, SECI, has already proven the auction-and-intermediary model at
+                India doesn't need a new market mechanism invented from scratch. Its own national platform, has already proven the auction-and-intermediary model at
                 massive scale — 73.8 GW of capacity awarded, 60+ GW of Power Sale Agreements executed
-                with DISCOMs, an AAA credit rating from ICRA. That model has only ever served one
-                buyer segment: DISCOMs. Wattmatch is the same playbook, rebuilt for the C&amp;I half
+                with DISCOMs, Wattmatch is the same playbook, rebuilt for the C&amp;I half
                 of India's electricity demand that's been left to transact bilaterally, deal by deal,
                 ever since.
               </p>

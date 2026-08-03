@@ -3,12 +3,11 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
 import CheckIcon from '../components/icons/CheckIcon';
-import OtpStep from '../components/OtpStep';
 import { indianStates } from '../data/content';
 import { submitCiRegistration } from '../lib/api';
 import type { CIRegistrationFormData } from '../types/forms';
 
-type Step = 'details' | 'otp' | 'review' | 'success';
+type Step = 'details' | 'review' | 'success';
 
 const emptyForm: CIRegistrationFormData = {
   name: '', company: '', email: '', phone: '', state: '',
@@ -37,7 +36,7 @@ export default function ConsumerRegisterPage() {
       message: String(data.get('message') ?? ''),
       consent: data.get('consent') === 'on',
     });
-    setStep('otp');
+    setStep('review');
   }
 
   async function handleFinalSubmit() {
@@ -60,14 +59,13 @@ export default function ConsumerRegisterPage() {
           <div className="register-hero">
             <span className="eyebrow">Buyer registration</span>
             <h1>Register as a C&amp;I buyer</h1>
-            <p>Tell us about your load and site. We verify your contact details, then our team matches you with vetted generators.</p>
+            <p>Tell us about your load and site. Our team matches you with vetted generators and will be in touch.</p>
           </div>
 
           {step !== 'success' && (
             <div className="step-indicator">
               <span className={`step ${step === 'details' ? 'active' : 'done'}`}>1. Details</span>
-              <span className={`step ${step === 'otp' ? 'active' : step === 'review' ? 'done' : ''}`}>2. Verify</span>
-              <span className={`step ${step === 'review' ? 'active' : ''}`}>3. Review</span>
+              <span className={`step ${step === 'review' ? 'active' : ''}`}>2. Review</span>
             </div>
           )}
 
@@ -138,24 +136,15 @@ export default function ConsumerRegisterPage() {
                   <span>I agree to be contacted by Wattmatch and consent to my details being shared with vetted generators for matching purposes.</span>
                 </label>
                 <button type="submit" className="btn btn-solar">
-                  Continue to verification <span className="btn-arrow">→</span>
+                  Continue to review <span className="btn-arrow">→</span>
                 </button>
               </form>
-            )}
-
-            {step === 'otp' && (
-              <>
-                <OtpStep email={form.email} phone={form.phone} onBothVerified={() => setStep('review')} />
-                <div className="form-nav">
-                  <button type="button" className="otp-resend" onClick={() => setStep('details')}>← Edit details</button>
-                </div>
-              </>
             )}
 
             {step === 'review' && (
               <div>
                 <h3>Review &amp; submit</h3>
-                <p className="sub">Your email and phone are verified. Confirm your details to submit.</p>
+                <p className="sub">Confirm your details to submit. We'll email you a confirmation once it's received.</p>
                 <ul className="register-review-list">
                   <li><strong>{form.name}</strong> · {form.company}</li>
                   <li>{form.email} · {form.phone}</li>
@@ -175,7 +164,7 @@ export default function ConsumerRegisterPage() {
               <div className="form-success show">
                 <div className="check"><CheckIcon size={20} /></div>
                 <h3>Registration received</h3>
-                <p>Our team will review your details and be in touch soon.</p>
+                <p>We've sent a confirmation to your email. Our team will review your details and be in touch soon.</p>
               </div>
             )}
           </Reveal>

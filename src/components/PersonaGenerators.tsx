@@ -116,7 +116,7 @@ export default function PersonaGenerators() {
           <span className="eyebrow">For generators</span>
           <h2>Access, not expertise, is the barrier. We remove it.</h2>
           <p className="lede">
-            Building a solar plant takes relatively little specialised expertise. What keeps new
+            Building a renewables plant takes relatively little specialised expertise. What keeps new
             entrants out is access to customers, and someone backing their credibility.
           </p>
           <div className="market-note">
