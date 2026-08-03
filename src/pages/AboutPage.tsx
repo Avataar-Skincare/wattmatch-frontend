@@ -26,7 +26,7 @@ export default function AboutPage() {
               <span className="eyebrow">Our story</span>
               <h2>Two sides of the same broken market</h2>
               <p>
-                India's commercial and industrial businesses want to switch to renewables — the economics
+                India's commercial and industrial businesses want to switch to renewables: the economics
                 have been compelling for years. Small and new renewable generators are ready to build the
                 capacity to serve them. Yet today, neither side can efficiently find or trust the other.
               </p>
@@ -35,8 +35,8 @@ export default function AboutPage() {
               <p>
                 C&amp;I buyers face complex, jargon-heavy PPA negotiations with no in-house expertise,
                 no structured way to compare generators on price and terms, and a heavy diligence
-                burden just to vet a single vendor's credibility. Generators — who often need very
-                little specialised expertise to build a quality plant — are locked out simply because
+                burden just to vet a single vendor's credibility. Generators, who often need very
+                little specialised expertise to build a quality plant, are locked out simply because
                 they lack access to buyers and someone backing their credibility.
               </p>
               <p>
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <Reveal className="prose">
               <p>
                 India doesn't need a new market mechanism invented from scratch. Its own national platform, has already proven the auction-and-intermediary model at
-                massive scale — 73.8 GW of capacity awarded, 60+ GW of Power Sale Agreements executed
+                massive scale: 73.8 GW of capacity awarded, 60+ GW of Power Sale Agreements executed
                 with DISCOMs, Wattmatch is the same playbook, rebuilt for the C&amp;I half
                 of India's electricity demand that's been left to transact bilaterally, deal by deal,
                 ever since.
@@ -82,7 +82,7 @@ export default function AboutPage() {
               <span className="eyebrow">Our approach</span>
               <h2>You run your business. We run your renewables.</h2>
               <p>
-                No in-house energy team, no consultant, no benchmarking exercise — Wattmatch sources,
+                No in-house energy team, no consultant, no benchmarking exercise: Wattmatch sources,
                 vets, negotiates, contracts and monitors your entire renewable transition.
               </p>
             </Reveal>

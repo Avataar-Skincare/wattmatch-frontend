@@ -13,7 +13,7 @@ export default function GlossaryPage() {
             <span className="eyebrow">Resources</span>
             <h1>Common industry terms, explained</h1>
             <p>
-              The vocabulary you'll run into while evaluating a switch to renewable power — in plain
+              The vocabulary you'll run into while evaluating a switch to renewable power, in plain
               language.
             </p>
           </div>

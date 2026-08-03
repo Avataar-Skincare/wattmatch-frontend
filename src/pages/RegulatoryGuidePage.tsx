@@ -15,7 +15,7 @@ export default function RegulatoryGuidePage() {
             <h1>Regulatory guide: the process for obtaining renewable power</h1>
             <p>
               A general framework for how open access and renewable procurement work in India. Rules
-              vary by state — treat this as an orientation, not a substitute for state-specific advice.
+              vary by state: treat this as an orientation, not a substitute for state-specific advice.
             </p>
           </div>
         </div>
@@ -25,8 +25,8 @@ export default function RegulatoryGuidePage() {
             <div className="legal-notice">
               <strong>Important:</strong> Open access is regulated at the state level by each State
               Electricity Regulatory Commission (SERC), operating within the national framework set by
-              the Ministry of Power and CERC. Specific thresholds, charges, and timelines vary by state
-              — always confirm current rules with your DISCOM or a qualified advisor before proceeding.
+              the Ministry of Power and CERC. Specific thresholds, charges, and timelines vary by state:
+              always confirm current rules with your DISCOM or a qualified advisor before proceeding.
               Wattmatch's platform is designed to manage this complexity on your behalf.
             </div>
 
@@ -97,7 +97,7 @@ export default function RegulatoryGuidePage() {
               <h2>The RCO compliance angle</h2>
               <p>
                 If your organisation is a "designated consumer" under India's energy conservation
-                framework, RCO isn't optional — it requires you to actually consume a rising share of
+                framework, RCO isn't optional: it requires you to actually consume a rising share of
                 renewable power, from roughly 30% today to 43.33% by FY 2029–30, enforced by the
                 Bureau of Energy Efficiency. Non-compliance carries a buyout penalty set by CERC.
                 Switching to open access solar is currently the most direct compliance path for most
@@ -105,7 +105,7 @@ export default function RegulatoryGuidePage() {
               </p>
               <p>
                 This is genuinely complex, and it changes by state. Wattmatch's platform is built to
-                navigate this for you — aggregating state-specific regulatory data and appointing
+                navigate this for you, aggregating state-specific regulatory data and appointing
                 dedicated state-level teams to manage licensing and connectivity on your behalf.
               </p>
             </Reveal>

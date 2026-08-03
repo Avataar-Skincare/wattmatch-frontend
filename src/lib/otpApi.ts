@@ -9,7 +9,7 @@ interface OtpResult {
 }
 
 async function postOtp(path: string, payload: unknown): Promise<OtpResult> {
-  if (!API_BASE) return { ok: true }; // No backend configured — OTP step succeeds locally (standalone demo mode).
+  if (!API_BASE) return { ok: true }; // No backend configured: OTP step succeeds locally (standalone demo mode).
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'POST',

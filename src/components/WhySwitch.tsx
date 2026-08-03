@@ -8,7 +8,7 @@ export default function WhySwitch() {
         <Reveal className="sec-head">
           <span className="eyebrow">Why switch</span>
           <h2>C&amp;I has every reason to switch to renewables</h2>
-          <p>The economics alone are compelling — but cost savings are just the beginning.</p>
+          <p>The economics alone are compelling, but cost savings are just the beginning.</p>
         </Reveal>
 
         <div className="ws-grid">
@@ -37,7 +37,7 @@ export default function WhySwitch() {
 
             <p className="ws-footnote">
               DISCOM tariffs have risen as much as 15%/year in some states, largely on fuel and
-              cross-subsidy costs. A solar PPA is fixed for the life of the contract — the gap only
+              cross-subsidy costs. A solar PPA is fixed for the life of the contract, so the gap only
               widens.
             </p>
           </Reveal>
@@ -60,7 +60,7 @@ export default function WhySwitch() {
         <p className="ws-source">
           Figures reflect published industry data as of 2025–26 (Saur Energy, CEEW, Optenpower, Hero
           Future Energies, PV Magazine); actual tariffs depend on state, load profile and contract
-          structure — always confirmed with a site-specific assessment.
+          structure: always confirmed with a site-specific assessment.
         </p>
       </div>
     </section>

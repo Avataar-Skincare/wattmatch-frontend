@@ -6,9 +6,9 @@ import { generatorOffers, vettingProcess } from '../data/content';
 
 const whyGeneratorsChoose = [
   { title: 'No sales or BD team required', body: 'Wattmatch brings qualified, ready-to-transact C&I demand straight to your pipeline.' },
-  { title: 'We vet you once', body: "Clients don't have to take our word for it — they see the check. Get vetted once, and the door to real demand opens." },
+  { title: 'We vet you once', body: "Clients don't have to take our word for it: they see the check. Get vetted once, and the door to real demand opens." },
   { title: 'Trust, transferred', body: 'Our mechanisms give C&I clients the confidence to award business to a smaller or newer name.' },
-  { title: 'Compete on merit, not brand', body: 'A well-run new entrant can now win on price and terms — not just recognition.' },
+  { title: 'Compete on merit, not brand', body: 'A well-run new entrant can now win on price and terms, not just recognition.' },
   { title: 'A constant, qualified pipeline', body: 'Instead of expensive, uncertain business development, demand comes to them.' },
   { title: 'Standardised, bankable contracts', body: 'Pre-vetted PPAs, escrow-backed payments, and platform-managed dispute resolution.' },
 ];
@@ -25,7 +25,7 @@ export default function ForGeneratorsPage() {
             <p>
               Building a renewables plant takes relatively little specialised expertise. What keeps new
               entrants out is access to customers, and someone backing their credibility. Wattmatch
-              is that backing. Today, a handful of players dominate C&amp;I generator relationships —
+              is that backing. Today, a handful of players dominate C&amp;I generator relationships,
               not because they build better plants, but because they already have the client access
               and trust that new entrants lack.
             </p>
