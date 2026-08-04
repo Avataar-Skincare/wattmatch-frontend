@@ -11,7 +11,7 @@ export default function HowItWorksPage() {
     <div className="content-page">
       <Seo
         title="How it works"
-        description="From your first requirement to any agreed term of managed power delivery, one platform runs the whole relationship."
+        description="From your first requirement to any agreed term of managed power delivery, one marketplace runs the whole relationship."
         path="/how-it-works"
       />
       <Header />
@@ -21,7 +21,7 @@ export default function HowItWorksPage() {
             <span className="eyebrow">The mechanism</span>
             <h1>Here's exactly what happens, step by step</h1>
             <p>
-              From your first requirement to fifteen years, or any agreed term of managed power delivery, one platform
+              From your first requirement to fifteen years, or any agreed term of managed power delivery, one marketplace
               runs the whole relationship.
             </p>
           </div>

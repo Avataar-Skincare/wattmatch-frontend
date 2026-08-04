@@ -11,7 +11,7 @@ const whyGeneratorsChoose = [
   { title: 'Trust, transferred', body: 'Our mechanisms give C&I clients the confidence to award business to a smaller or newer name.' },
   { title: 'Compete on merit, not brand', body: 'A well-run new entrant can now win on price and terms, not just recognition.' },
   { title: 'A constant, qualified pipeline', body: 'Instead of expensive, uncertain business development, demand comes to them.' },
-  { title: 'Standardised, bankable contracts', body: 'Pre-vetted PPAs, escrow-backed payments, and platform-managed dispute resolution.' },
+  { title: 'Standardised, bankable contracts', body: 'Pre-vetted PPAs, escrow-backed payments, and marketplace-managed dispute resolution.' },
 ];
 
 export default function ForGeneratorsPage() {

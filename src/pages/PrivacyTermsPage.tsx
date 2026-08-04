@@ -8,7 +8,7 @@ export default function PrivacyTermsPage() {
     <div className="content-page">
       <Seo
         title="Privacy Policy & Terms of Use"
-        description="How Wattmatch collects, uses and protects your data, and the terms governing use of the platform."
+        description="How Wattmatch collects, uses and protects your data, and the terms governing use of the marketplace."
         path="/privacy-terms"
       />
       <Header />
@@ -19,7 +19,7 @@ export default function PrivacyTermsPage() {
             <h1>Privacy Policy &amp; Terms of Use</h1>
             <p>
               How we collect, use and protect your data, and the terms governing your use of the
-              Wattmatch platform.
+              Wattmatch marketplace.
             </p>
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function PrivacyTermsPage() {
                 Wattmatch operates a marketplace connecting commercial &amp; industrial electricity
                 buyers with renewable energy generators. Wattmatch acts solely as a facilitator and is
                 not a party to, and never a principal in, any power purchase agreement executed
-                between a buyer and a generator through the platform.
+                between a buyer and a generator through the marketplace.
               </p>
 
               <h3>2. Eligibility &amp; accuracy</h3>
@@ -114,7 +114,7 @@ export default function PrivacyTermsPage() {
                 independent commercial agreement of both parties.
               </p>
 
-              <h3>4. Platform fees</h3>
+              <h3>4. Marketplace fees</h3>
               <p>
                 Wattmatch's fee structure, including processing fee and the per-unit transaction
                 fee, will be disclosed in full prior to any contract execution.

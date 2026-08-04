@@ -6,7 +6,7 @@ export default function Contact({
   hideHeading = false,
   eyebrow = 'Get in touch',
   heading = "Let's talk",
-  body = "Questions about the platform, a partnership, or press? Leave your email and we'll get back to you.",
+  body = "Questions about the marketplace, a partnership, or press? Leave your email and we'll get back to you.",
 }: {
   hideHeading?: boolean;
   eyebrow?: string;

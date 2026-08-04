@@ -23,7 +23,7 @@ export default function FAQPage() {
             <span className="eyebrow">FAQ</span>
             <h1>Questions we hear the most</h1>
             <p>
-              From C&amp;I buyers, generators, and everyone trying to understand how the platform
+              From C&amp;I buyers, generators, and everyone trying to understand how the marketplace
               actually works.
             </p>
           </div>

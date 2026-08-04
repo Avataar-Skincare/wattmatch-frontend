@@ -10,7 +10,7 @@ export default function ContactPage() {
     <div className="content-page">
       <Seo
         title="Contact"
-        description="Questions about the platform, a partnership, or press? Reach out, we read every message."
+        description="Questions about the marketplace, a partnership, or press? Reach out, we read every message."
         path="/contact"
       />
       <Header />
@@ -19,7 +19,7 @@ export default function ContactPage() {
           <div className="wrap">
             <span className="eyebrow">Contact</span>
             <h1>Let's talk</h1>
-            <p>Questions about the platform, a partnership, or press? Reach out, we read every message.</p>
+            <p>Questions about the marketplace, a partnership, or press? Reach out, we read every message.</p>
           </div>
         </div>
 

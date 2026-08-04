@@ -7,8 +7,8 @@ export default function Team() {
       <div className="wrap">
         <Reveal className="sec-head">
           <span className="eyebrow">Who's building this</span>
-          <h2>A founding team built for exactly this platform</h2>
-          <p>Institutional trust, energy-sector depth, and hands-on platform execution.</p>
+          <h2>A founding team built for exactly this marketplace</h2>
+          <p>Institutional trust, energy-sector depth, and hands-on marketplace execution.</p>
         </Reveal>
         <div className="team-grid">
           {teamMembers.map((m) => (

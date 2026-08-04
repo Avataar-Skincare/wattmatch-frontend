@@ -97,7 +97,7 @@ export const guaranteeCards = [
   {
     label: 'Best output',
     title: 'Generation you can rely on',
-    body: 'Every generator on the platform passes technical due-diligence before they can bid, and we keep monitoring performance after the deal is live, not just at signing.',
+    body: 'Every generator on the marketplace passes technical due-diligence before they can bid, and we keep monitoring performance after the deal is live, not just at signing.',
   },
   {
     label: 'Best terms',
@@ -165,8 +165,8 @@ export const fullJourneySteps = [
   { title: 'Tender published', body: "Your requirement goes live to Wattmatch's vetted generator pool." },
   { title: 'Generators quote', body: 'Vetted developers submit bids with tariff, technology, delivery timeline and performance guarantees.' },
   { title: 'Reverse auction', body: 'Price competition drives the tariff down. You see every bid, ranked transparently.' },
-  { title: 'Contract signed', body: 'A Wattmatch-standardised PPA is executed on the platform and reviewed by platform legal.' },
-  { title: 'Escrow opened', body: 'The developer deposits performance security into a platform-managed escrow, protecting you against non-delivery.' },
+  { title: 'Contract signed', body: 'A Wattmatch-standardised PPA is executed on the marketplace and reviewed by marketplace legal.' },
+  { title: 'Escrow opened', body: 'The developer deposits performance security into a marketplace-managed escrow, protecting you against non-delivery.' },
   { title: 'Electricity flows', body: "Post-commissioning, metered units flow, DISCOM billing hits escrow, and Wattmatch takes its per-unit fee, repeating monthly for the life of the contract." },
   { title: 'Ongoing management', body: 'Contract enforcement, performance monitoring, regulatory compliance tracking, refinancing support and carbon credit registry: all handled for you.' },
 ];
@@ -176,7 +176,7 @@ export const over15YearsItems = [
   { title: 'Performance monitoring', body: 'Tracks actual generation against the PPA guarantee, and alerts you if generation falls below contracted levels.' },
   { title: 'Escrow management', body: 'Administers monthly payment flows, ensures the generator is paid only for units actually delivered, and processes penalty deductions.' },
   { title: 'Regulatory compliance', body: 'Monitors changing open-access rules, RCO updates and banking policies across states, and flags changes to both parties.' },
-  { title: 'Refinancing support', body: "Assists developers in refinancing projects at better rates post-commissioning, using the platform's aggregated track record." },
+  { title: 'Refinancing support', body: "Assists developers in refinancing projects at better rates post-commissioning, using the marketplace's aggregated track record." },
   { title: 'Carbon credit registry', body: 'Registers your renewable consumption and helps manage tradeable carbon credits under India’s CCTS framework.' },
 ];
 
@@ -189,27 +189,27 @@ export const whySwitchNow = [
 
 export const generatorOffers = [
   { title: 'Qualified deal pipeline', body: 'Access to live C&I tenders that match your capacity and location, not cold leads.' },
-  { title: 'Substation & grid intelligence', body: 'Platform-level data on connectivity and grid access to help you plan and bid smarter.' },
+  { title: 'Substation & grid intelligence', body: 'Marketplace-level data on connectivity and grid access to help you plan and bid smarter.' },
   { title: 'Project finance facilitation', body: 'Support connecting to the PE and infrastructure capital actively looking for bankable C&I offtake agreements.' },
-  { title: 'Refinancing support', body: "Assistance refinancing projects at better rates post-commissioning, using the platform's aggregated track record." },
-  { title: 'Escrow-backed, on-time payment', body: "Monthly payment flows administered by the platform: you're paid for units delivered, on schedule." },
+  { title: 'Refinancing support', body: "Assistance refinancing projects at better rates post-commissioning, using the marketplace's aggregated track record." },
+  { title: 'Escrow-backed, on-time payment', body: "Monthly payment flows administered by the marketplace: you're paid for units delivered, on schedule." },
   { title: 'Group captive facilitation', body: 'Support structuring and aggregating demand for group captive project models.' },
 ];
 
 export const vettingProcess = [
   { title: 'Technical review', body: 'Track record, project quality, technology and delivery capability assessed.' },
   { title: 'Financial screening', body: "Balance sheet strength and delivery reliability checked before you're allowed to bid." },
-  { title: 'Live on the platform', body: "Once vetted, you're visible to every matching C&I tender: no cold outreach needed." },
+  { title: 'Live on the marketplace', body: "Once vetted, you're visible to every matching C&I tender: no cold outreach needed." },
 ];
 
 export const faqItems = [
   { q: 'What exactly is Wattmatch?', a: 'Wattmatch is a neutral marketplace connecting commercial & industrial (C&I) electricity buyers with vetted RE generators across India. We run a competitive auction for price discovery, provide a standardised pre-vetted PPA, and manage the relationship: escrow, performance monitoring, compliance, for the life of the contract.' },
   { q: 'Is Wattmatch a generator, or does it buy/sell power?', a: 'No. Wattmatch is never a principal buyer or seller of power. We facilitate the match between a C&I client and a generator: the two parties transact directly under a PPA, and Wattmatch earns a small fee per unit of electricity actually delivered.' },
-  { q: 'How does Wattmatch make money?', a: 'We charge a platform fee of approximately 5 paise per unit of electricity delivered under a matched contract, charged only once power is flowing, with minimal upfront cost to either side. We may also charge a modest processing fee to cover vetting costs.' },
+  { q: 'How does Wattmatch make money?', a: 'We charge a marketplace fee of approximately 5 paise per unit of electricity delivered under a matched contract, charged only once power is flowing, with minimal upfront cost to either side. We may also charge a modest processing fee to cover vetting costs.' },
  
   { q: "What's the minimum load required to use Wattmatch?", a: "India's Green Open Access Rules (2022) lowered the minimum eligible load for open access from 1 MW to 100 kW, opening the door to a much larger set of C&I consumers. Wattmatch is built to serve this broader range from 100kW onwards, with a particular focus on small and mid-sized consumers who are currently underserved." },
   { q: 'How long is a typical contract?', a: "Most C&I RE PPAs run 15–25 years, matching the useful life of a solar asset. Wattmatch's standardised PPA framework is built around this horizon, with ongoing monitoring and support for the full term, not just at signing." },
-  { q: 'What happens if a generator underperforms or defaults?', a: 'Every generator deposits performance security into a platform-managed escrow at contract signing. If generation falls below the contracted guarantee, Wattmatch tracks it, alerts the C&I client, and manages penalty deductions and dispute resolution as an independent arbiter.' },
+  { q: 'What happens if a generator underperforms or defaults?', a: 'Every generator deposits performance security into a marketplace-managed escrow at contract signing. If generation falls below the contracted guarantee, Wattmatch tracks it, alerts the C&I client, and manages penalty deductions and dispute resolution as an independent arbiter.' },
   { q: 'How are generators vetted?', a: "Every generator goes through a technical review (track record, project quality, delivery capability) and a financial screening (balance sheet strength, delivery reliability) before they're allowed to bid on any C&I tender." },
   { q: 'Can smaller or newer generators really compete?', a: 'Yes, that\'s a core part of why Wattmatch exists. Once vetted, a new entrant competes on price and terms in the same auction as established players, rather than being shut out purely for lack of brand recognition or an existing sales relationship.' },
   { q: 'How much can a C&I buyer typically save?', a: 'Based on current published tariff data, typical savings range from 25–50% versus grid/DISCOM rates, depending on state, load profile and contract structure. Use our savings calculator for an estimate specific to your load.' },
@@ -225,7 +225,7 @@ export const thingsToKnow = [
   { title: 'Vet the generator, not just the price', body: "The lowest bid isn't automatically the best deal if the generator lacks the financial strength or track record to deliver reliably over 15+ years. Look at technical capability, financial health, and delivery history, not tariff alone." },
   { title: 'Understand wheeling, banking and losses', body: '"Banking" provisions let you export surplus daytime solar and draw it back later; banking rules and any associated charges differ significantly by state. If you\'re buying power generated elsewhere, it travels through the grid to reach you, incurring wheeling charges and transmission losses along the way, both of which vary by state.' },
   { title: 'Factor in your compliance obligations', body: "India's Renewable Consumption Obligation (RCO) requires large consumers to source a rising share of power from renewables, currently around 30%, climbing to 43.33% by FY 2029–30, with financial penalties for shortfalls. If you're a designated consumer, switching isn't just an economic choice; it's increasingly a compliance one." },
-  { title: "Don't underestimate the admin burden, or the ways to avoid it", body: 'Negotiating a PPA, vetting a generator, and managing a 15-year relationship is real, ongoing work if you do it yourself, which is exactly the gap a platform like Wattmatch is built to close.' },
+  { title: "Don't underestimate the admin burden, or the ways to avoid it", body: 'Negotiating a PPA, vetting a generator, and managing a 15-year relationship is real, ongoing work if you do it yourself, which is exactly the gap a marketplace like Wattmatch is built to close.' },
 ];
 
 export const regulatoryProcessSteps = [
