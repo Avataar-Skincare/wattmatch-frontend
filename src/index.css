@@ -274,6 +274,23 @@ header .logo-mark{width:160px; height:32px;}
 .field input[type=number]::-webkit-inner-spin-button,
 .field input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}
 .form-card .btn{width:100%; justify-content:center; margin-top:6px;}
+
+/* Persona CTA card (replaces the embedded lead form) */
+.form-cta-card{display:flex; flex-direction:column; padding:40px;}
+@media (max-width:560px){.form-cta-card{padding:26px;}}
+.form-cta-card h3{font-size:28px; margin-bottom:12px;}
+.form-cta-card .sub{font-size:16px; line-height:1.5; margin-bottom:28px;}
+.form-cta-card .btn{font-size:16px; padding:16px 20px;}
+.form-cta-card .form-note{font-size:13px; margin-top:16px;}
+.cta-steps{display:flex; flex-direction:column; gap:22px; margin-top:40px; padding-top:28px; border-top:1px solid var(--line);}
+.cta-step{display:flex; gap:16px; align-items:flex-start;}
+.cta-step-num{
+  flex-shrink:0; width:34px; height:34px; border-radius:50%; background:var(--porcelain-2);
+  color:var(--solar-dark); font-family:var(--mono); font-size:14px; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+}
+.persona.gen .cta-step-num{color:var(--copper-dark);}
+.cta-step p{font-size:15px; color:var(--muted); line-height:1.5; margin:0;}
 .form-note{font-size:11.5px; color:var(--muted); margin-top:12px; text-align:center;}
 .form-error{font-size:12.5px; color:#B53A3A; margin-top:10px; text-align:center;}
 .form-success{display:none; text-align:center; padding:26px 6px;}
@@ -364,6 +381,13 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 .journey-item:last-child{border-bottom:none;}
 .journey-num{flex-shrink:0; width:38px; height:38px; border-radius:10px; background:var(--porcelain-2); color:var(--solar-dark); font-family:var(--display); font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center;}
 .journey-item h3{font-size:16px; margin-bottom:6px;}
+
+/* Blog index cards */
+.blog-card h3{font-size:16px; margin-bottom:6px;}
+.blog-card h3 a{color:var(--ink); transition:color .15s ease;}
+.blog-card h3 a:hover{color:var(--solar-dark);}
+.blog-card h3 a:hover .btn-arrow{transform:translateX(3px);}
+.blog-card .legal-updated{margin-bottom:8px;}
 .journey-item p{font-size:13.5px; color:var(--muted); line-height:1.5;}
 
 /* over-15-years management cards */

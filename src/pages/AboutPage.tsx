@@ -1,12 +1,18 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import Team from '../components/Team';
 import { modelStats } from '../data/content';
 
 export default function AboutPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="About Wattmatch"
+        description="Solar is 25-50% cheaper than grid power for most Indian C&I buyers. Wattmatch exists to close the gap between generators and buyers."
+        path="/about"
+      />
       <Header />
       <main>
         <div className="page-hero">
@@ -82,7 +88,7 @@ export default function AboutPage() {
               <span className="eyebrow">Our approach</span>
               <h2>You run your business. We run your renewables.</h2>
               <p>
-                No in-house energy team, no consultant, no benchmarking exercise: Wattmatch sources,
+                No in-house energy team, no consultant, no benchmarking exercise, no legal team: Wattmatch sources,
                 vets, negotiates, contracts and monitors your entire renewable transition.
               </p>
             </Reveal>

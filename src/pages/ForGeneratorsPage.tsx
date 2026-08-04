@@ -1,6 +1,7 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import PersonaGenerators from '../components/PersonaGenerators';
 import { generatorOffers, vettingProcess } from '../data/content';
 
@@ -16,6 +17,11 @@ const whyGeneratorsChoose = [
 export default function ForGeneratorsPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="For generators"
+        description="Access, not expertise, is the barrier for solar generators looking to reach C&I demand. Wattmatch removes it."
+        path="/for-generators"
+      />
       <Header />
       <main>
         <div className="page-hero">

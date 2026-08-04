@@ -2,12 +2,18 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import HowItWorks from '../components/HowItWorks';
 import { fullJourneySteps, over15YearsItems } from '../data/content';
 
 export default function HowItWorksPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="How it works"
+        description="From your first requirement to any agreed term of managed power delivery, one platform runs the whole relationship."
+        path="/how-it-works"
+      />
       <Header />
       <main>
         <div className="page-hero">
@@ -15,7 +21,7 @@ export default function HowItWorksPage() {
             <span className="eyebrow">The mechanism</span>
             <h1>Here's exactly what happens, step by step</h1>
             <p>
-              From your first requirement to fifteen years, any agreed term of managed power delivery, one platform
+              From your first requirement to fifteen years, or any agreed term of managed power delivery, one platform
               runs the whole relationship.
             </p>
           </div>

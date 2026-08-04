@@ -3,6 +3,7 @@ export const navLinks = [
   { href: '/how-it-works', label: 'How it works' },
   { href: '/for-ci', label: 'For C&I' },
   { href: '/for-generators', label: 'For generators' },
+  { href: '/blog', label: 'Blogs' },
   { href: '/faq', label: 'FAQ' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -202,12 +203,12 @@ export const vettingProcess = [
 ];
 
 export const faqItems = [
-  { q: 'What exactly is Wattmatch?', a: 'Wattmatch is a neutral marketplace connecting commercial & industrial (C&I) electricity buyers with vetted solar generators across India. We run a competitive auction for price discovery, provide a standardised pre-vetted PPA, and manage the relationship: escrow, performance monitoring, compliance, for the life of the contract.' },
+  { q: 'What exactly is Wattmatch?', a: 'Wattmatch is a neutral marketplace connecting commercial & industrial (C&I) electricity buyers with vetted RE generators across India. We run a competitive auction for price discovery, provide a standardised pre-vetted PPA, and manage the relationship: escrow, performance monitoring, compliance, for the life of the contract.' },
   { q: 'Is Wattmatch a generator, or does it buy/sell power?', a: 'No. Wattmatch is never a principal buyer or seller of power. We facilitate the match between a C&I client and a generator: the two parties transact directly under a PPA, and Wattmatch earns a small fee per unit of electricity actually delivered.' },
-  { q: 'How does Wattmatch make money?', a: 'We charge a platform fee of approximately 4–5 paise per unit of electricity delivered under a matched contract, charged only once power is flowing, with minimal upfront cost to either side. We may also charge a modest processing fee to cover vetting costs.' },
+  { q: 'How does Wattmatch make money?', a: 'We charge a platform fee of approximately 5 paise per unit of electricity delivered under a matched contract, charged only once power is flowing, with minimal upfront cost to either side. We may also charge a modest processing fee to cover vetting costs.' },
  
   { q: "What's the minimum load required to use Wattmatch?", a: "India's Green Open Access Rules (2022) lowered the minimum eligible load for open access from 1 MW to 100 kW, opening the door to a much larger set of C&I consumers. Wattmatch is built to serve this broader range from 100kW onwards, with a particular focus on small and mid-sized consumers who are currently underserved." },
-  { q: 'How long is a typical contract?', a: "Most C&I solar PPAs run 15–25 years, matching the useful life of a solar asset. Wattmatch's standardised PPA framework is built around this horizon, with ongoing monitoring and support for the full term, not just at signing." },
+  { q: 'How long is a typical contract?', a: "Most C&I RE PPAs run 15–25 years, matching the useful life of a solar asset. Wattmatch's standardised PPA framework is built around this horizon, with ongoing monitoring and support for the full term, not just at signing." },
   { q: 'What happens if a generator underperforms or defaults?', a: 'Every generator deposits performance security into a platform-managed escrow at contract signing. If generation falls below the contracted guarantee, Wattmatch tracks it, alerts the C&I client, and manages penalty deductions and dispute resolution as an independent arbiter.' },
   { q: 'How are generators vetted?', a: "Every generator goes through a technical review (track record, project quality, delivery capability) and a financial screening (balance sheet strength, delivery reliability) before they're allowed to bid on any C&I tender." },
   { q: 'Can smaller or newer generators really compete?', a: 'Yes, that\'s a core part of why Wattmatch exists. Once vetted, a new entrant competes on price and terms in the same auction as established players, rather than being shut out purely for lack of brand recognition or an existing sales relationship.' },
@@ -245,6 +246,7 @@ export const regulatoryCharges = [
 ];
 
 export const glossaryTerms = [
+  { term: 'Renewable Energy', abbr: 'RE', body: 'Electricity generated from renewable sources such as solar and wind, as distinct from conventional fossil-fuel-based grid power.' },
   { term: 'Power Purchase Agreement', abbr: 'PPA', body: 'The contract between a power buyer and a generator, setting out tariff, term, delivery and performance obligations, typically 15–25 years for solar.' },
   { term: 'Open Access', abbr: 'OA', body: 'The regulatory right for an eligible consumer to buy electricity from a generator other than their local DISCOM, using the shared grid to transport it.' },
   { term: 'Distribution Company', abbr: 'DISCOM', body: 'The state-licensed utility responsible for distributing and billing electricity to consumers in a given area.' },
@@ -262,7 +264,6 @@ export const glossaryTerms = [
   { term: 'Renewable Energy Certificate', abbr: 'REC', body: 'A tradeable certificate representing proof that one unit of electricity was generated from a renewable source, separable from the underlying power itself.' },
   { term: 'Carbon Credit Trading Scheme, 2023', abbr: 'CCTS', body: "India's domestic carbon market framework, under which obligated entities can generate and trade carbon credit certificates for emissions reductions." },
   { term: 'Business Responsibility & Sustainability Reporting', abbr: 'BRSR', body: "SEBI's mandatory ESG disclosure framework for India's largest listed companies, requiring reporting on emissions including Scope 1 and 2." },
-  { term: 'Solar Energy Corporation of India', abbr: 'SECI', body: "India's national solar aggregator, which runs competitive reverse auctions to award renewable capacity and sells the power on to DISCOMs via long-term agreements." },
   { term: 'Commercial & Industrial', abbr: 'C&I', body: 'Shorthand for commercial and industrial electricity consumers: offices, retail, hospitality, manufacturing, and similar large non-residential loads.' },
 ];
 

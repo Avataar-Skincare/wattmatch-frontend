@@ -2,11 +2,17 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import Contact from '../components/Contact';
 
 export default function ContactPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="Contact"
+        description="Questions about the platform, a partnership, or press? Reach out, we read every message."
+        path="/contact"
+      />
       <Header />
       <main>
         <div className="page-hero">

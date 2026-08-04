@@ -1,6 +1,7 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import Guarantee from '../components/Guarantee';
 import PersonaCI from '../components/PersonaCI';
 import { whySwitchNow } from '../data/content';
@@ -17,6 +18,11 @@ const whyChoose = [
 export default function ForCIPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="For C&I buyers"
+        description="Wattmatch sources, vets, negotiates, contracts and monitors your entire renewable energy transition, so you never need an in-house energy team."
+        path="/for-ci"
+      />
       <Header />
       <main>
         <div className="page-hero">
@@ -49,8 +55,8 @@ export default function ForCIPage() {
               <div className="tariff-arrow" aria-hidden="true">↓</div>
               <div className="tariff-card solar-tariff">
                 <span className="tc-label">Solar C&amp;I (open access)</span>
-                <span className="tc-value">₹3 – ₹6.5 <small>/ unit</small></span>
-                <span className="tc-note">Landed cost incl. wheeling &amp; surcharges</span>
+                <span className="tc-value">₹4 – ₹6.5 <small>/ unit</small></span>
+                <span className="tc-note">Landed cost incl. wheeling &amp; other charges</span>
               </div>
               <div className="example-box">
                 <span className="ex-icon">→</span>

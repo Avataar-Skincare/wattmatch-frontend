@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import { faqItems } from '../data/content';
 
 export default function FAQPage() {
@@ -10,6 +11,11 @@ export default function FAQPage() {
 
   return (
     <div className="content-page">
+      <Seo
+        title="FAQ"
+        description="Answers to the questions we hear most from C&I buyers, generators, and anyone trying to understand how Wattmatch works."
+        path="/faq"
+      />
       <Header />
       <main>
         <div className="page-hero">

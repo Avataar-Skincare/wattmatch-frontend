@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import CheckIcon from '../components/icons/CheckIcon';
 import { indianStates } from '../data/content';
 import { submitCiRegistration } from '../lib/api';
@@ -53,6 +54,11 @@ export default function ConsumerRegisterPage() {
 
   return (
     <div className="register-page">
+      <Seo
+        title="Register as a C&I buyer"
+        description="Register your business with Wattmatch and get matched with vetted renewable energy generators."
+        path="/ciBuyer"
+      />
       <Header minimal />
       <main>
         <div className="wrap">
@@ -116,11 +122,11 @@ export default function ConsumerRegisterPage() {
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="ciRegSite">Site location</label>
-                    <input id="ciRegSite" name="siteLocation" type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
+                    <input id="ciRegSite" name="siteLocation" required type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
                   </div>
                   <div className="field">
-                    <label htmlFor="ciRegTargetCapacity">Target capacity (MW)</label>
-                    <input id="ciRegTargetCapacity" name="targetCapacity" type="number" min="0.1" step="0.1" defaultValue={form.targetCapacity} />
+                    <label htmlFor="ciRegTargetCapacity">Max demand (MW)</label>
+                    <input id="ciRegTargetCapacity" name="targetCapacity" required type="number" min="0.1" step="0.1" defaultValue={form.targetCapacity} />
                   </div>
                 </div>
                 <div className="field">

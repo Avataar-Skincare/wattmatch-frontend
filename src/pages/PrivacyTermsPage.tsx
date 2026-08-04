@@ -1,10 +1,16 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 
 export default function PrivacyTermsPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="Privacy Policy & Terms of Use"
+        description="How Wattmatch collects, uses and protects your data, and the terms governing use of the platform."
+        path="/privacy-terms"
+      />
       <Header />
       <main>
         <div className="page-hero">
@@ -30,8 +36,6 @@ export default function PrivacyTermsPage() {
 
             <Reveal className="legal-block">
               <h2>Privacy Policy</h2>
-              <p className="legal-updated">Last updated: [Insert date]</p>
-
               <h3>1. What we collect</h3>
               <p>
                 When you use our lead-capture forms or contact us, we collect personal data you
@@ -88,8 +92,6 @@ export default function PrivacyTermsPage() {
 
             <Reveal className="legal-block">
               <h2>Terms of Use</h2>
-              <p className="legal-updated">Last updated: [Insert date]</p>
-
               <h3>1. Who we are</h3>
               <p>
                 Wattmatch operates a marketplace connecting commercial &amp; industrial electricity
