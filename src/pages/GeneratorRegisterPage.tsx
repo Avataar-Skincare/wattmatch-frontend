@@ -98,10 +98,8 @@ export default function GeneratorRegisterPage() {
                     <label htmlFor="genRegPhone">Phone</label>
                     <input
                       id="genRegPhone" name="phone" required type="tel" inputMode="tel"
-                      defaultValue={form.phone} placeholder="10-digit mobile number" maxLength={13}
-                      pattern="(\+?91\s?)?[6-9]\d{9}"
-                      title="Enter a valid 10-digit Indian mobile number"
-                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\s]/g, ''); }}
+                      defaultValue={form.phone} placeholder="Phone number" maxLength={20}
+                      onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\-\s()]/g, ''); }}
                     />
                   </div>
                 </div>
@@ -147,9 +145,16 @@ export default function GeneratorRegisterPage() {
                 <h3>Review &amp; submit</h3>
                 <p className="sub">Confirm your details to submit. We'll email you a confirmation once it's received.</p>
                 <ul className="register-review-list">
-                  <li><strong>{form.name}</strong> · {form.company}</li>
-                  <li>{form.email} · {form.phone}</li>
-                  <li>{form.state} · {form.capacity} MW</li>
+                  <li><strong>Name:</strong> {form.name}</li>
+                  <li><strong>Company:</strong> {form.company}</li>
+                  <li><strong>Email:</strong> {form.email}</li>
+                  <li><strong>Phone:</strong> {form.phone}</li>
+                  <li><strong>State:</strong> {form.state}</li>
+                  <li><strong>Installed capacity:</strong> {form.capacity} MW</li>
+                  <li><strong>Site location:</strong> {form.siteLocation}</li>
+                  <li><strong>Commissioning timeline:</strong> {form.commissioningTimeline}</li>
+                  <li><strong>Certifications:</strong> {form.certifications}</li>
+                  {form.message && <li><strong>Message:</strong> {form.message}</li>}
                 </ul>
                 <button type="button" className="btn btn-copper" disabled={submitting} onClick={handleFinalSubmit}>
                   {submitting ? 'Submitting…' : 'Submit registration'} <span className="btn-arrow">→</span>
