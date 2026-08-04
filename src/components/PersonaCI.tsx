@@ -122,9 +122,7 @@ Reveal block above, and re-adding these imports:
               required
               type="tel"
               inputMode="tel"
-              placeholder="9876543210"
-              pattern="[0-9+\s\(\)\-]{7,15}"
-              title="Phone number with digits, spaces, +, -, or () only"
+              placeholder="Phone number"
               onInput={(e) => {
                 e.currentTarget.value = e.currentTarget.value.replace(/[^0-9+\-\s()]/g, '');
               }}
