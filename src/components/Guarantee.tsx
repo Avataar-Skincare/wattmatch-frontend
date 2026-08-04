@@ -7,7 +7,7 @@ export default function Guarantee() {
       <div className="wrap">
         <Reveal className="sec-head center">
           <span className="eyebrow">The Wattmatch standard</span>
-          <h2>One platform. Everything renewable. No expertise required.</h2>
+          <h2>One marketplace. Everything renewable. No expertise required.</h2>
           <p>
             You don't need to hire an energy manager, retain a consultant, or run your own market
             benchmarking. Wattmatch is built to be the only renewables relationship you need.

@@ -33,7 +33,7 @@ export default function RegulatoryGuidePage() {
               Electricity Regulatory Commission (SERC), operating within the national framework set by
               the Ministry of Power and CERC. Specific thresholds, charges, and timelines vary by state:
               always confirm current rules with your DISCOM or a qualified advisor before proceeding.
-              Wattmatch's platform is designed to manage this complexity on your behalf.
+              Wattmatch's marketplace is designed to manage this complexity on your behalf.
             </div>
 
             <Reveal className="legal-block">
@@ -110,7 +110,7 @@ export default function RegulatoryGuidePage() {
                 large consumers.
               </p>
               <p>
-                This is genuinely complex, and it changes by state. Wattmatch's platform is built to
+                This is genuinely complex, and it changes by state. Wattmatch's marketplace is built to
                 navigate this for you, aggregating state-specific regulatory data and appointing
                 dedicated state-level teams to manage licensing and connectivity on your behalf.
               </p>
