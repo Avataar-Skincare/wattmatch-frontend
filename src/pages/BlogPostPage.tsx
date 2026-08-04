@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Seo from '../components/Seo';
-import { blogPosts } from '../data/blogPosts';
+import { blogPosts, formatMonthYear } from '../data/blogPosts';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -51,7 +51,8 @@ export default function BlogPostPage() {
           <div className="wrap">
             <span className="eyebrow">Blogs</span>
             <h1>{post.title}</h1>
-            <p className="legal-updated">{post.date}{post.author ? ` · ${post.author}` : ''}</p>
+            <p>{post.description}</p>
+            <p className="legal-updated">{post.author ? `By ${post.author} · ` : ''}{formatMonthYear(post.date)}</p>
           </div>
         </div>
 

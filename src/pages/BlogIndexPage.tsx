@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Seo from '../components/Seo';
-import { blogPosts } from '../data/blogPosts';
+import { blogPosts, formatMonthYear } from '../data/blogPosts';
 
 export default function BlogIndexPage() {
   const posts = [...blogPosts].sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -33,8 +33,8 @@ export default function BlogIndexPage() {
                 {posts.map((post) => (
                   <div className="mgmt-card blog-card" key={post.slug}>
                     <h3><Link to={`/blog/${post.slug}`}>{post.title} <span className="btn-arrow">→</span></Link></h3>
-                    <p className="legal-updated">{post.date}</p>
                     <p>{post.excerpt}</p>
+                    <p className="legal-updated">{post.author ? `By ${post.author} · ` : ''}{formatMonthYear(post.date)}</p>
                   </div>
                 ))}
               </div>

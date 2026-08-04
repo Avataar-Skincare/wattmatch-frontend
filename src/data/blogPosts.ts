@@ -16,6 +16,18 @@ export interface BlogPost {
   content: BlogContentBlock[];
 }
 
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+// Display-only month/year formatting (e.g. '2026-08-04' -> 'August 2026').
+// The underlying ISO date field stays as-is for sorting and structured data.
+export function formatMonthYear(isoDate: string): string {
+  const [year, month] = isoDate.split('-');
+  return `${MONTH_NAMES[Number(month) - 1]} ${year}`;
+}
+
 // Add new posts here, each gets its own route at /blog/:slug automatically,
 // picked up by the sitemap generator on the next build.
 export const blogPosts: BlogPost[] = [
@@ -34,7 +46,7 @@ export const blogPosts: BlogPost[] = [
       { type: 'p', text: "Bring the threshold down to 100 kW, and a huge population of previously ineligible consumers, smaller manufacturing units, commercial complexes, cold chains, auto-ancillary units, etc., become buyers for the first time. That's not just more addressable demand for developers. It's a meaningful de-concentration of India's renewable transition away from a small set of large corporates, toward the businesses that actually employ most of India's industrial workforce." },
       { type: 'h2', text: 'The Case for Switching Has Rarely Been This Clean' },
       { type: 'p', text: 'Strip away the policy narrative, and the underlying business case is straightforward, and increasingly hard to ignore on any single dimension:' },
-      { type: 'p', text: 'Cost. Power is one of the largest controllable line items for most C&I operations, and open access RE typically runs 25–30% cheaper than grid tariffs once wheeling and other charges are accounted for, a direct, recurring hit to the bottom line, not a one-time saving.' },
+      { type: 'p', text: 'Cost. Power is one of the largest controllable line items for most C&I operations, and open access RE typically runs 25–30% cheaper than grid tariffs once wheeling and surcharges are accounted for, a direct, recurring hit to the bottom line, not a one-time saving.' },
       { type: 'p', text: "Compliance. The Renewable Consumption Obligation is no longer a soft target: it's a binding requirement for designated consumers, climbing toward 43.33% by FY 2029-30, with real financial penalties for falling short." },
       { type: 'p', text: "Carbon credit monetisation. India's Carbon Credit Trading Scheme gives renewable consumption a second, tradeable economic value beyond the tariff saving itself." },
       { type: 'p', text: 'Tariff stability. A 15–25 year PPA locks in a rate for the life of the contract, insulating a business from grid tariffs that have historically climbed 5–8% a year, and considerably more in some states.' },
@@ -50,16 +62,16 @@ export const blogPosts: BlogPost[] = [
       { type: 'h2', text: 'Two Reforms, One Outcome' },
       { type: 'p', text: 'The Green Open Access Rules did their job: they removed the eligibility barrier. What remains is removing the execution barrier: an organised, trustworthy layer that gives every newly eligible buyer, regardless of size, the same transparent price discovery, standardised contracting, and vetted generator access that only the largest, most resourced companies could previously assemble for themselves.' },
       { type: 'p', text: "Get both right, open eligibility and an easy way to act on it, and India's next wave of C&I RE adoption won't just be bigger. It will finally reach the businesses the market was built to serve all along." },
-      { type: 'p', text: "This is precisely the gap Wattmatch is built to close. By offering a platform to match RE buyers and generators, helping C&I identify the best RE models to optimise their power, running transparent, competitive auctions for every C&I requirement, Wattmatch gives buyers real price discovery and a standardised, pre-vetted PPA they don't need an in-house energy or legal team to evaluate, removing the two biggest reasons a cautious buyer stays on the grid. By vetting every generator once, centrally, before they're allowed to bid, Wattmatch extends that same trust to the developers who can build excellent plants but have no way to reach credible buyers on their own, giving both large, established players and small, capable new entrants a constant, qualified deal pipeline instead of an expensive, uncertain sales cycle. Freed from the cost and time of chasing customers, generators can redirect that capital straight into building more capacity, which deepens competition and improves pricing further for buyers, a flywheel that compounds with every deal. It's this combination, easier discovery for buyers, a fair shot for every generator, and capital redirected from business development into capacity, that can move C&I's renewable penetration from today's low single digits toward a genuinely ambitious 40–50% over the next three to five years, turning India's most promising clean energy segment into one of its fastest-growing." },
+      { type: 'p', text: "This is precisely the gap Wattmatch is built to close. By offering a platform to match RE buyers and generators, helping C&I identify the best RE models to optimize their power, running transparent, competitive auction for every C&I requirement, Wattmatch gives buyers real price discovery and a standardised, pre-vetted PPA they don't need an in-house energy or legal team to evaluate, removing the two biggest reasons a cautious buyer stays on the grid. By vetting every generator once, centrally, before they're allowed to bid, Wattmatch extends that same trust to the developers who can build excellent plants but have no way to reach credible buyers on their own, giving both large, established players and small, capable new entrants a constant, qualified deal pipeline instead of an expensive, uncertain sales cycle. Freed from the cost and time of chasing customers, generators can redirect that capital straight into building more capacity, which deepens competition and improves pricing further for buyers, a flywheel that compounds with every deal. It's this combination, easier discovery for buyers, a fair shot for every generator, and capital redirected from business development into capacity, that can move C&I's renewable penetration from today's low single digits toward a genuinely ambitious 40–50% over the next three to five years, turning India's most promising clean energy segment into one of its fastest-growing." },
     ],
   },
   {
     slug: 'indias-ci-renewable-boom',
     title: "India's C&I Renewable Boom Is Real, and the Best Is Yet to Come",
-    description: "From 300 megawatts to 33 gigawatts in a decade, India has proven the model works. Closing three structural gaps could make it the country's fastest-growing energy market.",
+    description: "From 300 megawatts to 33 gigawatts in a decade, India has proven the model works. Closing three structural gaps could turn this into the country's fastest-growing energy market.",
     date: '2026-08-04',
     author: 'Shailesh Kumar Mishra, Co-Founder, Wattmatch',
-    excerpt: "From 300 megawatts to 33 gigawatts in a decade, India has proven the model works. Closing three structural gaps could make it the country's fastest-growing energy market.",
+    excerpt: "From 300 megawatts to 33 gigawatts in a decade, India has proven the model works. Closing three structural gaps could turn this into the country's fastest-growing energy market.",
     content: [
       { type: 'p', text: "Ten years ago, India's commercial and industrial (C&I) open access RE market barely existed: a rounding error of roughly 300 megawatts. Today it stands at 32.9 gigawatts of cumulative installed capacity, according to Mercom India's Q1 2026 Open Access Market report, with a further 45+ gigawatts in the development pipeline. The country added a record 7.8 GW of new open access RE capacity in 2025 alone, and Q1 2026 alone brought 2.7 GW, a 160% jump over the same quarter a year earlier." },
       { type: 'p', text: "By any reasonable measure, this is one of the genuine success stories of India's energy transition. India now ranks third globally in total renewable energy installed capacity, and hit its own target of sourcing 50% of cumulative installed power capacity from non-fossil sources in 2025, five years ahead of schedule. Total non-fossil capacity stood at 291.53 GW as of May 2026, en route to the honorable Prime Minister's stated target of 500 GW by 2030." },
