@@ -141,7 +141,7 @@ Reveal block above, and re-adding these imports:
           </div>
           <div className="field">
             <label htmlFor="ciLoad">Monthly consumption (kWh)</label>
-            <input id="ciLoad" name="load" type="number" />
+            <input id="ciLoad" name="load" type="number" onWheel={(e) => e.currentTarget.blur()} />
           </div>
         </div>
         <div className="field">

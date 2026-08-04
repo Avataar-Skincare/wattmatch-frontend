@@ -113,7 +113,7 @@ export default function GeneratorRegisterPage() {
                   </div>
                   <div className="field">
                     <label htmlFor="genRegCapacity">Installed capacity (MW)</label>
-                    <input id="genRegCapacity" name="capacity" required type="number" min="0.1" step="0.1" defaultValue={form.capacity} />
+                    <input id="genRegCapacity" name="capacity" required type="number" min="0.1" step="0.1" defaultValue={form.capacity} onWheel={(e) => e.currentTarget.blur()} />
                   </div>
                 </div>
                 <div className="field-row">
