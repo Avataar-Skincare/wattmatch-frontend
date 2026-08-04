@@ -68,6 +68,7 @@ export default function SavingsCalculatorPage() {
                     min="0"
                     value={consumption}
                     onChange={(e) => setConsumption(e.target.value)}
+                    onWheel={(e) => e.currentTarget.blur()}
                   />
                 </div>
                 <div className="field">
@@ -79,6 +80,7 @@ export default function SavingsCalculatorPage() {
                     step="0.1"
                     value={tariff}
                     onChange={(e) => setTariff(e.target.value)}
+                    onWheel={(e) => e.currentTarget.blur()}
                   />
                 </div>
               </div>

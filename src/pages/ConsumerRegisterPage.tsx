@@ -114,7 +114,7 @@ export default function ConsumerRegisterPage() {
                   </div>
                   <div className="field">
                     <label htmlFor="ciRegLoad">Monthly consumption (kWh)</label>
-                    <input id="ciRegLoad" name="load" required type="number" min="1" step="1" defaultValue={form.load} />
+                    <input id="ciRegLoad" name="load" required type="number" min="1" step="1" defaultValue={form.load} onWheel={(e) => e.currentTarget.blur()} />
                   </div>
                 </div>
                 <div className="field-row">
@@ -124,12 +124,12 @@ export default function ConsumerRegisterPage() {
                   </div>
                   <div className="field">
                     <label htmlFor="ciRegTargetCapacity">Max demand (MW)</label>
-                    <input id="ciRegTargetCapacity" name="targetCapacity" required type="number" min="0.1" step="0.1" defaultValue={form.targetCapacity} />
+                    <input id="ciRegTargetCapacity" name="targetCapacity" required type="number" min="0.1" step="0.1" defaultValue={form.targetCapacity} onWheel={(e) => e.currentTarget.blur()} />
                   </div>
                 </div>
                 <div className="field">
                   <label htmlFor="ciRegTenure">Preferred deal tenure (years)</label>
-                  <input id="ciRegTenure" name="tenurePreference" type="number" min="1" step="1" defaultValue={form.tenurePreference} placeholder="e.g. 10" />
+                  <input id="ciRegTenure" name="tenurePreference" type="number" min="1" step="1" defaultValue={form.tenurePreference} placeholder="e.g. 10" onWheel={(e) => e.currentTarget.blur()} />
                 </div>
                 <div className="field">
                   <label htmlFor="ciRegMsg">Anything else?</label>

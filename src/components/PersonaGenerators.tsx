@@ -149,7 +149,7 @@ form-cta-card Reveal block above, and re-adding these imports:
           </div>
           <div className="field">
             <label htmlFor="genCap">Installed capacity (MW)</label>
-            <input id="genCap" name="capacity" type="number" />
+            <input id="genCap" name="capacity" type="number" onWheel={(e) => e.currentTarget.blur()} />
           </div>
         </div>
         <div className="field">
