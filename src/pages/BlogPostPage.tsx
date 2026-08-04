@@ -52,7 +52,7 @@ export default function BlogPostPage() {
             <span className="eyebrow">Blogs</span>
             <h1>{post.title}</h1>
             <p>{post.description}</p>
-            <p className="legal-updated">{post.author ? `By ${post.author} · ` : ''}{formatMonthYear(post.date)}</p>
+            <p className="page-hero-byline">{post.author ? `By ${post.author} · ` : ''}{formatMonthYear(post.date)}</p>
           </div>
         </div>
 
