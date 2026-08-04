@@ -281,7 +281,7 @@ export const teamMembers = [
     initials: 'NS',
     name: 'Naga Satyam',
     role: 'Co-Founder',
-    bg: 'Background in the energy sector',
+    bg: "2.5 decades building and backing India's clean mobility and energy infrastructure, as a founder, operator, and early-stage investor.",
     why: 'Sector fluency across the power value chain, bringing the technical and market grounding to structure PPAs, price discovery and generator due-diligence.',
     lead: false,
     photo: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/final_img2.webp',
