@@ -1,11 +1,17 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import { glossaryTerms } from '../data/content';
 
 export default function GlossaryPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="Glossary of terms"
+        description="Common industry terms explained in plain language: PPA, wheeling, banking, RCO, CUF and more."
+        path="/glossary"
+      />
       <Header />
       <main>
         <div className="page-hero">

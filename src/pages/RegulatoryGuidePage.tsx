@@ -2,11 +2,17 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import { regulatoryProcessSteps, regulatoryCharges } from '../data/content';
 
 export default function RegulatoryGuidePage() {
   return (
     <div className="content-page">
+      <Seo
+        title="Regulatory guide"
+        description="A general framework for how open access and renewable procurement work in India, state by state."
+        path="/regulatory-guide"
+      />
       <Header />
       <main>
         <div className="page-hero">

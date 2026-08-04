@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 
 const infoCards = [
   { title: 'Grid tariffs vary a lot by state', body: 'Industrial and commercial DISCOM tariffs currently range roughly ₹6–₹15 per unit across India, depending on the state and consumer category.' },
-  { title: 'So do open-access renewables tariffs', body: 'Landed open-access renewables costs, including wheeling and surcharges, typically run ₹3–₹6.5 per unit, again varying by state and structure.' },
+  { title: 'So do open-access renewables tariffs', body: 'Landed open-access renewables costs, including wheeling and other charges, typically run ₹4–₹6.5 per unit, again varying by state and structure.' },
   { title: 'The gap only widens', body: "Grid tariffs have historically risen 5–8% a year (up to 15% in some states), while a renewables PPA locks your rate in for the contract term, so today's saving tends to grow, not shrink, over time." },
 ];
 
@@ -25,6 +26,11 @@ export default function SavingsCalculatorPage() {
 
   return (
     <div className="content-page">
+      <Seo
+        title="Savings calculator"
+        description="Estimate how much you could save by switching to open-access renewable power in India."
+        path="/savings-calculator"
+      />
       <Header />
       <main>
         <div className="page-hero">
@@ -46,7 +52,7 @@ export default function SavingsCalculatorPage() {
               <p>
                 Enter your current monthly electricity consumption and average tariff. We'll apply the
                 typical 25–50% savings range seen by C&amp;I buyers switching to open-access solar in
-                India, based on current published grid (₹6–₹15/unit) and solar (₹3–₹6.5/unit) tariff data.
+                India, based on current published grid (₹6–₹15/unit) and solar (₹4–₹6.5/unit) tariff data.
               </p>
             </Reveal>
 

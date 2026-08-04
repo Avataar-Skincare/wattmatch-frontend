@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import CheckIcon from '../components/icons/CheckIcon';
 import { indianStates } from '../data/content';
 import { submitGeneratorRegistration } from '../lib/api';
@@ -52,6 +53,11 @@ export default function GeneratorRegisterPage() {
 
   return (
     <div className="register-page">
+      <Seo
+        title="Register as a generator"
+        description="Register your renewable energy plant with Wattmatch and get matched with vetted C&I buyers."
+        path="/renewablesGenerator"
+      />
       <Header minimal />
       <main>
         <div className="wrap">
@@ -108,23 +114,23 @@ export default function GeneratorRegisterPage() {
                     </select>
                   </div>
                   <div className="field">
-                    <label htmlFor="genRegCapacity">Capacity (MW)</label>
+                    <label htmlFor="genRegCapacity">Installed capacity (MW)</label>
                     <input id="genRegCapacity" name="capacity" required type="number" min="0.1" step="0.1" defaultValue={form.capacity} />
                   </div>
                 </div>
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="genRegSite">Plant/site location</label>
-                    <input id="genRegSite" name="siteLocation" type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
+                    <input id="genRegSite" name="siteLocation" required type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
                   </div>
                   <div className="field">
                     <label htmlFor="genRegTimeline">Commissioning timeline</label>
-                    <input id="genRegTimeline" name="commissioningTimeline" type="text" maxLength={255} defaultValue={form.commissioningTimeline} placeholder="e.g. Operational, or 6 months" />
+                    <input id="genRegTimeline" name="commissioningTimeline" required type="text" maxLength={255} defaultValue={form.commissioningTimeline} placeholder="e.g. Operational, or 6 months" />
                   </div>
                 </div>
                 <div className="field">
                   <label htmlFor="genRegCert">Certifications</label>
-                  <input id="genRegCert" name="certifications" type="text" maxLength={255} defaultValue={form.certifications} placeholder="e.g. ISO 9001, grid compliance certificates" />
+                  <input id="genRegCert" name="certifications" required type="text" maxLength={255} defaultValue={form.certifications} placeholder="e.g. ISO 9001, grid compliance certificates" />
                 </div>
                 <div className="field">
                   <label htmlFor="genRegMsg">Anything else?</label>

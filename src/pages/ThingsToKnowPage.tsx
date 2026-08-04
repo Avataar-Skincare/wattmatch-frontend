@@ -2,11 +2,17 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
+import Seo from '../components/Seo';
 import { thingsToKnow } from '../data/content';
 
 export default function ThingsToKnowPage() {
   return (
     <div className="content-page">
+      <Seo
+        title="Things to know before switching"
+        description="A plain-language primer on the decisions and terminology you'll encounter, whether or not you use Wattmatch."
+        path="/things-to-know"
+      />
       <Header />
       <main>
         <div className="page-hero">

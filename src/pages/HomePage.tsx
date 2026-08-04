@@ -1,4 +1,5 @@
 import Header from '../components/Header';
+import Seo from '../components/Seo';
 import Hero from '../components/Hero';
 import StatStrip from '../components/StatStrip';
 import WhySwitch from '../components/WhySwitch';
@@ -14,6 +15,11 @@ import Footer from '../components/Footer';
 export default function HomePage() {
   return (
     <>
+      <Seo
+        title="Matching C&I renewables buyers with the right suppliers"
+        description="Wattmatch is a neutral marketplace connecting C&I electricity buyers with vetted solar generators across India."
+        path="/"
+      />
       <Header />
       <main id="top">
         <Hero />
