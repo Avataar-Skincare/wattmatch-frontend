@@ -367,6 +367,8 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 .prose h3:first-child{margin-top:0;}
 .prose p{font-size:14.5px; color:var(--muted); line-height:1.6; margin-bottom:14px;}
 .prose p:last-child{margin-bottom:0;}
+.prose ul{list-style:disc; margin:0 0 14px; padding-left:22px; display:flex; flex-direction:column; gap:6px;}
+.prose ul li{font-size:14.5px; color:var(--muted); line-height:1.6;}
 .legal-block{margin-bottom:40px;}
 .legal-block:last-child{margin-bottom:0;}
 .legal-notice{background:rgba(242,169,59,0.1); border:1px solid rgba(242,169,59,0.3); border-radius:12px; padding:18px 20px; margin-bottom:32px; font-size:13.5px; color:var(--ink); line-height:1.5;}
