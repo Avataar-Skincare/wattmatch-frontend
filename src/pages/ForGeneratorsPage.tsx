@@ -19,7 +19,7 @@ export default function ForGeneratorsPage() {
     <div className="content-page">
       <Seo
         title="For generators"
-        description="Access, not expertise, is the barrier for solar generators looking to reach C&I demand. Wattmatch removes it."
+        description="Access, not expertise, is the barrier for RE generators looking to reach C&I demand. Wattmatch removes it."
         path="/for-generators"
       />
       <Header />

@@ -37,7 +37,7 @@ export default function WhySwitch() {
 
             <p className="ws-footnote">
               DISCOM tariffs have risen as much as 15%/year in some states, largely on fuel and
-              cross-subsidy costs. A solar PPA is fixed for the life of the contract, so the gap only
+              cross-subsidy costs. A RE PPA is fixed for the life of the contract, so the gap only
               widens.
             </p>
           </Reveal>

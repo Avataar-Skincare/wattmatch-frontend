@@ -27,7 +27,7 @@ export default function Hero() {
           <div className="trace right"></div>
           <div className="node">
             <span className="eyebrow">Supply</span>
-            <strong>Solar Generator</strong>
+            <strong>RE Generator</strong>
           </div>
         </div>
       </div>

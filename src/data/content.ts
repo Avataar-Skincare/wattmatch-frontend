@@ -74,7 +74,7 @@ export const beyondCostReasons = [
   {
     color: 'var(--ink)',
     title: 'Energy security & tariff predictability',
-    body: 'A 25-year solar PPA locks in your rate for the life of the contract, insulating your P&L from DISCOM hikes that have run 5–8% a year, and as high as 15% in some states.',
+    body: 'A 25-year RE PPA locks in your rate for the life of the contract, insulating your P&L from DISCOM hikes that have run 5–8% a year, and as high as 15% in some states.',
   },
   {
     color: 'var(--copper)',
@@ -155,7 +155,7 @@ export const generatorBenefits: { strong?: string; text: string }[] = [
 
 export const modelStats = [
   { value: '~50%', label: "of India's electricity is consumed by commercial & industrial users" },
-  { value: '~6%', label: 'of that C&I demand is currently met by solar' },
+  { value: '~6%', label: 'of that C&I demand is currently met by RE' },
   { value: '25–50%', label: 'typical cost saving available by switching, depending on state and load profile' },
 ];
 
@@ -165,9 +165,9 @@ export const fullJourneySteps = [
   { title: 'Tender published', body: "Your requirement goes live to Wattmatch's vetted generator pool." },
   { title: 'Generators quote', body: 'Vetted developers submit bids with tariff, technology, delivery timeline and performance guarantees.' },
   { title: 'Reverse auction', body: 'Price competition drives the tariff down. You see every bid, ranked transparently.' },
-  { title: 'Contract signed', body: 'A Wattmatch-standardised PPA is executed on the marketplace and reviewed by marketplace legal.' },
+  { title: 'Contract signed', body: 'A Wattmatch-standardised PPA is executed between generator and C&I on the marketplace and reviewed by marketplace legal.' },
   { title: 'Escrow opened', body: 'The developer deposits performance security into a marketplace-managed escrow, protecting you against non-delivery.' },
-  { title: 'Electricity flows', body: "Post-commissioning, metered units flow, DISCOM billing hits escrow, and Wattmatch takes its per-unit fee, repeating monthly for the life of the contract." },
+  { title: 'Electricity flows', body: "Post-commissioning, metered units flow, DISCOM billing hits escrow, repeating monthly for the life of the contract." },
   { title: 'Ongoing management', body: 'Contract enforcement, performance monitoring, regulatory compliance tracking, refinancing support and carbon credit registry: all handled for you.' },
 ];
 
@@ -204,11 +204,11 @@ export const vettingProcess = [
 
 export const faqItems = [
   { q: 'What exactly is Wattmatch?', a: 'Wattmatch is a neutral marketplace connecting commercial & industrial (C&I) electricity buyers with vetted RE generators across India. We run a competitive auction for price discovery, provide a standardised pre-vetted PPA, and manage the relationship: escrow, performance monitoring, compliance, for the life of the contract.' },
-  { q: 'Is Wattmatch a generator, or does it buy/sell power?', a: 'No. Wattmatch is never a principal buyer or seller of power. We facilitate the match between a C&I client and a generator: the two parties transact directly under a PPA, and Wattmatch earns a small fee per unit of electricity actually delivered.' },
-  { q: 'How does Wattmatch make money?', a: 'We charge a marketplace fee of approximately 5 paise per unit of electricity delivered under a matched contract, charged only once power is flowing, with minimal upfront cost to either side. We may also charge a modest processing fee to cover vetting costs.' },
+  { q: 'Is Wattmatch a generator, or does it buy/sell power?', a: 'No. Wattmatch is never a principal buyer or seller of power. We facilitate the match between a C&I client and a generator: the two parties transact directly under a PPA.' },
+  { q: 'How does Wattmatch make money?', a: 'We charge a marketplace fee per unit of electricity delivered under a matched contract, charged only once power is flowing, with minimal upfront cost to either side. We may also charge a modest processing fee to cover vetting costs.' },
  
   { q: "What's the minimum load required to use Wattmatch?", a: "India's Green Open Access Rules (2022) lowered the minimum eligible load for open access from 1 MW to 100 kW, opening the door to a much larger set of C&I consumers. Wattmatch is built to serve this broader range from 100kW onwards, with a particular focus on small and mid-sized consumers who are currently underserved." },
-  { q: 'How long is a typical contract?', a: "Most C&I RE PPAs run 15–25 years, matching the useful life of a solar asset. Wattmatch's standardised PPA framework is built around this horizon, with ongoing monitoring and support for the full term, not just at signing." },
+  { q: 'How long is a typical contract?', a: "Most C&I RE PPAs run 15–25 years, matching the useful life of a RE asset. Wattmatch's standardised PPA framework is built around this horizon, with ongoing monitoring and support for the full term, not just at signing." },
   { q: 'What happens if a generator underperforms or defaults?', a: 'Every generator deposits performance security into a marketplace-managed escrow at contract signing. If generation falls below the contracted guarantee, Wattmatch tracks it, alerts the C&I client, and manages penalty deductions and dispute resolution as an independent arbiter.' },
   { q: 'How are generators vetted?', a: "Every generator goes through a technical review (track record, project quality, delivery capability) and a financial screening (balance sheet strength, delivery reliability) before they're allowed to bid on any C&I tender." },
   { q: 'Can smaller or newer generators really compete?', a: 'Yes, that\'s a core part of why Wattmatch exists. Once vetted, a new entrant competes on price and terms in the same auction as established players, rather than being shut out purely for lack of brand recognition or an existing sales relationship.' },
@@ -220,7 +220,7 @@ export const faqItems = [
 export const thingsToKnow = [
   { title: 'Rooftop vs. open access: two different models', body: 'Rooftop solar is installed on your own premises and directly offsets your consumption, simple, but limited by how much roof or land you actually have. Open access lets you buy power from a renewables plant located elsewhere (including a different state), delivered to you through the grid, unlocking much larger capacity than your rooftop could ever support, but bringing in transmission and wheeling charges, cross-subsidy surcharges, and more regulatory moving parts.' },
   { title: 'Know your eligibility threshold', body: "India's Green Open Access Rules (2022) lowered the minimum load eligible for open access from 1 MW to 100 kW, opening the door to a much wider set of mid-sized C&I consumers who previously couldn't participate. Check your connected load and consumption pattern before assuming you don't qualify." },
-  { title: 'Contracts run long: plan accordingly', body: "Most solar PPAs run 15–25 years, matched to the useful life of the asset. That's a real commitment: think through your facility's expected life, any planned relocation or expansion, and how a long tariff lock-in interacts with your own growth plans before signing." },
+  { title: 'Contracts run long: plan accordingly', body: "Most RE PPAs run 15–25 years, matched to the useful life of the asset. That's a real commitment: think through your facility's expected life, any planned relocation or expansion, and how a long tariff lock-in interacts with your own growth plans before signing." },
   { title: 'Fixed tariff vs. escalating tariff', body: 'Some PPAs offer a flat tariff for the full term; others build in a small annual escalation. A flat tariff is easier to forecast; an escalating one may start lower but rise over time. Understand which structure you’re being offered, and model both against your expected DISCOM tariff trajectory.' },
   { title: 'Vet the generator, not just the price', body: "The lowest bid isn't automatically the best deal if the generator lacks the financial strength or track record to deliver reliably over 15+ years. Look at technical capability, financial health, and delivery history, not tariff alone." },
   { title: 'Understand wheeling, banking and losses', body: '"Banking" provisions let you export surplus daytime solar and draw it back later; banking rules and any associated charges differ significantly by state. If you\'re buying power generated elsewhere, it travels through the grid to reach you, incurring wheeling charges and transmission losses along the way, both of which vary by state.' },
@@ -247,7 +247,7 @@ export const regulatoryCharges = [
 
 export const glossaryTerms = [
   { term: 'Renewable Energy', abbr: 'RE', body: 'Electricity generated from renewable sources such as solar and wind, as distinct from conventional fossil-fuel-based grid power.' },
-  { term: 'Power Purchase Agreement', abbr: 'PPA', body: 'The contract between a power buyer and a generator, setting out tariff, term, delivery and performance obligations, typically 15–25 years for solar.' },
+  { term: 'Power Purchase Agreement', abbr: 'PPA', body: 'The contract between a power buyer and a generator, setting out tariff, term, delivery and performance obligations, typically 15–25 years for RE.' },
   { term: 'Open Access', abbr: 'OA', body: 'The regulatory right for an eligible consumer to buy electricity from a generator other than their local DISCOM, using the shared grid to transport it.' },
   { term: 'Distribution Company', abbr: 'DISCOM', body: 'The state-licensed utility responsible for distributing and billing electricity to consumers in a given area.' },
   { term: 'State Electricity Regulatory Commission', abbr: 'SERC', body: 'The state-level regulator that sets tariffs for utilities, approves open access applications, and oversees electricity distribution within a state.' },

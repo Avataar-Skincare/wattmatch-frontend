@@ -17,7 +17,7 @@ export default function HomePage() {
     <>
       <Seo
         title="Matching C&I renewables buyers with the right suppliers"
-        description="Wattmatch is a neutral marketplace connecting C&I electricity buyers with vetted solar generators across India."
+        description="Wattmatch is a neutral marketplace connecting C&I electricity buyers with vetted RE generators across India."
         path="/"
       />
       <Header />
