@@ -270,8 +270,8 @@ export const glossaryTerms = [
 export const teamMembers = [
   {
     initials: 'SM',
-    name: 'S K Misra',
-    role: 'Co-Founder & Strategic Advisor',
+    name: 'Shailesh Kumar Mishra',
+    role: 'Co-Founder',
     bg: 'Background with SECI and Power Grid Corporation of India',
     why: 'First-hand institutional experience at the organisations behind India’s largest renewable aggregation and grid-scale power trading model, direct credibility with DISCOMs, regulators and generators.',
     lead: false,
