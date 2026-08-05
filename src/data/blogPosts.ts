@@ -101,6 +101,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Rooftop, Open Access, or Captive? How to Actually Decide.',
     description: "A practical guide for any C&I business trying to figure out which route to renewable power actually fits them, and why so many end up stuck before they even start.",
     date: '2026-08-05',
+    author: 'Shailesh Kumar Mishra, Co-Founder, Wattmatch',
     excerpt: "A practical guide for any C&I business trying to figure out which route to renewable power actually fits them, and why so many end up stuck before they even start.",
     content: [
       { type: 'p', text: "Ask ten C&I energy heads how they should switch to renewable power, and you'll likely get ten different half-answers. Rooftop? Open access? Captive? Group captive? Most businesses know they should be doing something. Very few can tell you, with real confidence, which structure actually fits their load, their site, their balance sheet and their risk appetite, and that uncertainty, more than the technology or the economics, is what keeps most switches stuck at the \"we should look into this\" stage." },
