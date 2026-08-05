@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { STATIC_ROUTES } from './routes.mjs';
 
-const SITE_URL = 'https://wattmatch.in';
+const SITE_URL = 'https://www.wattmatch.in';
 
 const { blogPosts } = await import('../src/data/blogPosts.ts');
 

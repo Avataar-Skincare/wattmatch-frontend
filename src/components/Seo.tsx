@@ -1,7 +1,7 @@
 import { Head } from 'vite-react-ssg';
 
 const SITE_NAME = 'Wattmatch';
-const SITE_URL = 'https://wattmatch.in';
+const SITE_URL = 'https://www.wattmatch.in';
 const DEFAULT_IMAGE = 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-favicon.png';
 
 // Wraps vite-react-ssg's <Head>: it correctly overrides duplicate tags
