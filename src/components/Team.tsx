@@ -25,7 +25,6 @@ export default function Team() {
             </Reveal>
           ))}
         </div>
-        <p className="team-note">Roles and titles above are working designations pending final confirmation.</p>
       </div>
     </section>
   );
