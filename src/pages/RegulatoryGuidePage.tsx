@@ -106,7 +106,7 @@ export default function RegulatoryGuidePage() {
                 framework, RCO isn't optional: it requires you to actually consume a rising share of
                 renewable power, from roughly 30% today to 43.33% by FY 2029–30, enforced by the
                 Bureau of Energy Efficiency. Non-compliance carries a buyout penalty set by CERC.
-                Switching to open access solar is currently the most direct compliance path for most
+                Switching to open access RE is currently the most direct compliance path for most
                 large consumers.
               </p>
               <p>

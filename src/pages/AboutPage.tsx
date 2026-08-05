@@ -10,7 +10,7 @@ export default function AboutPage() {
     <div className="content-page">
       <Seo
         title="About Wattmatch"
-        description="Solar is 25-50% cheaper than grid power for most Indian C&I buyers. Wattmatch exists to close the gap between generators and buyers."
+        description="RE is 25-50% cheaper than grid power for most Indian C&I buyers. Wattmatch exists to close the gap between generators and buyers."
         path="/about"
       />
       <Header />
@@ -20,8 +20,8 @@ export default function AboutPage() {
             <span className="eyebrow">About Wattmatch</span>
             <h1>Built to close a gap that's structural, not economic</h1>
             <p>
-              Solar is 25–50% cheaper than grid power for most Indian C&amp;I buyers. Only a fraction
-              of that demand has actually moved to solar. Wattmatch exists to close that gap.
+              RE is 25–50% cheaper than grid power for most Indian C&amp;I buyers. Only a fraction
+              of that demand has actually moved to RE. Wattmatch exists to close that gap.
             </p>
           </div>
         </div>

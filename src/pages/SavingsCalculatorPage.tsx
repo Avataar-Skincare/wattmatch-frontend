@@ -51,7 +51,7 @@ export default function SavingsCalculatorPage() {
               <h2>Estimate your savings</h2>
               <p>
                 Enter your current monthly electricity consumption and average tariff. We'll apply the
-                typical 25–50% savings range seen by C&amp;I buyers switching to open-access solar in
+                typical 25–50% savings range seen by C&amp;I buyers switching to open-access RE in
                 India, based on current published grid (₹6–₹15/unit) and solar (₹4–₹6.5/unit) tariff data.
               </p>
             </Reveal>
@@ -92,7 +92,7 @@ export default function SavingsCalculatorPage() {
                 <span className="cr-value" style={{ fontSize: 28 }}>{fmt(lowSaving)} – {fmt(highSaving)}</span>
                 <span className="cr-range">
                   Based on a typical 25–50% saving vs. your current DISCOM cost, switching to
-                  open-access solar.
+                  open-access RE.
                 </span>
               </div>
             </Reveal>

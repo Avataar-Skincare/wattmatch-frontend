@@ -11,7 +11,7 @@ export default function BlogIndexPage() {
     <div className="content-page">
       <Seo
         title="Blogs"
-        description="Insights on C&I renewable energy procurement, open access, PPAs and India's solar market from the Wattmatch team."
+        description="Insights on C&I renewable energy procurement, open access, PPAs and India's RE market from the Wattmatch team."
         path="/blog"
       />
       <Header />
