@@ -1,6 +1,7 @@
 export interface BlogContentBlock {
-  type: 'h2' | 'p';
-  text: string;
+  type: 'h2' | 'p' | 'ul';
+  text?: string;
+  items?: string[];
 }
 
 export interface BlogPost {
@@ -93,6 +94,65 @@ export const blogPosts: BlogPost[] = [
       { type: 'p', text: 'Markets grow when every participant in them benefits, and this one is no exception. A marketplace that gives buyers transparent, competitive price discovery and a standardised, plain-language contracting process removes the two biggest reasons a cautious CFO says no. A marketplace that vets and certifies generators, doing the technical and financial diligence once, centrally, rather than requiring every buyer to redo it, gives smaller and newer developers a real, merit-based shot at demand they currently can\'t reach. And a generator who no longer has to fund a marketing and business-development function to survive can redirect that capital straight into building more capacity.' },
       { type: 'p', text: 'That is the flywheel: easier discovery and trust drive more deals; more deals give generators a reason to build more capacity without the customer-acquisition drag; more capacity deepens competition and improves pricing further for buyers; better pricing pulls in the next wave of cautious buyers who were sitting on the fence. Every turn of that flywheel is additive to the same 500 GW target the country has already committed to, not a new policy lever, but a more efficient use of the ones already in place.' },
       { type: 'p', text: "India has proven, over the last three years, that the demand exists, the economics work, and the policy environment is genuinely supportive. What remains is the unglamorous, structural work of making the market itself easy to transact in, for both sides of the deal, at the same time. Get that right, and the next phase of India's C&I solar story won't just track the curve of the last five years. It will bend it." },
+    ],
+  },
+  {
+    slug: 'rooftop-open-access-or-captive',
+    title: 'Rooftop, Open Access, or Captive? How to Actually Decide.',
+    description: "A practical guide for any C&I business trying to figure out which route to renewable power actually fits them, and why so many end up stuck before they even start.",
+    date: '2026-08-05',
+    excerpt: "A practical guide for any C&I business trying to figure out which route to renewable power actually fits them, and why so many end up stuck before they even start.",
+    content: [
+      { type: 'p', text: "Ask ten C&I energy heads how they should switch to renewable power, and you'll likely get ten different half-answers. Rooftop? Open access? Captive? Group captive? Most businesses know they should be doing something. Very few can tell you, with real confidence, which structure actually fits their load, their site, their balance sheet and their risk appetite, and that uncertainty, more than the technology or the economics, is what keeps most switches stuck at the \"we should look into this\" stage." },
+      { type: 'p', text: "This isn't a knowledge problem that reflects badly on anyone. Nobody outside the power sector is expected to know the difference between a captive and a group captive structure, or why a Cross-Subsidy Surcharge changes the math on open access. It's genuinely unfamiliar territory for a CFO or plant head whose day job is running a business, not structuring power contracts. So before anything else, here's what each option actually means, in plain terms." },
+      { type: 'h2', text: 'The Three Routes, Explained Simply' },
+      { type: 'h2', text: '1. Rooftop Solar' },
+      { type: 'p', text: 'Rooftop means installing solar panels on your own premises, your factory roof, your warehouse, your open land, and consuming the power directly, with no grid transmission involved.' },
+      { type: 'ul', items: [
+        'Fastest to get moving, with the fewest regulatory approvals of the three options',
+        'No wheeling charges or cross-subsidy surcharges, since the power never touches the shared grid',
+        'Can be capex-owned (you fund and own the system) or opex/RESCO-owned (a developer installs, owns and maintains it, and you simply pay for the power you use: zero upfront cost)',
+        "The catch: it's capped by your physical roof or land area. For most mid-to-large industrial loads, rooftop alone can typically offset only a fraction of total consumption: it's rarely, by itself, a complete answer",
+      ] },
+      { type: 'h2', text: '2. Open Access (Third-Party PPA)' },
+      { type: 'p', text: 'Open access lets you buy power from a solar (or wind, or hybrid) plant located elsewhere, often in a different state, delivered to your site through the shared grid, under a direct power purchase agreement with the generator.' },
+      { type: 'ul', items: [
+        'Effectively unlimited scale: you can contract for your entire load, not just what your roof can hold',
+        "No equity investment required: it's a procurement contract, not an ownership stake",
+        "The catch: you pay wheeling charges, and typically a Cross-Subsidy Surcharge and Additional Surcharge set by your state: charges that exist precisely because you're using the shared grid and stepping outside your DISCOM's tariff structure. These vary meaningfully by state and can materially affect your actual savings",
+      ] },
+      { type: 'h2', text: '3. Captive & Group Captive' },
+      { type: 'p', text: 'A captive structure means you (or, in a group captive, a consortium of businesses) hold at least 26% equity ownership in the generating plant itself, and consume at least 51% of the electricity it produces, broadly in proportion to your shareholding. In exchange, most states exempt captive consumers from the Cross-Subsidy Surcharge and Additional Surcharge that apply to plain open access, often the single biggest lever on total savings.' },
+      { type: 'ul', items: [
+        'The deepest potential savings of the three routes, precisely because of the surcharge exemptions',
+        'Group captive lets smaller buyers pool together to collectively meet the 26% equity threshold, without any single business needing to fund a plant alone',
+        'The catch: it requires real equity investment, not just an offtake contract: capital gets locked in, the structuring is more complex, and for group captive, you need compatible co-investors willing to commit alongside you',
+      ] },
+      { type: 'p', text: '"Most businesses don\'t pick one and walk away. They blend: rooftop for whatever the roof can hold, and open access or captive for the rest."' },
+      { type: 'h2', text: 'So How Should a Business Actually Decide?' },
+      { type: 'p', text: "There's no universal right answer, but there is a reasonably clear set of questions that gets most businesses to the right one:" },
+      { type: 'ul', items: [
+        "How much of your load can your roof or land physically hold? If it's a meaningful share, rooftop is close to a free decision: there's little downside to taking it (especially via a zero-capex RESCO model) as a first step, even if it can't cover everything.",
+        "Are you set up to hold equity in a power plant, or do you want a pure procurement relationship? Captive and group captive change your balance sheet and require ongoing governance involvement. If that's not something your business is set up for, or wants, open access keeps things at arm's length.",
+        "What does your state's surcharge structure actually look like? Cross-subsidy and additional surcharges vary significantly by state, and in some states they're steep enough that the captive exemption is the difference between a marginal saving and a genuinely compelling one.",
+        "Is your load large enough to structure a captive alone, or would you need partners? Group captive exists exactly for businesses whose load doesn't justify going it alone, but it does mean finding co-investors you're willing to be in a plant with for 15+ years.",
+        'How much certainty do you need versus how much complexity can you absorb? Rooftop is simple and contained. Open access is simple to contract but grid-dependent. Captive is the most complex to set up but can deliver the deepest, most durable savings.',
+      ] },
+      { type: 'p', text: "In practice, most businesses don't pick one of these and walk away from the other two. They blend: take whatever rooftop capacity the site can hold as a fast, low-risk first step, and layer open access or a captive structure on top for the remainder of the load. The right mix depends entirely on your specific site, state and appetite, which is exactly where most businesses get stuck, because working that out today requires expertise almost no C&I business has in-house." },
+      { type: 'h2', text: "Here's What That Actually Looks Like Today" },
+      { type: 'p', text: "Walk into this process without help, and here is roughly what it involves: first, you need to even understand which of the three routes fits your situation, no small task on its own. Then you need to find a generator, or several, to compare, not a simple Google search, but a genuine search for a credible, financially sound developer with a track record, often through word-of-mouth or a broker relationship. Once you have a quote or two, you have almost no independent way to know if the pricing or terms are actually good, because there's no organised market showing you what else is on offer." },
+      { type: 'p', text: "At this point, most businesses turn to a consultant, except finding a good one is its own separate search, with its own uncertainty about quality and cost. And even with a consultant in the room, you're now signing a 15-25 year power purchase agreement, sometimes alongside a shareholders' agreement for captive structures, full of legal and technical language that very few in-house teams are equipped to properly evaluate." },
+      { type: 'p', text: "Every one of these steps adds weeks. Strung together, they add months: rounds of discussion, renegotiation, second opinions, and second-guessing. It's not that businesses don't want to switch. It's that the path to actually doing it is long, unfamiliar, and dependent on the right consultant, the right generator, and a fair amount of luck lining up at the same time. Multiply that friction across thousands of C&I businesses trying to make the same decision independently, and it becomes obvious why India's C&I renewable adoption still lags so far behind what the economics alone would predict." },
+      { type: 'h2', text: 'How Wattmatch Removes Each Step' },
+      { type: 'p', text: 'This is precisely the gap Wattmatch exists to close, not by pushing every business toward the same structure, but by making all three routes equally easy to evaluate and execute.' },
+      { type: 'ul', items: [
+        'We help you work out the right structure for your site and load: rooftop, open access, captive or a blend, based on your actual consumption pattern, location and appetite, not a one-size-fits-all pitch.',
+        "Every generator on Wattmatch is pre-vetted on technical and financial credibility before they're allowed to bid, so you're never choosing blind, and never starting your own search from zero.",
+        'A live, competitive auction gives you real price discovery: multiple vetted generators bidding for your demand, so you know your pricing is actually competitive, not just "whatever the one developer you found quoted."',
+        "A standardised, pre-vetted PPA (and SHA, for captive structures) means you're not relying on a consultant you had to independently find and vet: the contract is already built around fair, standard terms.",
+        "We manage the relationship for the life of the contract: escrow, performance monitoring, regulatory compliance across states, so the decision to switch isn't also a decision to take on 15 years of ongoing legal and operational oversight yourself.",
+      ] },
+      { type: 'p', text: "The technology has been ready for years. The economics have worked for a while now. What's been missing is a way to make the decision, and the execution that follows it, fast, transparent and trustworthy, for a rooftop installation, an open access contract, or a captive structure alike. That is what Wattmatch is built to be: not another consultant to go find, but the marketplace that removes the need to." },
     ],
   },
 ];

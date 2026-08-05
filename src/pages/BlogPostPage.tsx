@@ -59,9 +59,17 @@ export default function BlogPostPage() {
         <section>
           <div className="wrap prose">
             <div className="legal-block">
-              {post.content.map((block, i) =>
-                block.type === 'h2' ? <h2 key={i}>{block.text}</h2> : <p key={i}>{block.text}</p>
-              )}
+              {post.content.map((block, i) => {
+                if (block.type === 'h2') return <h2 key={i}>{block.text}</h2>;
+                if (block.type === 'ul') {
+                  return (
+                    <ul key={i}>
+                      {block.items?.map((item, j) => <li key={j}>{item}</li>)}
+                    </ul>
+                  );
+                }
+                return <p key={i}>{block.text}</p>;
+              })}
             </div>
             <p className="ws-source"><Link to="/blog">← Back to all posts</Link></p>
           </div>
