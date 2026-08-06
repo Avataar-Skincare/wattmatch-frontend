@@ -58,6 +58,19 @@ export const indianStates = [
   'Puducherry',
 ];
 
+export interface LaunchPhoto {
+  src: string;
+  caption: string;
+  /** CSS rotation fix, in degrees, for a source file that lost its EXIF orientation. */
+  rotate?: number;
+}
+
+export const launchPhotos: LaunchPhoto[] = [
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_1.webp', caption: 'Wattmatch inaugural launch' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_2.webp', caption: 'Wattmatch inaugural launch' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_3.webp', caption: 'Wattmatch inaugural launch' },
+];
+
 export const heroStats = [
   { value: '~50%', label: "of India's electricity is C&I" },
   { value: '~915 TWh', label: 'annual C&I demand' },
