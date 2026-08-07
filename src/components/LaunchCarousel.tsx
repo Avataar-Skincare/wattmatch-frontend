@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { launchPhotos } from '../data/content';
+import { launchCaptionMeta, launchPhotos } from '../data/content';
 
 const SLIDE_INTERVAL_MS = 4000;
 
@@ -63,6 +63,11 @@ export default function LaunchCarousel() {
           ))}
         </div>
       )}
+      <div className="launch-carousel-caption">
+        <span className="launch-carousel-tag">Industry recognition</span>
+        <p className="launch-carousel-caption-text">{photo.caption}</p>
+        <p className="launch-carousel-meta">{launchCaptionMeta}</p>
+      </div>
     </div>
   );
 }

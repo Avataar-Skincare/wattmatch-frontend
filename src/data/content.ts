@@ -65,10 +65,15 @@ export interface LaunchPhoto {
   rotate?: number;
 }
 
+export const launchCaptionMeta = '7th CII International Energy Conference & Exhibition · India · 2026';
+
+const inauguralCaption =
+  "WattMatch's stall inaugurated at the 7th CII International Energy Conference & Exhibition by Shri Prahlad Joshi, Hon'ble Union Minister for New and Renewable Energy, Education and Consumer Affairs, Food & Public Distribution.";
+
 export const launchPhotos: LaunchPhoto[] = [
-  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_1.webp', caption: 'Wattmatch inaugural launch' },
-  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_2.webp', caption: 'Wattmatch inaugural launch' },
-  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_3.webp', caption: 'Wattmatch inaugural launch' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_1.webp', caption: inauguralCaption },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_2.webp', caption: inauguralCaption },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_3.webp', caption: inauguralCaption },
 ];
 
 export const heroStats = [
