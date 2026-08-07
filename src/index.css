@@ -116,11 +116,12 @@ header .logo-mark{width:160px; height:32px;}
   .hero-grid{grid-template-columns:1fr; gap:8px;}
   .hero-copy{text-align:center;}
   .hero p.lead{margin:0 auto 34px;}
-  .hero-ctas{justify-content:center;}
+  .hero-ctas{justify-content:center; flex-wrap:nowrap;}
+  .hero-ctas .btn{min-width:0; flex:1; padding:13px 10px; font-size:13.5px;}
 }
 
 /* launch photo carousel */
-.launch-carousel{position:relative; max-width:580px; margin:40px auto 0; text-align:center;}
+.launch-carousel{position:relative; max-width:420px; margin:40px auto 0; text-align:left;}
 @media (min-width:861px){ .launch-carousel{margin:0 auto;} }
 .launch-carousel-frame{display:flex; align-items:center; justify-content:center;}
 .launch-carousel-photo{
@@ -138,8 +139,16 @@ header .logo-mark{width:160px; height:32px;}
   transition:background .15s, width .15s;
 }
 .launch-carousel-dots button.on{background:var(--solar); width:16px; border-radius:3px;}
+.launch-carousel-caption{margin-top:20px;}
+.launch-carousel-tag{
+  display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--solar); font-weight:500;
+}
+.launch-carousel-tag::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--solar); flex-shrink:0;}
+.launch-carousel-caption-text{font-size:13.5px; color:var(--white); line-height:1.55; margin:8px 0 6px; font-weight:500;}
+.launch-carousel-meta{font-family:var(--mono); font-size:10.5px; color:var(--muted-dark);}
 @media (max-width:480px){
-  .launch-carousel-photo{width:270px;}
+  .launch-carousel-photo{width:min(320px, 78vw);}
 }
 
 /* circuit diagram */
