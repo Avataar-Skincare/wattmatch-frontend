@@ -56,6 +56,23 @@ export default function HowItWorksPage() {
         <section style={{ background: 'var(--porcelain-2)' }}>
           <div className="wrap">
             <Reveal className="sec-head center">
+              <span className="eyebrow">See it in action</span>
+              <h2>Watch a reverse auction play out live</h2>
+              <p>
+                A short, interactive simulation of the reverse-auction step above — anonymous
+                generators compete, bids only fall, and the lowest live bid wins once the market
+                goes quiet.
+              </p>
+            </Reveal>
+            <div style={{ textAlign: 'center' }}>
+              <Link to="/auction" className="btn btn-solar">Try the auction simulator <span className="btn-arrow">→</span></Link>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className="wrap">
+            <Reveal className="sec-head center">
               <span className="eyebrow">Over 15 years</span>
               <h2>What Wattmatch keeps doing after the deal is signed</h2>
               <p>A PPA is a 15–25 year commitment. Wattmatch's job doesn't end at signature.</p>
