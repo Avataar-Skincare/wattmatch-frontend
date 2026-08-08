@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LogoMark from './icons/LogoMark';
 import { navLinks } from '../data/content';
@@ -7,6 +7,13 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
   const [open, setOpen] = useState(false);
 
   const closeMenu = () => setOpen(false);
+
+  // Every page mounts its own Header, so this fires on each navigation —
+  // without it the new page keeps the previous page's scroll offset
+  // (e.g. landing just above the footer if the link that was clicked sat low on the page).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (minimal) {
     return (
