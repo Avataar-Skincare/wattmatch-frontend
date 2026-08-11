@@ -8,6 +8,7 @@ import Replace from '../components/Replace';
 import HowItWorks from '../components/HowItWorks';
 import PersonaCI from '../components/PersonaCI';
 import PersonaGenerators from '../components/PersonaGenerators';
+import PressSection from '../components/PressSection';
 import Team from '../components/Team';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
@@ -27,6 +28,7 @@ export default function HomePage() {
         <WhySwitch />
         <Guarantee />
         <Replace />
+        <PressSection />
         <HowItWorks />
         <PersonaCI />
         <PersonaGenerators />
