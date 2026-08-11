@@ -478,3 +478,57 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
   .register-hero{margin-bottom:24px;}
   .otp-verify-row input{width:100%;}
 }
+
+/* ---------- Live auction PoC (/auction-live) ---------- */
+.ac-label{font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#4B5560; display:block; margin-bottom:6px;}
+.auction-room{
+  background:var(--white); border:1px solid var(--line); border-radius:20px; padding:32px 30px;
+  max-width:640px; margin:0 auto; box-shadow:0 24px 48px -32px rgba(20,24,28,0.18);
+}
+.auction-room-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:10px;}
+.auction-status{display:flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:#4B5560;}
+.auction-status .dot{width:7px; height:7px; border-radius:50%; background:var(--line);}
+.auction-status.live .dot{background:#3EAE6B; box-shadow:0 0 6px 1px rgba(62,174,107,0.5); animation:acPulse 1.4s ease-in-out infinite;}
+@keyframes acPulse{50%{opacity:.4;}}
+
+.auction-centerpiece{display:flex; flex-direction:column; align-items:center; gap:4px; padding:14px 0 22px; text-align:center;}
+.auction-ring-center{display:flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:6px;}
+.auction-ring-center .t{font-family:var(--mono); font-size:30px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums;}
+.auction-ring-center .l{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#4B5560; margin-top:2px;}
+
+.auction-price{text-align:center; margin-top:4px;}
+.auction-price .pv{font-family:var(--display); font-size:clamp(34px,5vw,44px); font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums;}
+.auction-price .pv sup{font-size:14px; color:#4B5560; font-weight:500; margin-left:3px;}
+.auction-price .pd{font-family:var(--mono); font-size:13.5px; color:#4B5560; margin-top:4px;}
+
+.auction-human-controls{text-align:center; margin:4px 0 20px;}
+.auction-human-form{display:flex; gap:8px; justify-content:center; align-items:stretch; flex-wrap:wrap; margin-top:8px;}
+.auction-human-form-field{position:relative; display:inline-flex; align-items:center;}
+.auction-human-prefix{position:absolute; left:12px; font-family:var(--mono); font-size:14px; color:var(--muted); pointer-events:none;}
+.auction-human-form input{
+  width:150px; border:1.5px solid var(--line); border-radius:8px; padding:11px 12px 11px 24px; font-family:var(--mono); font-size:14px;
+  background:var(--porcelain); color:var(--ink); transition:border-color .15s; -moz-appearance:textfield;
+}
+.auction-human-form input::-webkit-inner-spin-button,
+.auction-human-form input::-webkit-outer-spin-button{-webkit-appearance:none; margin:0;}
+.auction-human-form input:focus{outline:none; border-color:var(--ink);}
+.auction-human-form input:disabled{opacity:.5; cursor:not-allowed;}
+.auction-human-form .btn{padding:11px 18px; font-size:13.5px;}
+.auction-human-hint{font-family:var(--mono); font-size:12px; line-height:1.5; color:#4B5560; margin-top:9px;}
+.auction-human-error{font-family:var(--mono); font-size:13px; font-weight:600; color:#B53A3A; margin-top:7px;}
+
+.auction-feed{
+  background:var(--porcelain); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-family:var(--mono); font-size:13px;
+  line-height:1.6; color:#3D454E; display:flex; flex-direction:column; gap:9px; max-height:200px; overflow-y:auto; text-align:left;
+}
+.auction-winner{margin-top:24px; padding-top:22px; border-top:1px solid var(--line); text-align:center;}
+.auction-winner strong{display:block; font-family:var(--display); font-size:21px; color:var(--solar-dark); margin:7px 0 9px;}
+.auction-winner-top{margin-top:0; padding-top:0; padding-bottom:22px; border-top:none; border-bottom:1px solid var(--line); margin-bottom:20px;}
+
+.auction-rules-box{
+  background:var(--porcelain); border:1px solid var(--line); border-radius:12px; padding:18px 20px;
+  max-width:440px; margin:0 auto; text-align:left;
+}
+.auction-rules-box ul{margin:8px 0 16px; padding-left:18px; list-style:disc;}
+.auction-rules-box li{font-size:13px; line-height:1.6; color:#3D454E; margin-bottom:6px;}
+.auction-rules-box .btn{width:100%; justify-content:center;}
