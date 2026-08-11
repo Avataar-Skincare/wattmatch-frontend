@@ -83,11 +83,11 @@ export default function ConsumerRegisterPage() {
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="ciRegName">Full name</label>
-                    <input id="ciRegName" name="name" required type="text" maxLength={255} defaultValue={form.name} placeholder="Your name" />
+                    <input id="ciRegName" name="name" type="text" maxLength={255} defaultValue={form.name} placeholder="Your name" />
                   </div>
                   <div className="field">
                     <label htmlFor="ciRegCompany">Company</label>
-                    <input id="ciRegCompany" name="company" required type="text" maxLength={255} defaultValue={form.company} placeholder="Company name" />
+                    <input id="ciRegCompany" name="company" type="text" maxLength={255} defaultValue={form.company} placeholder="Company name" />
                   </div>
                 </div>
                 <div className="field-row">
@@ -107,24 +107,24 @@ export default function ConsumerRegisterPage() {
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="ciRegState">State</label>
-                    <select id="ciRegState" name="state" required defaultValue={form.state}>
+                    <select id="ciRegState" name="state" defaultValue={form.state}>
                       <option value="" disabled>Select state</option>
                       {indianStates.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div className="field">
                     <label htmlFor="ciRegLoad">Monthly consumption (kWh)</label>
-                    <input id="ciRegLoad" name="load" required type="number" min="1" step="1" defaultValue={form.load} onWheel={(e) => e.currentTarget.blur()} />
+                    <input id="ciRegLoad" name="load" type="number" min="1" step="1" defaultValue={form.load} onWheel={(e) => e.currentTarget.blur()} />
                   </div>
                 </div>
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="ciRegSite">Site location</label>
-                    <input id="ciRegSite" name="siteLocation" required type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
+                    <input id="ciRegSite" name="siteLocation" type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
                   </div>
                   <div className="field">
                     <label htmlFor="ciRegTargetCapacity">Max demand (MW)</label>
-                    <input id="ciRegTargetCapacity" name="targetCapacity" required type="number" min="0.1" step="0.1" defaultValue={form.targetCapacity} onWheel={(e) => e.currentTarget.blur()} />
+                    <input id="ciRegTargetCapacity" name="targetCapacity" type="number" min="0.1" step="0.1" defaultValue={form.targetCapacity} onWheel={(e) => e.currentTarget.blur()} />
                   </div>
                 </div>
                 <div className="field">
@@ -150,14 +150,14 @@ export default function ConsumerRegisterPage() {
                 <h3>Review &amp; submit</h3>
                 <p className="sub">Confirm your details to submit. We'll email you a confirmation once it's received.</p>
                 <ul className="register-review-list">
-                  <li><strong>Name:</strong> {form.name}</li>
-                  <li><strong>Company:</strong> {form.company}</li>
+                  {form.name && <li><strong>Name:</strong> {form.name}</li>}
+                  {form.company && <li><strong>Company:</strong> {form.company}</li>}
                   <li><strong>Email:</strong> {form.email}</li>
                   <li><strong>Phone:</strong> {form.phone}</li>
-                  <li><strong>State:</strong> {form.state}</li>
-                  <li><strong>Monthly consumption:</strong> {form.load} kWh</li>
-                  <li><strong>Site location:</strong> {form.siteLocation}</li>
-                  <li><strong>Max demand:</strong> {form.targetCapacity} MW</li>
+                  {form.state && <li><strong>State:</strong> {form.state}</li>}
+                  {form.load && <li><strong>Monthly consumption:</strong> {form.load} kWh</li>}
+                  {form.siteLocation && <li><strong>Site location:</strong> {form.siteLocation}</li>}
+                  {form.targetCapacity && <li><strong>Max demand:</strong> {form.targetCapacity} MW</li>}
                   {form.tenurePreference && <li><strong>Preferred tenure:</strong> {form.tenurePreference} years</li>}
                   {form.message && <li><strong>Message:</strong> {form.message}</li>}
                 </ul>

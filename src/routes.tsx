@@ -16,6 +16,7 @@ import SavingsCalculatorPage from './pages/SavingsCalculatorPage';
 import BlogIndexPage from './pages/BlogIndexPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AuctionLivePage from './pages/AuctionLivePage';
+import AuctionPage from './pages/AuctionPage';
 import { blogPosts } from './data/blogPosts';
 
 export const routes: RouteRecord[] = [
@@ -35,6 +36,7 @@ export const routes: RouteRecord[] = [
   { path: '/savings-calculator', Component: SavingsCalculatorPage },
   { path: '/blog', Component: BlogIndexPage },
   { path: '/auction-live', Component: AuctionLivePage },
+  { path: '/auction', Component: AuctionPage },
   {
     path: '/blog/:slug',
     Component: BlogPostPage,

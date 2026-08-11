@@ -82,11 +82,11 @@ export default function GeneratorRegisterPage() {
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="genRegName">Full name</label>
-                    <input id="genRegName" name="name" required type="text" maxLength={255} defaultValue={form.name} placeholder="Your name" />
+                    <input id="genRegName" name="name" type="text" maxLength={255} defaultValue={form.name} placeholder="Your name" />
                   </div>
                   <div className="field">
                     <label htmlFor="genRegCompany">Company</label>
-                    <input id="genRegCompany" name="company" required type="text" maxLength={255} defaultValue={form.company} placeholder="Company name" />
+                    <input id="genRegCompany" name="company" type="text" maxLength={255} defaultValue={form.company} placeholder="Company name" />
                   </div>
                 </div>
                 <div className="field-row">
@@ -106,29 +106,29 @@ export default function GeneratorRegisterPage() {
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="genRegState">Primary state of operation</label>
-                    <select id="genRegState" name="state" required defaultValue={form.state}>
+                    <select id="genRegState" name="state" defaultValue={form.state}>
                       <option value="" disabled>Select state</option>
                       {indianStates.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div className="field">
                     <label htmlFor="genRegCapacity">Installed capacity (MW)</label>
-                    <input id="genRegCapacity" name="capacity" required type="number" min="0.1" step="0.1" defaultValue={form.capacity} onWheel={(e) => e.currentTarget.blur()} />
+                    <input id="genRegCapacity" name="capacity" type="number" min="0.1" step="0.1" defaultValue={form.capacity} onWheel={(e) => e.currentTarget.blur()} />
                   </div>
                 </div>
                 <div className="field-row">
                   <div className="field">
                     <label htmlFor="genRegSite">Plant/site location</label>
-                    <input id="genRegSite" name="siteLocation" required type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
+                    <input id="genRegSite" name="siteLocation" type="text" maxLength={255} defaultValue={form.siteLocation} placeholder="City, district" />
                   </div>
                   <div className="field">
                     <label htmlFor="genRegTimeline">Commissioning timeline</label>
-                    <input id="genRegTimeline" name="commissioningTimeline" required type="text" maxLength={255} defaultValue={form.commissioningTimeline} placeholder="e.g. Operational, or 6 months" />
+                    <input id="genRegTimeline" name="commissioningTimeline" type="text" maxLength={255} defaultValue={form.commissioningTimeline} placeholder="e.g. Operational, or 6 months" />
                   </div>
                 </div>
                 <div className="field">
                   <label htmlFor="genRegCert">Certifications</label>
-                  <input id="genRegCert" name="certifications" required type="text" maxLength={255} defaultValue={form.certifications} placeholder="e.g. ISO 9001, grid compliance certificates" />
+                  <input id="genRegCert" name="certifications" type="text" maxLength={255} defaultValue={form.certifications} placeholder="e.g. ISO 9001, grid compliance certificates" />
                 </div>
                 <div className="field">
                   <label htmlFor="genRegMsg">Anything else?</label>
@@ -145,15 +145,15 @@ export default function GeneratorRegisterPage() {
                 <h3>Review &amp; submit</h3>
                 <p className="sub">Confirm your details to submit. We'll email you a confirmation once it's received.</p>
                 <ul className="register-review-list">
-                  <li><strong>Name:</strong> {form.name}</li>
-                  <li><strong>Company:</strong> {form.company}</li>
+                  {form.name && <li><strong>Name:</strong> {form.name}</li>}
+                  {form.company && <li><strong>Company:</strong> {form.company}</li>}
                   <li><strong>Email:</strong> {form.email}</li>
                   <li><strong>Phone:</strong> {form.phone}</li>
-                  <li><strong>State:</strong> {form.state}</li>
-                  <li><strong>Installed capacity:</strong> {form.capacity} MW</li>
-                  <li><strong>Site location:</strong> {form.siteLocation}</li>
-                  <li><strong>Commissioning timeline:</strong> {form.commissioningTimeline}</li>
-                  <li><strong>Certifications:</strong> {form.certifications}</li>
+                  {form.state && <li><strong>State:</strong> {form.state}</li>}
+                  {form.capacity && <li><strong>Installed capacity:</strong> {form.capacity} MW</li>}
+                  {form.siteLocation && <li><strong>Site location:</strong> {form.siteLocation}</li>}
+                  {form.commissioningTimeline && <li><strong>Commissioning timeline:</strong> {form.commissioningTimeline}</li>}
+                  {form.certifications && <li><strong>Certifications:</strong> {form.certifications}</li>}
                   {form.message && <li><strong>Message:</strong> {form.message}</li>}
                 </ul>
                 <button type="button" className="btn btn-copper" disabled={submitting} onClick={handleFinalSubmit}>
