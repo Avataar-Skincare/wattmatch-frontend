@@ -1,4 +1,5 @@
 import LaunchCarousel from './LaunchCarousel';
+import { launchPhotos, launchCaptionMeta } from '../data/content';
 
 export default function Hero() {
   return (
@@ -19,7 +20,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="hero-photo-col">
-            <LaunchCarousel />
+            <LaunchCarousel photos={launchPhotos} captionMeta={launchCaptionMeta} />
           </div>
         </div>
       </div>

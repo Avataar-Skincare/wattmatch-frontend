@@ -63,6 +63,10 @@ export interface LaunchPhoto {
   caption: string;
   /** CSS rotation fix, in degrees, for a source file that lost its EXIF orientation. */
   rotate?: number;
+  /** CSS aspect-ratio value (e.g. '854 / 1139'), for a set whose photos aren't all the same
+   *  shape. Measured from the actual source file, not guessed — see LaunchCarousel.tsx for how
+   *  it's applied. Omit when every photo in the set shares one known ratio (default 1/1). */
+  aspectRatio?: string;
 }
 
 export const launchCaptionMeta = '7th CII International Energy Conference & Exhibition · India · 2026';
@@ -74,6 +78,18 @@ export const launchPhotos: LaunchPhoto[] = [
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_1.webp', caption: inauguralCaption },
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_2.webp', caption: inauguralCaption },
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaugural_3.webp', caption: inauguralCaption },
+];
+
+// Same event/stall as launchPhotos above (7th CII International Energy Conference & Exhibition),
+// a different notable visitor.
+const gujaratMinisterCaption =
+  "We were honoured to welcome the Hon'ble Minister of Health & Family Welfare, Government of Gujarat, to the WattMatch stall.";
+
+export const inaugDayPhotos: LaunchPhoto[] = [
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_1.webp', caption: gujaratMinisterCaption, aspectRatio: '854 / 1139' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_2.webp', caption: gujaratMinisterCaption, aspectRatio: '1280 / 672' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_3.webp', caption: gujaratMinisterCaption, aspectRatio: '854 / 1137' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_4.webp', caption: gujaratMinisterCaption, aspectRatio: '960 / 1280' },
 ];
 
 export const heroStats = [

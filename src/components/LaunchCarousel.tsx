@@ -1,9 +1,30 @@
 import { useEffect, useState } from 'react';
-import { launchCaptionMeta, launchPhotos } from '../data/content';
+import type { LaunchPhoto } from '../data/content';
 
 const SLIDE_INTERVAL_MS = 4000;
+// Fixed frame height for any photo set with mixed aspect ratios, so the carousel doesn't jump
+// taller/shorter as it cycles between a portrait and a landscape shot — width is derived from
+// each photo's own ratio instead, so a landscape photo simply renders wider at the same height
+// rather than getting force-cropped to match. 560 matches what a ~3:4 portrait already renders at
+// (the more common shape in this set), so those photos are unaffected — only the odd-one-out
+// landscape photo actually changes size (a wider frame within the same height).
+const MIXED_RATIO_FRAME_HEIGHT = 560;
 
-export default function LaunchCarousel() {
+interface LaunchCarouselProps {
+  photos: LaunchPhoto[];
+  captionMeta: string;
+  tag?: string;
+  /** 'large' widens the frame and bumps up the caption text — for a standalone section where the
+   *  carousel isn't sharing a narrow hero grid column. Default matches the original Hero sizing. */
+  size?: 'default' | 'large';
+}
+
+export default function LaunchCarousel({
+  photos: launchPhotos,
+  captionMeta: launchCaptionMeta,
+  tag = 'Industry recognition',
+  size = 'default',
+}: LaunchCarouselProps) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -38,9 +59,32 @@ export default function LaunchCarousel() {
     : { transform: `rotate(${rotate}deg)` };
 
   return (
-    <div className="launch-carousel">
+    <div className={`launch-carousel${size === 'large' ? ' launch-carousel-lg' : ''}`}>
       <div className="launch-carousel-frame">
-        <div className="launch-carousel-photo">
+        {/* Height stays fixed; width (via aspect-ratio) adapts per photo — a set with mixed
+            portrait/landscape shots would look wrong force-cropped into one fixed frame, and
+            would visibly jump taller/shorter each slide if width were the fixed axis instead.
+            Photos that don't specify aspectRatio (e.g. launchPhotos, which are all the same 2:3
+            shape) keep the default fixed-width square frame from the CSS. */}
+        <div
+          className="launch-carousel-photo"
+          style={
+            photo.aspectRatio
+              ? {
+                  width: 'auto',
+                  height: MIXED_RATIO_FRAME_HEIGHT,
+                  aspectRatio: photo.aspectRatio,
+                  // .launch-carousel itself caps out at 420px (sized for the portrait shape /
+                  // Hero's grid column) — flexShrink:0 stops the flex layout from squeezing a
+                  // wider landscape photo back down to fit that column; maxWidth is a viewport-
+                  // relative safety net instead of a container-relative one, precisely so it isn't
+                  // capped by that same narrow ancestor.
+                  flexShrink: 0,
+                  maxWidth: '92vw',
+                }
+              : undefined
+          }
+        >
           {/* key={index} forces a remount on every slide change, so only one photo is ever
               in the DOM at once — no double-exposure — while still fading in smoothly. */}
           <div key={index} className="launch-carousel-slide">
@@ -64,7 +108,7 @@ export default function LaunchCarousel() {
         </div>
       )}
       <div className="launch-carousel-caption">
-        <span className="launch-carousel-tag">Industry recognition</span>
+        <span className="launch-carousel-tag">{tag}</span>
         <p className="launch-carousel-caption-text">{photo.caption}</p>
         <p className="launch-carousel-meta">{launchCaptionMeta}</p>
       </div>
