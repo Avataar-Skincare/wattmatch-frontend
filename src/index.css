@@ -151,6 +151,20 @@ header .logo-mark{width:160px; height:32px;}
   .launch-carousel-photo{width:min(320px, 78vw);}
 }
 
+/* 'large' variant (see LaunchCarousel's size prop) — wider caption column and bigger text, for a
+   standalone section rather than a hero grid column. Scoped to .launch-carousel-lg so the
+   original Hero carousel (no modifier class) keeps its existing sizing exactly as-is. */
+.launch-carousel-lg{max-width:640px;}
+.launch-carousel-lg .launch-carousel-tag{font-size:13px;}
+.launch-carousel-lg .launch-carousel-caption-text{font-size:17px;}
+.launch-carousel-lg .launch-carousel-meta{font-size:12px;}
+
+/* ---------- Press section (home page, between Replace and "The mechanism"/HowItWorks) ---------- */
+/* Reuses .launch-carousel as-is (see above) — its caption text is styled for a dark
+   background, so this section shares Hero's dark blueprint background rather than the page's
+   default light one, keeping the carousel's existing colors correct without any overrides. */
+.press-section{background:var(--blueprint); color:var(--white);}
+
 /* circuit diagram */
 .circuit{
   position:relative; max-width:940px; margin:88px auto 0; display:flex; align-items:center; justify-content:space-between; gap:0;
