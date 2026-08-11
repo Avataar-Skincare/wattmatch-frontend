@@ -156,9 +156,9 @@ export default function AuctionLivePage() {
                   </span>
                 </div>
 
-                <div className="auction-centerpiece">
+                <div className="auction-centerpiece auction-live-centerpiece">
                   {secondsLeft !== null && state.status === 'live' && (
-                    <div className="auction-ring-center" style={{ position: 'static' }}>
+                    <div className="auction-ring-center auction-live-ring-center">
                       <span className="t">{secondsLeft}</span>
                       <span className="l">sec left</span>
                     </div>
@@ -166,9 +166,9 @@ export default function AuctionLivePage() {
                   <div className="auction-price">
                     <span className="ac-label">Current lowest bid</span>
                     <div className="pv">
-                      ₹{state.currentBid.toFixed(2)}<sup>/unit</sup>
+                      ₹{state.currentBid.toFixed(2)}<sup className="auction-live-price-sup">/unit</sup>
                     </div>
-                    <div className="pd">Held by {state.leaderAlias ?? 'nobody yet'}</div>
+                    <div className="pd auction-live-price-pd">Held by {state.leaderAlias ?? 'nobody yet'}</div>
                   </div>
                   <p className="auction-human-hint">
                     Extensions used: {state.extensionCount} / {state.maxExtensions}
@@ -200,7 +200,7 @@ export default function AuctionLivePage() {
                 {state.status === 'live' && rulesAccepted && (
                   <div className="auction-human-controls">
                     <form className="auction-human-form" onSubmit={submitBid}>
-                      <span className="auction-human-form-field">
+                      <span className="auction-human-form-field auction-live-form-field">
                         <span className="auction-human-prefix">₹</span>
                         <input
                           type="number"
