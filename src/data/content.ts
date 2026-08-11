@@ -85,11 +85,23 @@ export const launchPhotos: LaunchPhoto[] = [
 const gujaratMinisterCaption =
   "We were honoured to welcome the Hon'ble Minister of Health & Family Welfare, Government of Gujarat, to the WattMatch stall.";
 
+// Same event/stall, two more notable visitors.
+const sriLankaMinisterCaption =
+  "We were honoured to welcome the Hon'ble Minister Anura Karunathilake, Minister of Energy of Sri Lanka, to the WattMatch stall.";
+const dmrcMdCaption =
+  'Dr. Vikas Kumar, Managing Director, Delhi Metro Rail Corporation (DMRC), inaugurating the WattMatch brochure at the 7th CII International Energy Conference & Exhibition.';
+
 export const inaugDayPhotos: LaunchPhoto[] = [
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_1.webp', caption: gujaratMinisterCaption, aspectRatio: '854 / 1139' },
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_2.webp', caption: gujaratMinisterCaption, aspectRatio: '1280 / 672' },
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_3.webp', caption: gujaratMinisterCaption, aspectRatio: '854 / 1137' },
   { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_photo_4.webp', caption: gujaratMinisterCaption, aspectRatio: '960 / 1280' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_car_(1).webp', caption: sriLankaMinisterCaption, aspectRatio: '3744 / 2496' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_car_(3).webp', caption: sriLankaMinisterCaption, aspectRatio: '3559 / 2319' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_car_(4).webp', caption: sriLankaMinisterCaption, aspectRatio: '2765 / 2231' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_car_(2).webp', caption: dmrcMdCaption, aspectRatio: '5113 / 4000' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_car_(5).webp', caption: dmrcMdCaption, aspectRatio: '6000 / 4000' },
+  { src: 'https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/inaug_car_(6).webp', caption: dmrcMdCaption, aspectRatio: '6000 / 4000' },
 ];
 
 export const heroStats = [

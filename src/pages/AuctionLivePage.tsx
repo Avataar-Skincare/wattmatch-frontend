@@ -81,6 +81,8 @@ export default function AuctionLivePage() {
           ? 'This auction is no longer live.'
           : payload.reason === 'RULES_NOT_ACCEPTED'
           ? 'Accept the auction rules before bidding.'
+          : payload.reason === 'INTERNAL_ERROR'
+          ? 'Something went wrong processing that bid — try again.'
           : 'Bid rejected — enter a valid amount.'
       );
     });
@@ -114,7 +116,7 @@ export default function AuctionLivePage() {
     e.preventDefault();
     setBidError(null);
     const amount = Number(bidInput);
-    if (!bidInput.trim() || Number.isNaN(amount)) {
+    if (!bidInput.trim() || Number.isNaN(amount) || amount <= 0) {
       setBidError('Enter a valid amount.');
       return;
     }
@@ -205,6 +207,7 @@ export default function AuctionLivePage() {
                         <input
                           type="number"
                           step="0.01"
+                          min="0.01"
                           inputMode="decimal"
                           placeholder={`below ${state.currentBid.toFixed(2)}`}
                           value={bidInput}

@@ -5,10 +5,10 @@ const SLIDE_INTERVAL_MS = 4000;
 // Fixed frame height for any photo set with mixed aspect ratios, so the carousel doesn't jump
 // taller/shorter as it cycles between a portrait and a landscape shot — width is derived from
 // each photo's own ratio instead, so a landscape photo simply renders wider at the same height
-// rather than getting force-cropped to match. 560 matches what a ~3:4 portrait already renders at
-// (the more common shape in this set), so those photos are unaffected — only the odd-one-out
-// landscape photo actually changes size (a wider frame within the same height).
-const MIXED_RATIO_FRAME_HEIGHT = 560;
+// rather than getting force-cropped to match. Kept modest (rather than matching the tallest
+// portrait's natural size) now that most of this carousel's photos are landscape — a taller frame
+// was pushing the caption text below the fold on shorter viewports.
+const MIXED_RATIO_FRAME_HEIGHT = 440;
 
 interface LaunchCarouselProps {
   photos: LaunchPhoto[];

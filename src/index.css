@@ -156,8 +156,25 @@ header .logo-mark{width:160px; height:32px;}
    original Hero carousel (no modifier class) keeps its existing sizing exactly as-is. */
 .launch-carousel-lg{max-width:640px;}
 .launch-carousel-lg .launch-carousel-tag{font-size:13px;}
-.launch-carousel-lg .launch-carousel-caption-text{font-size:17px;}
+.launch-carousel-lg .launch-carousel-caption-text{font-size:18.5px;}
 .launch-carousel-lg .launch-carousel-meta{font-size:12px;}
+@media (min-width:861px){
+  /* Side-by-side on desktop — photo (+ dots) on the left, caption on the right — instead of
+     stacking everything in one column, which was pushing the caption text down the page,
+     especially now that most photos in this set are wide landscape shots. Stays stacked below
+     this breakpoint; there's no room for two columns on a phone. */
+  .launch-carousel-lg{
+    /* Both tracks sized to their own content (not 1fr, which would greedily stretch the caption
+       column across the rest of .wrap) and width:fit-content so the whole two-column group is one
+       compact block — margin:auto (inherited from .launch-carousel) then centers that block as a
+       unit, instead of the photo and caption ending up off-center from each other. */
+    max-width:none; width:fit-content; display:grid; grid-template-columns:auto minmax(0, 420px);
+    column-gap:48px; align-items:center;
+  }
+  .launch-carousel-lg .launch-carousel-frame{grid-column:1; grid-row:1;}
+  .launch-carousel-lg .launch-carousel-dots{grid-column:1; grid-row:2;}
+  .launch-carousel-lg .launch-carousel-caption{grid-column:2; grid-row:1 / span 2; margin-top:0;}
+}
 
 /* ---------- Press section (home page, between Replace and "The mechanism"/HowItWorks) ---------- */
 /* Reuses .launch-carousel as-is (see above) — its caption text is styled for a dark
