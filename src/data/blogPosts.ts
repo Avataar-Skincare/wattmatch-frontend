@@ -1,7 +1,9 @@
 export interface BlogContentBlock {
-  type: 'h2' | 'p' | 'ul';
+  type: 'h2' | 'p' | 'ul' | 'table';
   text?: string;
   items?: string[];
+  headers?: string[];
+  rows?: string[][];
 }
 
 export interface BlogPost {
@@ -320,9 +322,22 @@ export const blogPosts: BlogPost[] = [
       { type: 'p', text: 'A renewable PPA is not just a price contract. It is a long-term delivery relationship.' },
       { type: 'h2', text: 'Step 9: Compare multiple offers properly' },
       { type: 'p', text: 'If you receive five proposals, you should not simply arrange them from lowest tariff to highest tariff.' },
-      { type: 'p', text: 'The comparison needs to be standardised.' },
-      { type: 'p', text: 'For example:' },
-      { type: 'ul', items: ['Tariff (₹ per unit)', 'Escalation (whether the tariff increases annually, and by how much)', 'Contract term', 'Expected generation', 'Technology', 'Project status', 'Performance guarantee', 'Financial strength', 'Security mechanism'] },
+      { type: 'p', text: 'The comparison needs to be standardised. For example:' },
+      {
+        type: 'table',
+        headers: ['Factor', 'Generator A', 'Generator B', 'Generator C'],
+        rows: [
+          ['Tariff (₹ per unit)', '₹X', '₹Y', '₹Z'],
+          ['Escalation', 'Fixed', 'X% p.a.', 'Fixed'],
+          ['Contract term', 'X years', 'X years', 'X years'],
+          ['Expected generation', 'X units', 'X units', 'X units'],
+          ['Technology', 'Solar', 'Solar', 'Solar'],
+          ['Project status', 'Operational', 'Under construction', 'Operational'],
+          ['Performance guarantee', 'Yes', 'Yes', 'No'],
+          ['Financial strength', 'Strong', 'Moderate', 'Strong'],
+          ['Security mechanism', 'Bank guarantee', 'Corporate guarantee', 'Bank guarantee'],
+        ],
+      },
       { type: 'p', text: 'This is the kind of comparison that gives a CFO or procurement team confidence that they are making an informed decision.' },
       { type: 'p', text: 'A lower tariff with weak performance protection may ultimately be more expensive than a slightly higher tariff from a financially stronger generator.' },
       { type: 'h2', text: 'Step 10: Understand the Power Purchase Agreement' },
@@ -715,7 +730,26 @@ export const blogPosts: BlogPost[] = [
       { type: 'p', text: 'That is the renewable-energy flywheel India is building through policy.' },
       { type: 'h2', text: '21. The policy stack is increasingly aligned with C&I economics' },
       { type: 'p', text: 'For a C&I business, the most important policy developments can therefore be thought of as five layers.' },
-      { type: 'ul', items: ['Electricity Act & Open Access — enables alternative power procurement, creating the legal basis for buying renewable power outside the local DISCOM.', 'Green Open Access Rules — broadens access and simplifies the framework, bringing more C&I consumers into the market.', 'RCO / renewable obligations — creates renewable-consumption requirements, turning renewable procurement into a compliance issue as well as an economic one.', 'State regulations — determine charges, banking, connectivity and procedures, directly affecting landed renewable cost.', 'Renewable-generation schemes — increase supply and diversify generators, creating more renewable projects and potentially more competitive procurement.', 'Emerging: PM-KUSUM 2.0 / Agri-PV — more distributed renewable generation and potentially new supply from agricultural land.', 'Emerging: potential storage integration — greater ability to align renewable generation with consumption.'] },
+      {
+        type: 'table',
+        headers: ['Policy layer', 'What it does', 'Why it matters to C&I'],
+        rows: [
+          ['Electricity Act & Open Access', 'Enables alternative power procurement', 'Creates the legal basis for buying renewable power outside the local DISCOM'],
+          ['Green Open Access Rules', 'Broadens access and simplifies the framework', 'Brings more C&I consumers into the market'],
+          ['RCO / renewable obligations', 'Creates renewable-consumption requirements', 'Turns renewable procurement into a compliance issue as well as an economic one'],
+          ['State regulations', 'Determine charges, banking, connectivity and procedures', 'Directly affect landed renewable cost'],
+          ['Renewable-generation schemes', 'Increase supply and diversify generators', 'Creates more renewable projects and potentially more competitive procurement'],
+        ],
+      },
+      { type: 'p', text: 'And the emerging PM-KUSUM 2.0 direction adds another potential layer:' },
+      {
+        type: 'table',
+        headers: ['Emerging layer', 'Potential impact'],
+        rows: [
+          ['PM-KUSUM 2.0 / Agri-PV', 'More distributed renewable generation and potentially new supply from agricultural land'],
+          ['Potential storage integration', 'Greater ability to align renewable generation with consumption'],
+        ],
+      },
       { type: 'h2', text: '22. But policy support does not mean every renewable project is automatically attractive' },
       { type: 'p', text: 'This is an important distinction.' },
       { type: 'p', text: 'A supportive policy environment does not mean every solar PPA is a good deal.' },
