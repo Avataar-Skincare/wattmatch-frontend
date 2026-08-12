@@ -68,6 +68,26 @@ export default function BlogPostPage() {
                     </ul>
                   );
                 }
+                if (block.type === 'table') {
+                  return (
+                    <div className="reg-table-wrap" key={i}>
+                      <table className="reg-table">
+                        <thead>
+                          <tr>
+                            {block.headers?.map((header, j) => <th key={j}>{header}</th>)}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {block.rows?.map((row, j) => (
+                            <tr key={j}>
+                              {row.map((cell, k) => <td key={k}>{cell}</td>)}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                }
                 return <p key={i}>{block.text}</p>;
               })}
             </div>
