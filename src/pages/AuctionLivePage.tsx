@@ -9,8 +9,34 @@ import Seo from '../components/Seo';
 // people in their own tabs, not client-side simulation.
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
 
+// Matches the countdown ring already used by the /auction demo page — same radius/circumference,
+// same CSS classes, so this reuses styling that already exists rather than inventing new rules.
+const RING_RADIUS = 52;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
 type ConnectionState = 'connecting' | 'connected' | 'error';
 type ParticipantRole = 'generator' | 'buyer';
+
+// Reads the auctionId claim out of the join token's payload segment — not a verification (the
+// server re-verifies the token's signature on every real request), just enough to know which
+// auction to ask /winner-identity about. A malformed/unreadable token here just means the reveal
+// call never fires; the socket connection itself (which does verify the token) already handles
+// the real "is this token valid" case.
+function decodeAuctionIdFromToken(token: string): number | null {
+  try {
+    const payload = token.split('.')[1];
+    // JWT segments are base64url with no padding — atob() is inconsistent about tolerating that
+    // across browsers (notably stricter on mobile Safari), so pad back to a multiple of 4 before
+    // decoding rather than relying on every environment accepting an unpadded string.
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+    const json = atob(padded);
+    const auctionId = JSON.parse(json)?.auctionId;
+    return typeof auctionId === 'number' ? auctionId : null;
+  } catch {
+    return null;
+  }
+}
 
 interface AuctionState {
   status: 'scheduled' | 'live' | 'closed';
@@ -31,12 +57,21 @@ export default function AuctionLivePage() {
   const [rulesAccepted, setRulesAccepted] = useState(false);
   const [state, setState] = useState<AuctionState | null>(null);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
-  const [feed, setFeed] = useState<string[]>([]);
+  // Brief visual flash on a new lowest bid — same purpose as the /auction demo's flashId, just
+  // simpler (a boolean, not per-bidder), since only the current leading bid is shown, not a
+  // per-bidder history feed.
+  const [priceFlash, setPriceFlash] = useState(false);
   const [bidInput, setBidInput] = useState('');
   const [bidError, setBidError] = useState<string | null>(null);
   const [winner, setWinner] = useState<{ alias: string | null; amount: number; disclosure: string } | null>(null);
+  // Real identity (organizationName), not just alias — populated only if the /winner-identity
+  // reveal succeeds, which the backend restricts to the winning generator and the buyer only (see
+  // auctionAdmin.ts). Every other role gets a 403 there, so this simply stays null for them — not
+  // an error state, just nothing to show.
+  const [revealedCounterparty, setRevealedCounterparty] = useState<{ alias: string; organizationName: string } | null>(null);
   const [sessionReplaced, setSessionReplaced] = useState(false);
   const socketRef = useRef<Socket | null>(null);
+  const tokenRef = useRef<string | null>(null);
   // Socket event handlers below are wired up once (empty-deps effect), so they'd otherwise close
   // over the initial null `state` forever — this ref gives them a live read of the latest value.
   const stateRef = useRef<AuctionState | null>(null);
@@ -51,6 +86,7 @@ export default function AuctionLivePage() {
       setConnectionError('No join token in the URL — use the link generated for you.');
       return;
     }
+    tokenRef.current = token;
 
     // Default Socket.io path — kept separate from /api/*; needs its own CloudFront routing rule
     // in production rather than piggybacking on the REST API. See AUCTION_PLAN.md.
@@ -69,17 +105,12 @@ export default function AuctionLivePage() {
     });
     socket.on('rules:accepted', () => setRulesAccepted(true));
     socket.on('state:sync', (payload: AuctionState | null) => setState(payload));
-    // Backfills the feed from the server's durable record on (re)connect — without the `prev.length
-    // > 0` guard, a feed:sync arriving after a live state:update had already started the feed would
-    // wholesale overwrite it and could drop that just-received live entry.
-    socket.on('feed:sync', (bids: { alias: string; amount: number }[]) => {
-      setFeed((prev) => (prev.length > 0 ? prev : bids.map((b) => `${b.alias} bid ₹${b.amount.toFixed(2)}/unit`)));
-    });
     socket.on(
       'state:update',
       (payload: { currentBid: number; windowEndsAt: number; alias: string }) => {
         setState((prev) => (prev ? { ...prev, currentBid: payload.currentBid, windowEndsAt: payload.windowEndsAt, leaderAlias: payload.alias } : prev));
-        setFeed((f) => [`${payload.alias} bid ₹${payload.currentBid.toFixed(2)}/unit`, ...f].slice(0, 10));
+        setPriceFlash(true);
+        setTimeout(() => setPriceFlash(false), 700);
       }
     );
     socket.on('bid:rejected', (payload: { reason: string; currentBid?: number }) => {
@@ -132,6 +163,35 @@ export default function AuctionLivePage() {
     const interval = setInterval(tick, 250);
     return () => clearInterval(interval);
   }, [state?.windowEndsAt]);
+
+  // Fires once the auction closes — asks the backend to reveal the counterparty's real identity.
+  // Harmless to call regardless of role: the endpoint itself restricts this to the winning
+  // generator and the buyer (auctionAdmin.ts), so a losing generator's request just comes back
+  // 403 and revealedCounterparty simply stays null — no separate role check needed here.
+  useEffect(() => {
+    if (!winner) return;
+    const token = tokenRef.current;
+    const auctionId = token ? decodeAuctionIdFromToken(token) : null;
+    if (!token || auctionId === null) return;
+
+    let cancelled = false;
+    fetch(`${API_BASE}/api/auction-admin/auctions/${auctionId}/winner-identity`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (!cancelled && result.success) {
+          setRevealedCounterparty({ alias: result.alias, organizationName: result.organizationName });
+        }
+      })
+      .catch(() => {
+        // Not part of the winning pair, network hiccup, etc. — nothing to show, not an error the
+        // user needs to see; the rest of the closed-auction UI (alias, winning bid) already works.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [winner]);
 
   function submitBid(e: React.FormEvent) {
     e.preventDefault();
@@ -192,14 +252,30 @@ export default function AuctionLivePage() {
 
                     <div className="auction-centerpiece auction-live-centerpiece">
                       {secondsLeft !== null && state.status === 'live' && (
-                        <div className="auction-ring-center auction-live-ring-center">
-                          <span className="t">{secondsLeft}</span>
-                          <span className="l">sec left</span>
+                        <div className={`auction-ring-wrap${priceFlash ? ' flash' : ''}`}>
+                          <svg viewBox="0 0 120 120">
+                            <circle className="auction-ring-track" cx="60" cy="60" r={RING_RADIUS} />
+                            <circle
+                              className={`auction-ring-fill${priceFlash ? ' reset' : ''}`}
+                              cx="60"
+                              cy="60"
+                              r={RING_RADIUS}
+                              strokeDasharray={RING_CIRCUMFERENCE}
+                              strokeDashoffset={
+                                RING_CIRCUMFERENCE *
+                                (1 - Math.min(1, Math.max(0, secondsLeft / (state.windowMs / 1000))))
+                              }
+                            />
+                          </svg>
+                          <div className="auction-ring-center">
+                            <span className="t">{secondsLeft}</span>
+                            <span className="l">sec left</span>
+                          </div>
                         </div>
                       )}
                       <div className="auction-price">
                         <span className="ac-label">Current lowest bid</span>
-                        <div className="pv">
+                        <div className={`pv${priceFlash ? ' pulse' : ''}`}>
                           ₹{state.currentBid.toFixed(2)}<sup className="auction-live-price-sup">/unit</sup>
                         </div>
                         <div className="pd auction-live-price-pd">Held by {state.leaderAlias ?? 'nobody yet'}</div>
@@ -264,18 +340,16 @@ export default function AuctionLivePage() {
                       </div>
                     )}
 
-                    <div className="auction-feed">
-                      {feed.length === 0 && <p>No bids yet.</p>}
-                      {feed.map((line, i) => (
-                        <p key={i}>{line}</p>
-                      ))}
-                    </div>
-
                     {winner && (
                       <div className="auction-winner auction-winner-top">
                         <span className="ac-label">Winning bid</span>
                         <strong>{winner.alias ?? 'Unknown'} at ₹{winner.amount.toFixed(2)}/unit</strong>
                         <p className="auction-human-hint">{winner.disclosure}</p>
+                        {revealedCounterparty && (
+                          <p className="auction-human-hint">
+                            <strong>{revealedCounterparty.alias}</strong> is <strong>{revealedCounterparty.organizationName}</strong> — contact details for the PPA go through your usual channel.
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>

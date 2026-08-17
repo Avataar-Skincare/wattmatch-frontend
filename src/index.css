@@ -650,11 +650,11 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 .auction-winner-top{margin-top:0; padding-top:0; padding-bottom:22px; border-top:none; border-bottom:1px solid var(--line); margin-bottom:20px;}
 
 /* ---------- Live auction PoC (/auction-live) ---------- */
-/* Reuses the simulator's .auction-* classes above (same room/price/form layout) — both pages share
-   the same visual language. A handful of properties genuinely differ (no SVG ring or pulse/flash
-   animation here, different text colors, no extra text-align on the centerpiece) — rather than
-   editing the simulator's rules above, this page adds one qualifying class per differing element,
-   each specific enough to win the cascade without touching the simulator's own rules. */
+/* Reuses the simulator's .auction-* classes above (same room/price/form/ring layout) — both pages
+   share the same visual language. A handful of properties genuinely differ (different text
+   colors, no extra text-align on the centerpiece) — rather than editing the simulator's rules
+   above, this page adds one qualifying class per differing element, each specific enough to win
+   the cascade without touching the simulator's own rules. */
 .auction-rules-box{
   background:var(--porcelain); border:1px solid var(--line); border-radius:12px; padding:18px 20px;
   max-width:440px; margin:0 auto; text-align:left;
@@ -663,7 +663,6 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 .auction-rules-box li{font-size:13px; line-height:1.6; color:#3D454E; margin-bottom:6px;}
 .auction-rules-box .btn{width:100%; justify-content:center;}
 .auction-centerpiece.auction-live-centerpiece{text-align:center;}
-.auction-ring-center.auction-live-ring-center{position:static; display:flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:6px;}
 .auction-price .pv sup.auction-live-price-sup{color:#4B5560;}
 .auction-price .pd.auction-live-price-pd{color:#4B5560;}
 .auction-human-form-field.auction-live-form-field{display:inline-flex;}
