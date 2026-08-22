@@ -35,6 +35,15 @@ export default function ContactPage() {
                 </span>
               </div>
               <div className="stat-card">
+                {/* TODO: replace with a real, working number before go-live — payment-processor
+                    review (and DPDP/consumer-facing practice generally) expects a phone number
+                    here, not just email. */}
+                <span className="sc-label">Phone</span>
+                <span className="sc-value" style={{ fontSize: 19 }}>
+                  <a href="tel:+91TODO">[TODO: phone number]</a>
+                </span>
+              </div>
+              <div className="stat-card">
                 <span className="sc-label">For C&amp;I buyers</span>
                 <span className="sc-value" style={{ fontSize: 15 }}>
                   Looking to switch to renewables? <Link to="/for-ci">Request a match →</Link>
@@ -47,7 +56,9 @@ export default function ContactPage() {
                 </span>
               </div>
             </Reveal>
-            <p className="ws-source">Office: Delhi NCR, India (full address to be added)</p>
+            {/* TODO: replace with the full, exact registered postal address — required for
+                payment-processor KYC review, a city name alone is not sufficient. */}
+            <p className="ws-source">Registered office: [TODO: full postal address], Delhi NCR, India</p>
           </div>
         </section>
       </main>

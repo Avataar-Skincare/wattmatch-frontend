@@ -17,6 +17,15 @@ import BlogIndexPage from './pages/BlogIndexPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AuctionLivePage from './pages/AuctionLivePage';
 import AuctionPage from './pages/AuctionPage';
+import AdminVettingDashboardPage from './pages/AdminVettingDashboardPage';
+import GeneratorBidSubmissionPage from './pages/GeneratorBidSubmissionPage';
+import BuyerTenderConsolePage from './pages/BuyerTenderConsolePage';
+import RfsDocumentPurchasePage from './pages/RfsDocumentPurchasePage';
+import PublicTendersPage from './pages/PublicTendersPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import PricingPage from './pages/PricingPage';
 import { blogPosts } from './data/blogPosts';
 
 export const routes: RouteRecord[] = [
@@ -37,6 +46,15 @@ export const routes: RouteRecord[] = [
   { path: '/blog', Component: BlogIndexPage },
   { path: '/auction-live', Component: AuctionLivePage },
   { path: '/auction', Component: AuctionPage },
+  { path: '/admin-vetting', Component: AdminVettingDashboardPage },
+  { path: '/submit-bid', Component: GeneratorBidSubmissionPage },
+  { path: '/buyer-console', Component: BuyerTenderConsolePage },
+  { path: '/rfs-document-purchase', Component: RfsDocumentPurchasePage },
+  { path: '/tenders', Component: PublicTendersPage },
+  { path: '/privacy', Component: PrivacyPolicyPage },
+  { path: '/terms', Component: TermsOfServicePage },
+  { path: '/refund-policy', Component: RefundPolicyPage },
+  { path: '/pricing', Component: PricingPage },
   {
     path: '/blog/:slug',
     Component: BlogPostPage,
