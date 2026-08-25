@@ -5,6 +5,8 @@ import Footer from '../components/Footer';
 import Seo from '../components/Seo';
 import { usePayment } from '../hooks/usePayment';
 
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
+
 // Stage 3's RfS Document purchase form (TENDER_WORKFLOW_STAKEHOLDER_PLAN.md) — deliberately
 // account-less. Every field here is now a real structured field on the Payment row (see
 // routes/payments.ts's rfsDocumentOrderBodySchema), not free-form notes. The consent checkbox
@@ -28,7 +30,7 @@ export default function RfsDocumentPurchasePage() {
     e.preventDefault();
     reset();
     if (!consentGiven) return;
-    await startPayment({
+    const result = await startPayment({
       purpose: 'rfs_document',
       tenderId: Number(tenderId),
       payerName: name,
@@ -40,6 +42,21 @@ export default function RfsDocumentPurchasePage() {
       consentGiven: true,
       prefill: { name, email, contact: mobile },
     });
+    if (result) await downloadTenderDocument();
+  }
+
+  // Fires the moment payment verifies — the tender document isn't tied to an account yet at this
+  // point (this whole flow is deliberately account-less), so it's fetched by the email just paid
+  // with, same as hasRfsDocumentPaid does everywhere else. Once they enroll, it stays fetchable
+  // from their generator dashboard too (GeneratorBidSubmissionPage) — this isn't the only copy.
+  async function downloadTenderDocument() {
+    try {
+      const res = await fetch(`${API_BASE}/api/tenders/${tenderId}/tender-document?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (data.success) window.open(data.url, '_blank');
+    } catch {
+      // best-effort — nothing to show the user if this fails, the doc is still safely re-fetchable later
+    }
   }
 
   return (
@@ -58,7 +75,12 @@ export default function RfsDocumentPurchasePage() {
         <section>
           <form onSubmit={handleSubmit} className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 480 }}>
             {error && <p style={{ color: '#B53A3A' }}>{error}</p>}
-            {status === 'success' && <p style={{ color: '#2F7A3E' }}>Payment successful — document unlocked.</p>}
+            {status === 'success' && (
+              <p style={{ color: '#2F7A3E' }}>
+                Payment successful — your tender document should have opened in a new tab. You can also
+                come back for it any time by enrolling and visiting your generator dashboard.
+              </p>
+            )}
             {status === 'cancelled' && <p>Payment cancelled.</p>}
 
             <input type="text" placeholder="Tender id" value={tenderId} onChange={(e) => setTenderId(e.target.value)} required />

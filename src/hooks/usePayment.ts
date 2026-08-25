@@ -6,7 +6,7 @@ const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID as string | undefin
 
 export type PaymentStatus = 'idle' | 'creating_order' | 'awaiting_payment' | 'verifying' | 'success' | 'failed' | 'cancelled';
 
-export type PaymentPurpose = 'rfs_document' | 'bid_processing' | 'emd' | 'success_charge';
+export type PaymentPurpose = 'rfs_document' | 'bid_processing';
 
 interface Prefill {
   name?: string;
@@ -31,7 +31,7 @@ export type StartPaymentInput =
       notes?: Record<string, string>;
       prefill?: Prefill;
     }
-  | { purpose: 'bid_processing' | 'emd' | 'success_charge'; tenderId: number; token: string; prefill?: Prefill };
+  | { purpose: 'bid_processing'; tenderId: number; token: string; prefill?: Prefill };
 
 export interface PaymentResult {
   paymentId: string;

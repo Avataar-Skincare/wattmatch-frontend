@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import LogoMark from './icons/LogoMark';
 import { navLinks } from '../data/content';
 
+const tenderLinks = [
+  { href: '/tenders?view=live', label: 'Live' },
+  { href: '/tenders?view=archived', label: 'Archive' },
+  { href: '/tenders?view=completed', label: 'Tender Results' },
+];
+
 export default function Header({ minimal = false }: { minimal?: boolean }) {
   const [open, setOpen] = useState(false);
 
@@ -34,11 +40,23 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
           <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-1.webp" />
         </Link>
         <div className="nav-links">
-          {navLinks.map((link) => (
+          {navLinks.slice(0, 2).map((link) => (
+            <Link key={link.href} to={link.href}>{link.label}</Link>
+          ))}
+          <div className="nav-dropdown">
+            <span className="nav-dropdown-trigger">Tenders</span>
+            <div className="nav-dropdown-panel">
+              {tenderLinks.map((link) => (
+                <Link key={link.href} to={link.href}>{link.label}</Link>
+              ))}
+            </div>
+          </div>
+          {navLinks.slice(2).map((link) => (
             <Link key={link.href} to={link.href}>{link.label}</Link>
           ))}
         </div>
         <div className="nav-cta">
+          <Link to="/login" className="btn btn-ghost">Log in</Link>
           <Link to="/for-ci" className="btn btn-ghost">I buy power</Link>
           <Link to="/for-generators" className="btn btn-solar">I generate power</Link>
         </div>
@@ -52,9 +70,17 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
         </button>
       </nav>
       <div className={`mobile-menu${open ? ' open' : ''}`}>
-        {navLinks.map((link) => (
+        {navLinks.slice(0, 2).map((link) => (
           <Link key={link.href} to={link.href} onClick={closeMenu}>{link.label}</Link>
         ))}
+        <span className="mobile-menu-group-label">Tenders</span>
+        {tenderLinks.map((link) => (
+          <Link key={link.href} to={link.href} className="mobile-menu-sublink" onClick={closeMenu}>{link.label}</Link>
+        ))}
+        {navLinks.slice(2).map((link) => (
+          <Link key={link.href} to={link.href} onClick={closeMenu}>{link.label}</Link>
+        ))}
+        <Link to="/login" className="btn btn-ghost" onClick={closeMenu}>Log in</Link>
         <Link to="/for-ci" className="btn btn-ghost" onClick={closeMenu}>I buy power</Link>
         <Link to="/for-generators" className="btn btn-solar" onClick={closeMenu}>I generate power</Link>
       </div>

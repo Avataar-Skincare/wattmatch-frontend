@@ -52,19 +52,13 @@ export default function PricingPage() {
 
               <h3>3. Earnest Money Deposit (EMD)</h3>
               <p>
-                A refundable security deposit (not a fee) required at bid submission, sized to your
-                declared project capacity. See our{' '}
-                <a href="/refund-policy">Refund &amp; Cancellation Policy</a> for the full refund/
-                forfeiture rules. Amount: [TODO — capacity-based], exclusive of applicable taxes.
+                Not a fee and not collected as money — EMD is a Bank Guarantee you arrange through
+                your own bank and submit to us as a document, sized to the amount stated on the
+                tender. See our <a href="/refund-policy">Refund &amp; Cancellation Policy</a> for how
+                it is returned or invoked.
               </p>
 
-              <h3>4. Success charge</h3>
-              <p>
-                Charged only to the confirmed winner of an auction, on successful award. Amount:
-                [TODO], exclusive of applicable taxes.
-              </p>
-
-              <h3>5. Payment methods</h3>
+              <h3>4. Payment methods</h3>
               <p>
                 All payments are processed securely through Razorpay. We accept the payment methods
                 Razorpay makes available for our account — this may include cards, UPI, netbanking,

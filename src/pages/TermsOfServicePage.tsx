@@ -79,10 +79,10 @@ export default function TermsOfServicePage() {
                   into the vetting queue immediately on payment confirmation.
                 </li>
                 <li>
-                  <strong>Earnest Money Deposit (EMD):</strong> this is a refundable/forfeitable
-                  security deposit, not a fee for a service rendered at the time of payment — see our{' '}
+                  <strong>Earnest Money Deposit (EMD):</strong> this is a Bank Guarantee document you
+                  submit to us, not a payment — it is not covered by section 4 above at all. See our{' '}
                   <a href="/refund-policy">Refund &amp; Cancellation Policy</a> for when it is
-                  returned or retained.
+                  returned or invoked.
                 </li>
               </ul>
               <p>

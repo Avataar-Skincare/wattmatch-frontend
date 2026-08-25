@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Seo from '../components/Seo';
@@ -6,13 +7,21 @@ import Seo from '../components/Seo';
 // Stage 2 (TENDER_WORKFLOW_STAKEHOLDER_PLAN.md): "All tenders are listed under a Tenders tab with
 // three views: Live, Archived, Completed. Anyone can open a tender and see its basic details... no
 // account, no purchase required." This is the actual first step of the funnel — without this page,
-// GET /api/tenders worked but nobody could ever discover a tender to buy the document for. Also
-// carries Stage 4's two enrollment paths inline per card: the account-less bridge (POST
-// /tenders/:id/enroll, for someone who already bought the RfS Document but never registered) and
-// authenticated self-enroll (for someone who already has an account) via a lightweight login form.
+// GET /api/tenders worked but nobody could ever discover a tender to buy the document for. Full
+// detail plus the purchase/enroll CTAs live on TenderDetailsPage, reached via "View tender" below.
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
 
 type View = 'live' | 'completed' | 'archived';
+
+const VIEW_LABELS: Record<View, string> = {
+  live: 'Live',
+  archived: 'Archive',
+  completed: 'Tender Results',
+};
+
+function isView(value: string | null): value is View {
+  return value === 'live' || value === 'completed' || value === 'archived';
+}
 
 interface TenderTeaser {
   id: number;
@@ -21,61 +30,7 @@ interface TenderTeaser {
   status: string;
 }
 
-function TenderCard({ tender, token }: { tender: TenderTeaser; token: string | null }) {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState<{ text: string; kind: 'success' | 'error' } | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  async function handleEnrollWithEmail(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setMessage(null);
-    setBusy(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/tenders/${tender.id}/enroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        if (res.status === 402) {
-          setMessage({ text: "You'll need to buy this tender's document first — use the link above.", kind: 'error' });
-        } else if (res.status === 409 && data.accountExists) {
-          setMessage({ text: 'An account already exists for that email — log in above, then use "Self-enroll".', kind: 'error' });
-        } else {
-          setMessage({ text: data.error || 'Enrollment failed', kind: 'error' });
-        }
-        return;
-      }
-      setMessage({ text: "You're enrolled! We've emailed your login details to that address.", kind: 'success' });
-    } catch (err) {
-      setMessage({ text: err instanceof Error ? err.message : 'Enrollment failed', kind: 'error' });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleSelfEnroll() {
-    setMessage(null);
-    setBusy(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/tenders/${tender.id}/self-enroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setMessage({ text: res.status === 402 ? "You'll need to buy this tender's document first." : data.error, kind: 'error' });
-        return;
-      }
-      setMessage({ text: 'Enrolled from your account.', kind: 'success' });
-    } catch (err) {
-      setMessage({ text: err instanceof Error ? err.message : 'Enrollment failed', kind: 'error' });
-    } finally {
-      setBusy(false);
-    }
-  }
-
+function TenderCard({ tender }: { tender: TenderTeaser }) {
   return (
     <div className="stat-card" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       <div>
@@ -85,44 +40,27 @@ function TenderCard({ tender, token }: { tender: TenderTeaser; token: string | n
         </div>
       </div>
 
-      <a href={`/rfs-document-purchase?tenderId=${tender.id}`} className="btn btn-outline" style={{ alignSelf: 'flex-start' }}>
-        View &amp; buy tender document
+      <a href={`/tender-details?tenderId=${tender.id}`} className="btn btn-solar" style={{ alignSelf: 'flex-start' }}>
+        View tender
       </a>
-
-      {token ? (
-        <button type="button" className="btn btn-solar" onClick={handleSelfEnroll} disabled={busy} style={{ alignSelf: 'flex-start' }}>
-          Self-enroll with my account
-        </button>
-      ) : (
-        <form onSubmit={handleEnrollWithEmail} style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <input
-            type="email"
-            placeholder="Email you bought the document with"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ flex: 1, minWidth: 220 }}
-          />
-          <button type="submit" className="btn btn-outline" disabled={busy}>
-            Already bought it — Enroll
-          </button>
-        </form>
-      )}
-
-      {message && <p style={{ color: message.kind === 'success' ? '#2F7A3E' : '#B53A3A', margin: 0 }}>{message.text}</p>}
     </div>
   );
 }
 
 export default function PublicTendersPage() {
-  const [view, setView] = useState<View>('live');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedView = searchParams.get('view');
+  const [view, setView] = useState<View>(isView(requestedView) ? requestedView : 'live');
   const [tenders, setTenders] = useState<TenderTeaser[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [token, setToken] = useState<string | null>(null);
-  const [loginError, setLoginError] = useState<string | null>(null);
+  // Header's Tenders dropdown links to /tenders?view=... — since navigating between those
+  // links keeps this same page mounted, sync `view` state whenever the URL param changes.
+  useEffect(() => {
+    if (isView(requestedView) && requestedView !== view) {
+      setView(requestedView);
+    }
+  }, [requestedView]);
 
   useEffect(() => {
     setError(null);
@@ -136,23 +74,6 @@ export default function PublicTendersPage() {
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load tenders'));
   }, [view]);
 
-  async function handleLogin(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoginError(null);
-    try {
-      const res = await fetch(`${API_BASE}/api/organizations/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      });
-      const data = await res.json();
-      if (!data.success) return setLoginError(data.error);
-      setToken(data.token);
-    } catch (err) {
-      setLoginError(err instanceof Error ? err.message : 'Login failed');
-    }
-  }
-
   return (
     <div className="content-page">
       <Seo title="Open tenders" description="Browse live, completed, and archived tenders on Wattmatch." path="/tenders" />
@@ -162,7 +83,7 @@ export default function PublicTendersPage() {
           <div className="wrap">
             <span className="eyebrow">Tenders</span>
             <h1>Browse tenders</h1>
-            <p>No account needed to browse. Buy a tender's document to see full detail and enroll.</p>
+            <p>No account needed to browse. Open a tender to see full detail, buy its document, or enroll.</p>
           </div>
         </div>
 
@@ -174,25 +95,12 @@ export default function PublicTendersPage() {
                   key={v}
                   type="button"
                   className={v === view ? 'btn btn-solar' : 'btn btn-outline'}
-                  onClick={() => setView(v)}
+                  onClick={() => { setView(v); setSearchParams({ view: v }); }}
                 >
-                  {v[0].toUpperCase() + v.slice(1)}
+                  {VIEW_LABELS[v]}
                 </button>
               ))}
             </div>
-
-            {!token && (
-              <details>
-                <summary style={{ cursor: 'pointer' }}>Already have a Wattmatch account? Log in to self-enroll directly</summary>
-                <form onSubmit={handleLogin} style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
-                  {loginError && <p style={{ color: '#B53A3A', width: '100%' }}>{loginError}</p>}
-                  <input type="email" placeholder="Email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
-                  <input type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
-                  <button type="submit" className="btn btn-solar">Log in</button>
-                </form>
-              </details>
-            )}
-            {token && <p style={{ color: '#2F7A3E' }}>Logged in — each tender below now offers direct self-enroll.</p>}
 
             {error && <p style={{ color: '#B53A3A' }}>{error}</p>}
             {tenders === null && !error && <p>Loading…</p>}
@@ -201,7 +109,7 @@ export default function PublicTendersPage() {
             {tenders && tenders.length > 0 && (
               <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
                 {tenders.map((t) => (
-                  <TenderCard key={t.id} tender={t} token={token} />
+                  <TenderCard key={t.id} tender={t} />
                 ))}
               </div>
             )}

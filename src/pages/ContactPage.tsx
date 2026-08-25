@@ -56,9 +56,10 @@ export default function ContactPage() {
                 </span>
               </div>
             </Reveal>
-            {/* TODO: replace with the full, exact registered postal address — required for
-                payment-processor KYC review, a city name alone is not sufficient. */}
-            <p className="ws-source">Registered office: [TODO: full postal address], Delhi NCR, India</p>
+            <p className="ws-source">
+              Registered office: Wattmatch Energy Private Limited, E-15 F/F, Nandwani S, Baba Balak
+              Nath Marg, New Delhi, Delhi - 110021, India
+            </p>
           </div>
         </section>
       </main>

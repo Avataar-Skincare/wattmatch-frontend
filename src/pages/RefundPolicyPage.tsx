@@ -4,11 +4,11 @@ import Reveal from '../components/Reveal';
 import Seo from '../components/Seo';
 
 // New page, required for Razorpay's KYC/activation review — a missing or vague refund policy is
-// one of the most common rejection reasons. The EMD outcome matrix below is not a placeholder —
-// it's the actual, already-decided business rule (see TENDER_WORKFLOW_STAKEHOLDER_PLAN.md's Stage
-// 8), reused here verbatim rather than invented for this page. The processing timeline and the
-// two flat fees' non-refundable status are flagged as [TODO] since those are commercial decisions,
-// not yet formally confirmed.
+// one of the most common rejection reasons. EMD moved off money entirely (2026-08-25) — it's a
+// Bank Guarantee document released or invoked, never a payment refund; Success Charge is dropped
+// from the platform, not just from this page. The processing timeline and the two flat fees'
+// non-refundable status are flagged as [TODO] since those are commercial decisions, not yet
+// formally confirmed.
 export default function RefundPolicyPage() {
   return (
     <div className="content-page">
@@ -61,32 +61,31 @@ export default function RefundPolicyPage() {
 
               <h3>4. Earnest Money Deposit (EMD)</h3>
               <p>
-                The EMD is a refundable security deposit, not a fee for a service — refund or
-                forfeiture depends entirely on the outcome of your bid:
+                The EMD is not money we collect — it is a Bank Guarantee you arrange through your own
+                bank and submit to us as a document. "Refund" therefore means returning that document
+                to you; it is never a payment reversal.
               </p>
               <ul>
-                <li><strong>Not approved at technical review:</strong> refunded in full.</li>
-                <li><strong>Approved, but did not win the auction:</strong> refunded in full.</li>
                 <li>
-                  <strong>Won the auction and paid the success charge:</strong> refunded in full,
-                  separately from and in addition to the success charge itself.
+                  <strong>Released:</strong> we return the Bank Guarantee to the address you provided
+                  once your bid's outcome no longer requires it on file — for example, you were not
+                  approved at technical review, you were approved but did not win, or you won and the
+                  tender was successfully completed.
                 </li>
                 <li>
-                  <strong>Won the auction, then withdrew or failed to pay the success charge:</strong>{' '}
-                  the EMD is <strong>forfeited</strong>, not refunded. This is the one case where you
-                  do not get your deposit back — it exists specifically to discourage backing out
-                  after winning.
+                  <strong>Invoked:</strong> if you win and then withdraw or otherwise back out, we
+                  invoke the Bank Guarantee with your issuing bank instead of returning it. This is the
+                  one case where you do not get the instrument back — it exists specifically to
+                  discourage backing out after winning.
                 </li>
               </ul>
-
-              <h3>5. Success charge</h3>
               <p>
-                The success charge is only ever collected from the confirmed auction winner, after
-                they choose to proceed — it is not collected from anyone who does not win, and is not
-                refundable once paid, as it corresponds to a completed match.
+                Both outcomes are recorded by us as an explicit, reasoned decision — never automatic —
+                since returning or invoking a physical instrument is a real-world action, not a system
+                event.
               </p>
 
-              <h3>6. How to request a refund status update</h3>
+              <h3>5. How to request a refund status update</h3>
               <p>
                 If a refund you're expecting under this policy hasn't arrived within the timeline
                 above, contact us at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a> with
