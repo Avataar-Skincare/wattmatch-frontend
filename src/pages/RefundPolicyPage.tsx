@@ -6,9 +6,10 @@ import Seo from '../components/Seo';
 // New page, required for Razorpay's KYC/activation review — a missing or vague refund policy is
 // one of the most common rejection reasons. EMD moved off money entirely (2026-08-25) — it's a
 // Bank Guarantee document released or invoked, never a payment refund; Success Charge is dropped
-// from the platform, not just from this page. The processing timeline and the two flat fees'
-// non-refundable status are flagged as [TODO] since those are commercial decisions, not yet
-// formally confirmed.
+// from the platform, not just from this page. Confirmed business policy: both Razorpay-collected
+// fees (RfS Document, Bid Processing) are non-refundable once paid — Wattmatch does not process any
+// monetary refund through Razorpay. EMD is the only "returned" item on the platform, and it was
+// never a Razorpay payment to begin with (see Section 4).
 export default function RefundPolicyPage() {
   return (
     <div className="content-page">
@@ -29,34 +30,29 @@ export default function RefundPolicyPage() {
 
         <section>
           <div className="wrap prose">
-            <div className="legal-notice">
-              <strong>Template notice:</strong> This page is a working draft. It is not a substitute
-              for review by qualified legal counsel — please confirm the processing timeline below
-              against our actual payment processor settlement cycle before publishing live.
-            </div>
-
             <Reveal className="legal-block">
-              <h3>1. Processing timeline</h3>
+              <h3>1. No monetary refunds are processed through Razorpay</h3>
               <p>
-                Where a refund is due under this policy, we initiate it within [TODO: confirm — e.g.
-                "2 working days"] of the refund becoming due, and it is processed to your original
-                payment method within <strong>7 working days</strong> of initiation, subject to your
-                bank's or payment provider's own processing time.
+                Both fees Wattmatch collects through Razorpay — the RfS Document Fee and the Bid
+                Processing Fee — are non-refundable once paid (see Sections 2 and 3). The only item
+                ever "returned" on Wattmatch is the EMD, which is not a payment at all (Section 4).
+                As a result, no payment made through Razorpay is ever reversed or refunded under this
+                policy.
               </p>
 
               <h3>2. RfS Document (Bid Purchase) Fee</h3>
               <p>
                 This fee is charged once, to unlock a tender's full detail, and is{' '}
-                <strong>non-refundable</strong> [TODO: confirm] once the document has been accessed —
-                it reflects a service (access) that has already been delivered.
+                <strong>non-refundable</strong> once the document has been accessed — it reflects a
+                service (access) that has already been delivered.
               </p>
 
               <h3>3. Bid Processing Fee</h3>
               <p>
                 This fee is charged once your technical and financial bid is accepted into the
-                vetting queue, and is <strong>non-refundable</strong> [TODO: confirm] regardless of
-                the outcome of the technical review — it reflects the cost of administering the
-                vetting process itself, not a guarantee of approval.
+                vetting queue, and is <strong>non-refundable</strong> regardless of the outcome of the
+                technical review — it reflects the cost of administering the vetting process itself,
+                not a guarantee of approval.
               </p>
 
               <h3>4. Earnest Money Deposit (EMD)</h3>
@@ -85,11 +81,11 @@ export default function RefundPolicyPage() {
                 event.
               </p>
 
-              <h3>5. How to request a refund status update</h3>
+              <h3>5. How to check your EMD status</h3>
               <p>
-                If a refund you're expecting under this policy hasn't arrived within the timeline
-                above, contact us at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a> with
-                your tender reference and payment date.
+                If you're expecting your EMD Bank Guarantee to be released and it hasn't arrived,
+                contact us at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a> with your
+                tender reference and guarantee number.
               </p>
             </Reveal>
           </div>

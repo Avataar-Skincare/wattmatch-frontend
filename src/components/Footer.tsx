@@ -20,11 +20,7 @@ export default function Footer() {
           ))}
         </div>
         <div className="foot-bottom">
-          {/* TODO: replace with the full registered legal entity name, matching the PAN
-              character-for-character — payment-processor KYC review checks this against the
-              business's actual PAN/incorporation documents, "Wattmatch" alone is a trade name, not
-              the registered entity. */}
-          <span>© 2026 [TODO: full registered legal entity name]. All rights reserved.</span>
+          <span>© 2026 Wattmatch Energy Private Limited. All rights reserved.</span>
           <span>Built for India's C&amp;I solar transition.</span>
         </div>
       </div>

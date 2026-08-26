@@ -3,13 +3,12 @@ import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
 import Seo from '../components/Seo';
 
-// New page, required for Razorpay's KYC/activation review — "state the fee model." Every amount
-// below is deliberately marked [TODO], not shown as a real figure: the platform's actual pricing
-// engine (computeAmountPaise, wattmatch-server/src/services/pricingService.ts) is currently a
-// placeholder stub pending a final commission-model decision — showing a fabricated number here
-// would be actively misleading, not just incomplete. All fees are stated exclusive of applicable
-// taxes, since Wattmatch does not yet hold a GSTIN — this avoids having to reprice every fee the
-// moment GST registration is completed.
+// New page, required for Razorpay's KYC/activation review — "state the fee model." Both fees below
+// are genuinely set per-tender (Tender.rfsDocumentFeePaise / bidProcessingFeePaise, set by the admin
+// at tender creation — routes/tenders.ts), not a fixed platform-wide number, so there is no single
+// figure to publish here; the accurate fee model IS "varies by tender, disclosed before you pay."
+// All fees are stated exclusive of applicable taxes, since Wattmatch does not yet hold a GSTIN —
+// this avoids having to reprice every fee the moment GST registration is completed.
 export default function PricingPage() {
   return (
     <div className="content-page">
@@ -31,9 +30,10 @@ export default function PricingPage() {
         <section>
           <div className="wrap prose">
             <div className="legal-notice">
-              <strong>Template notice:</strong> Amounts marked [TODO] are pending a final commission-
-              model decision and are not yet charged to real users — see the Refund &amp;
-              Cancellation Policy for how each fee is (or isn't) refunded.
+              <strong>Fee model:</strong> Wattmatch does not charge a single flat fee across all
+              tenders — both fees below are set individually for each tender and shown to you on that
+              tender's page before you pay. See the Refund &amp; Cancellation Policy for how each fee
+              is (or isn't) refunded.
             </div>
 
             <Reveal className="legal-block">
@@ -41,13 +41,15 @@ export default function PricingPage() {
               <p>
                 A one-time, flat fee to unlock a tender's full detail (requirements, timelines, and
                 supporting documents). Charged once per tender per bidder — never charged again for
-                the same tender. Amount: [TODO], exclusive of applicable taxes.
+                the same tender. The amount varies by tender and is stated on that tender's page
+                before you pay, exclusive of applicable taxes.
               </p>
 
               <h3>2. Bid Processing Fee</h3>
               <p>
                 A one-time fee charged when you submit your technical and financial bid, covering the
-                cost of the vetting process. Amount: [TODO], exclusive of applicable taxes.
+                cost of the vetting process. The amount varies by tender and is stated on that
+                tender's page before you pay, exclusive of applicable taxes.
               </p>
 
               <h3>3. Earnest Money Deposit (EMD)</h3>

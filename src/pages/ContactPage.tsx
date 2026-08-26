@@ -35,15 +35,6 @@ export default function ContactPage() {
                 </span>
               </div>
               <div className="stat-card">
-                {/* TODO: replace with a real, working number before go-live — payment-processor
-                    review (and DPDP/consumer-facing practice generally) expects a phone number
-                    here, not just email. */}
-                <span className="sc-label">Phone</span>
-                <span className="sc-value" style={{ fontSize: 19 }}>
-                  <a href="tel:+91TODO">[TODO: phone number]</a>
-                </span>
-              </div>
-              <div className="stat-card">
                 <span className="sc-label">For C&amp;I buyers</span>
                 <span className="sc-value" style={{ fontSize: 15 }}>
                   Looking to switch to renewables? <Link to="/for-ci">Request a match →</Link>
