@@ -20,7 +20,7 @@ export default function Footer() {
           ))}
         </div>
         <div className="foot-bottom">
-          <span>© 2026 Wattmatch. All rights reserved.</span>
+          <span>© 2026 Wattmatch Energy Private Limited. All rights reserved.</span>
           <span>Built for India's C&amp;I solar transition.</span>
         </div>
       </div>

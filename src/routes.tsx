@@ -16,6 +16,10 @@ import SavingsCalculatorPage from './pages/SavingsCalculatorPage';
 import BlogIndexPage from './pages/BlogIndexPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AuctionPage from './pages/AuctionPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
+import PricingPage from './pages/PricingPage';
 import { blogPosts } from './data/blogPosts';
 
 export const routes: RouteRecord[] = [
@@ -35,6 +39,10 @@ export const routes: RouteRecord[] = [
   { path: '/savings-calculator', Component: SavingsCalculatorPage },
   { path: '/blog', Component: BlogIndexPage },
   { path: '/auction', Component: AuctionPage },
+  { path: '/privacy', Component: PrivacyPolicyPage },
+  { path: '/terms', Component: TermsOfServicePage },
+  { path: '/refund-policy', Component: RefundPolicyPage },
+  { path: '/pricing', Component: PricingPage },
   {
     path: '/blog/:slug',
     Component: BlogPostPage,

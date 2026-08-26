@@ -14,10 +14,17 @@ export const resourceLinks = [
   { href: '/regulatory-guide', label: 'Regulatory guide' },
   { href: '/glossary', label: 'Glossary of terms' },
   { href: '/savings-calculator', label: 'Savings calculator' },
+  { href: '/pricing', label: 'Pricing' },
 ];
 
+// Split from one combined "Privacy Policy & Terms" link into separate pages — required for
+// Razorpay's KYC/activation review, which checks for these as individually reachable pages, plus a
+// Refund & Cancellation policy which didn't exist before at all. The old combined page
+// (/privacy-terms) is left in place, just no longer linked from here.
 export const legalLinks = [
-  { href: '/privacy-terms', label: 'Privacy Policy & Terms' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/refund-policy', label: 'Refund & Cancellation' },
 ];
 
 export const indianStates = [

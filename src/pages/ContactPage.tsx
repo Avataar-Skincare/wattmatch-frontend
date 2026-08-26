@@ -47,7 +47,10 @@ export default function ContactPage() {
                 </span>
               </div>
             </Reveal>
-            <p className="ws-source">Office: Delhi NCR, India (full address to be added)</p>
+            <p className="ws-source">
+              Registered office: Wattmatch Energy Private Limited, E-15 F/F, Nandwani S, Baba Balak
+              Nath Marg, New Delhi, Delhi - 110021, India
+            </p>
           </div>
         </section>
       </main>
