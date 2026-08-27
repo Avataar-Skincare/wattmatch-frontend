@@ -92,7 +92,17 @@ export default function TermsOfServicePage() {
                 agreement, except as expressly set out in the applicable PPA and escrow terms.
               </p>
 
-              <h3>7. Governing law</h3>
+              <h3>7. Grievance redressal</h3>
+              <p>
+                If you have a complaint about a transaction, a fee, or anything else related to your
+                use of Wattmatch, you can reach our support team at{' '}
+                <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a>. We aim to acknowledge and
+                resolve every complaint within 5 (five) business days of receiving it. If your
+                complaint isn't resolved to your satisfaction within that time, you can escalate it by
+                replying to the same thread and asking for it to be escalated.
+              </p>
+
+              <h3>8. Governing law</h3>
               <p>
                 These terms are governed by the laws of India, and the courts of New Delhi shall
                 have exclusive jurisdiction over any dispute arising from them.
