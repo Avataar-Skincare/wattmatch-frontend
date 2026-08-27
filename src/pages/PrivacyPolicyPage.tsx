@@ -26,13 +26,6 @@ export default function PrivacyPolicyPage() {
 
         <section>
           <div className="wrap prose">
-            <div className="legal-notice">
-              <strong>Template notice:</strong> This page is a working draft structured around
-              India's Digital Personal Data Protection Act, 2023 (DPDP Act). It is not a substitute
-              for review by qualified legal counsel: please have a lawyer review and finalise this
-              before publishing it live.
-            </div>
-
             <Reveal className="legal-block">
               <h3>1. What we collect</h3>
               <p>
