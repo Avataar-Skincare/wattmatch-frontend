@@ -4,15 +4,9 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
 import Seo from '../components/Seo';
-import { useAuth, type OrgType } from '../lib/authContext';
+import { useAuth, HOME_BY_TYPE, type OrgType } from '../lib/authContext';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
-
-const DASHBOARD_BY_TYPE: Record<OrgType, string> = {
-  buyer: '/buyer-console',
-  generator: '/submit-bid',
-  admin: '/admin-console',
-};
 
 // One login for every account type — the backend already tells us which (Organization.type, baked
 // into the token at /organizations/login), so this is the single entry point that replaces the
@@ -29,7 +23,7 @@ export default function LoginPage() {
 
   // Already logged in (e.g. someone bookmarked /login, or clicked "Log in" while still signed in) —
   // send them straight to their dashboard instead of showing the form again.
-  if (hydrated && auth) return <Navigate to={DASHBOARD_BY_TYPE[auth.type]} replace />;
+  if (hydrated && auth) return <Navigate to={HOME_BY_TYPE[auth.type]} replace />;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -48,7 +42,7 @@ export default function LoginPage() {
       }
       const type = data.type as OrgType;
       login({ token: data.token, organizationId: data.organizationId, type });
-      navigate(DASHBOARD_BY_TYPE[type], { replace: true });
+      navigate(HOME_BY_TYPE[type], { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

@@ -1,18 +1,7 @@
 import { Outlet, Navigate, Link } from 'react-router-dom';
 import Footer from './Footer';
-import { useAuth, type OrgType } from '../lib/authContext';
-
-const HOME_BY_TYPE: Record<OrgType, string> = {
-  buyer: '/buyer-console',
-  generator: '/submit-bid',
-  admin: '/admin-console',
-};
-
-const LABEL_BY_TYPE: Record<OrgType, string> = {
-  buyer: 'Buyer',
-  generator: 'Generator',
-  admin: 'Admin',
-};
+import LogoMark from './icons/LogoMark';
+import { useAuth, HOME_BY_TYPE, LABEL_BY_TYPE, type OrgType } from '../lib/authContext';
 
 // One shared shell for every logged-in page — replaces each console's own copy-pasted login form
 // and its own <Header minimal/>. Also the route guard: redirects to /login if no one's logged in,
@@ -31,15 +20,17 @@ export default function DashboardShell({ allow }: { allow: OrgType[] }) {
   return (
     <div className="content-page">
       <header>
-        <nav>
-          <Link to="/" className="logo">Wattmatch</Link>
+        <nav className="dashboard-nav">
+          <Link to="/" className="logo">
+            <LogoMark src="https://cdn.avataarskin.com/static/cms/production/CONSULTATION_PORTAL/watt-logo-1.webp" />
+          </Link>
           <div className="nav-links">
             <Link to={HOME_BY_TYPE[auth.type]}>Dashboard</Link>
             {auth.type === 'admin' && <Link to="/admin-vetting">Vetting</Link>}
           </div>
           <div className="nav-cta">
             <span>{LABEL_BY_TYPE[auth.type]} account</span>
-            <button type="button" className="btn btn-outline" onClick={logout}>
+            <button type="button" className="btn btn-ghost" onClick={logout}>
               Log out
             </button>
           </div>

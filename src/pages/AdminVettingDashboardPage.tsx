@@ -32,7 +32,7 @@ interface OpenedEntry {
 
 interface PromotionResult {
   auctionId: number;
-  windowEndsAt: number;
+  scheduledStartAt: string;
   links: Array<{ alias: string; joinUrl: string }>;
 }
 
@@ -57,6 +57,7 @@ export default function AdminVettingDashboardPage() {
   const [openedFinancial, setOpenedFinancial] = useState<OpenedEntry[] | null>(null);
 
   const [promotion, setPromotion] = useState<PromotionResult | null>(null);
+  const [scheduledStartAt, setScheduledStartAt] = useState('');
 
   async function loadTenders() {
     try {
@@ -135,11 +136,23 @@ export default function AdminVettingDashboardPage() {
 
   async function promoteToAuction() {
     setError(null);
+    // A blank or past start time would otherwise reach the backend as an invalid/missing value —
+    // catching it here gives an immediate, specific message instead of a round-trip 400. Scheduling
+    // is mandatory: this tool never generates an auction that goes live immediately.
+    if (!scheduledStartAt) {
+      setError('Pick an auction start date and time — auctions are never generated live.');
+      return;
+    }
+    const candidate = new Date(scheduledStartAt);
+    if (candidate.getTime() <= Date.now()) {
+      setError('Auction start must be in the future.');
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE}/api/vetting-bids/${tenderRef}/promote-to-auction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ scheduledStartAt: candidate.toISOString() }),
       });
       const data = await res.json();
       if (!data.success) return setError(data.error);
@@ -259,14 +272,30 @@ export default function AdminVettingDashboardPage() {
               <h2>4. Generate auction</h2>
               <p className="sub sub-tight">
                 The lowest financial bid above becomes the auction's starting price automatically.
-                Every technically accepted generator gets a unique link to join.
+                Every technically accepted generator is emailed a unique link to join.
               </p>
-              <button type="button" className="btn btn-solar" onClick={promoteToAuction}>
-                Generate Auction
-              </button>
+              <div className="admin-field-row">
+                <label>
+                  Auction start (required){' '}
+                  <input
+                    type="datetime-local"
+                    value={scheduledStartAt}
+                    onChange={(e) => setScheduledStartAt(e.target.value)}
+                    required
+                  />
+                </label>
+                <button type="button" className="btn btn-solar" onClick={promoteToAuction} disabled={!scheduledStartAt}>
+                  Generate Auction
+                </button>
+              </div>
+              <p className="sub sub-tight">Auctions always launch at the scheduled time — never immediately.</p>
               {promotion && (
                 <div className="promotion-result">
-                  <p>Auction #{promotion.auctionId} is live.</p>
+                  <p>
+                    Auction #{promotion.auctionId} is scheduled to go live on{' '}
+                    {new Date(promotion.scheduledStartAt).toLocaleString()}. Join links have already
+                    been emailed to every generator.
+                  </p>
                   <ul className="join-links">
                     {promotion.links.map((l) => (
                       <li key={l.alias}>

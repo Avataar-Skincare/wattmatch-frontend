@@ -2,7 +2,9 @@ import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Reveal from '../components/Reveal';
 import Seo from '../components/Seo';
+import CheckIcon from '../components/icons/CheckIcon';
 import { usePayment } from '../hooks/usePayment';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
@@ -15,7 +17,12 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http:/
 // site. Accepts a `?tenderId=` query param so a link from the public Tenders list can prefill it.
 export default function RfsDocumentPurchasePage() {
   const [searchParams] = useSearchParams();
-  const [tenderId, setTenderId] = useState(searchParams.get('tenderId') ?? '');
+  // Arriving with a tenderId already in the URL means the link came from a specific tender (the
+  // public Tenders list, TenderDetailsPage's "buy" link) — that identity is fixed by how they got
+  // here, so the field is locked rather than left editable to something else by mistake. Arriving
+  // with no tenderId (this page's own bare URL) is the only case where typing one in makes sense.
+  const tenderIdFromLink = searchParams.get('tenderId');
+  const [tenderId, setTenderId] = useState(tenderIdFromLink ?? '');
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
   const [designation, setDesignation] = useState('');
@@ -60,67 +67,102 @@ export default function RfsDocumentPurchasePage() {
   }
 
   return (
-    <div className="content-page">
+    <div className="register-page">
       <Seo title="Buy tender document" description="Buy a tender's RfS Document to unlock full details." path="/rfs-document-purchase" />
       <Header minimal />
       <main>
-        <div className="page-hero">
-          <div className="wrap">
+        <div className="wrap">
+          <div className="register-hero">
             <span className="eyebrow">Stage 3</span>
             <h1>Buy the tender document</h1>
             <p>No account required. Pay the Bid Purchase Fee to unlock the full tender detail.</p>
           </div>
-        </div>
 
-        <section>
-          <form onSubmit={handleSubmit} className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 480 }}>
-            {error && <p style={{ color: '#B53A3A' }}>{error}</p>}
-            {status === 'success' && (
-              <p style={{ color: '#2F7A3E' }}>
-                Payment successful — your tender document should have opened in a new tab. You can also
-                come back for it any time by enrolling and visiting your generator dashboard.
-              </p>
+          <Reveal className="form-card register-form-card">
+            {status === 'success' ? (
+              <div className="form-success show">
+                <div className="check">
+                  <CheckIcon size={20} />
+                </div>
+                <h3>Payment successful</h3>
+                <p>
+                  Your tender document should have opened in a new tab. You can also come back for it
+                  any time by enrolling and visiting your generator dashboard.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <h3>Purchase details</h3>
+                <p className="sub">Fill in your details below to unlock the full tender document.</p>
+
+                {status === 'cancelled' && <p className="form-note">Payment cancelled — you can try again below.</p>}
+
+                <div className="field">
+                  <label htmlFor="rfsTenderId">Tender id</label>
+                  <input
+                    id="rfsTenderId"
+                    type="text"
+                    value={tenderId}
+                    onChange={(e) => setTenderId(e.target.value)}
+                    readOnly={!!tenderIdFromLink}
+                    required
+                  />
+                </div>
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="rfsName">Name</label>
+                    <input id="rfsName" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="rfsCompany">Company</label>
+                    <input id="rfsCompany" type="text" value={company} onChange={(e) => setCompany(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="rfsDesignation">Designation</label>
+                    <input id="rfsDesignation" type="text" value={designation} onChange={(e) => setDesignation(e.target.value)} required />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="rfsEmail">Email</label>
+                    <input id="rfsEmail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="rfsMobile">Mobile</label>
+                    <input id="rfsMobile" type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} required />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="rfsIsGenerator">Are you a generator?</label>
+                    <select id="rfsIsGenerator" value={isGenerator} onChange={(e) => setIsGenerator(e.target.value as 'yes' | 'no')}>
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </select>
+                  </div>
+                </div>
+
+                <p style={{ fontSize: '12.5px', color: 'var(--muted)', lineHeight: 1.5, marginBottom: '16px' }}>
+                  We collect the details above to process your purchase and, if you enroll later, to
+                  contact you about this tender. See our <a href="/privacy">Privacy Policy</a> for how
+                  your data is used and retained.
+                </p>
+                <label className="consent-field">
+                  <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)} required />
+                  <span>
+                    I have read the <a href="/privacy">Privacy Policy</a> and consent to Wattmatch
+                    collecting and processing my details as described there.
+                  </span>
+                </label>
+
+                <button type="submit" className="btn btn-solar" disabled={isProcessing || !consentGiven}>
+                  {isProcessing ? `${status.replace('_', ' ')}…` : 'Pay & buy document'}
+                </button>
+                {error && <p className="form-error">{error}</p>}
+              </form>
             )}
-            {status === 'cancelled' && <p>Payment cancelled.</p>}
-
-            <input type="text" placeholder="Tender id" value={tenderId} onChange={(e) => setTenderId(e.target.value)} required />
-            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-            <input type="text" placeholder="Company" value={company} onChange={(e) => setCompany(e.target.value)} required />
-            <input type="text" placeholder="Designation" value={designation} onChange={(e) => setDesignation(e.target.value)} required />
-            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="tel" placeholder="Mobile" value={mobile} onChange={(e) => setMobile(e.target.value)} required />
-            <label>
-              Are you a generator?{' '}
-              <select value={isGenerator} onChange={(e) => setIsGenerator(e.target.value as 'yes' | 'no')}>
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </label>
-
-            <p style={{ fontSize: '0.85rem', color: '#555' }}>
-              We collect the details above to process your purchase and, if you enroll later, to
-              contact you about this tender. See our <a href="/privacy">Privacy Policy</a> for how
-              your data is used and retained.
-            </p>
-            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.9rem' }}>
-              <input
-                type="checkbox"
-                checked={consentGiven}
-                onChange={(e) => setConsentGiven(e.target.checked)}
-                required
-                style={{ marginTop: '0.2rem' }}
-              />
-              <span>
-                I have read the <a href="/privacy">Privacy Policy</a> and consent to Wattmatch
-                collecting and processing my details as described there.
-              </span>
-            </label>
-
-            <button type="submit" className="btn btn-solar" disabled={isProcessing || !consentGiven}>
-              {isProcessing ? `${status.replace('_', ' ')}…` : 'Pay & buy document'}
-            </button>
-          </form>
-        </section>
+          </Reveal>
+        </div>
       </main>
       <Footer />
     </div>

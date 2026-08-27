@@ -71,15 +71,16 @@ header{
   position:sticky; top:0; z-index:100; background:rgba(245,242,234,0.88); backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
 }
-nav{display:flex; align-items:center; justify-content:space-between; padding:18px 32px; max-width:var(--maxw); margin:0 auto;}
-.logo{display:flex; align-items:center; gap:9px; font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-0.01em;}
+nav{display:flex; align-items:center; justify-content:space-between; padding:18px 32px; max-width:1440px; margin:0 auto;}
+.logo{display:flex; align-items:center; gap:9px; font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-0.01em; flex-shrink:0;}
 .logo-mark{width:140px; height:28px; flex-shrink:0; object-fit:contain; object-position:left center;}
 header .logo-mark{width:160px; height:32px;}
-.nav-links{display:flex; align-items:center; gap:30px; font-size:14.5px; font-weight:500;}
-.nav-links a{color:var(--ink); opacity:0.75; transition:opacity .15s;}
+.nav-links{display:flex; align-items:center; gap:24px; font-size:14.5px; font-weight:500;}
+.nav-links a{color:var(--ink); opacity:0.75; transition:opacity .15s; white-space:nowrap;}
 .nav-links a:hover{opacity:1;}
-.nav-cta{display:flex; gap:10px;}
-.nav-cta .btn{padding:10px 16px; font-size:13.5px;}
+.nav-cta{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+.nav-cta .btn{padding:10px 16px; font-size:13.5px; white-space:nowrap; flex-shrink:0;}
+.nav-cta > span{white-space:nowrap; opacity:0.75; font-size:13.5px;}
 .nav-dropdown{position:relative; padding:8px 0;}
 .nav-dropdown-trigger{color:var(--ink); opacity:0.75; cursor:pointer; transition:opacity .15s;}
 .nav-dropdown-trigger::after{content:"▾"; display:inline-block; margin-left:5px; font-size:10px; opacity:0.8;}
@@ -100,9 +101,16 @@ header .logo-mark{width:160px; height:32px;}
 .burger{display:none; width:38px; height:38px; border-radius:8px; border:1.5px solid var(--line); background:none; cursor:pointer; align-items:center; justify-content:center;}
 .burger span, .burger span::before, .burger span::after{content:""; display:block; width:16px; height:2px; background:var(--ink); position:relative; transition:.2s;}
 .burger span::before{position:absolute; top:-5px;} .burger span::after{position:absolute; top:5px;}
-@media (max-width:900px){
+@media (max-width:1180px){
   .nav-links, .nav-cta{display:none;}
   .burger{display:flex;}
+}
+/* Dashboard nav (DashboardShell) has no burger/mobile-menu counterpart and far less content than
+   the public site header, so it doesn't need to collapse at the same breakpoint — keep it visible
+   and let it wrap onto a second row on narrow screens instead of disappearing. */
+.dashboard-nav .nav-links, .dashboard-nav .nav-cta{display:flex;}
+@media (max-width:560px){
+  .dashboard-nav{flex-wrap:wrap; row-gap:10px;}
 }
 .mobile-menu{display:none; flex-direction:column; gap:2px; padding:8px 20px 22px; border-top:1px solid var(--line);}
 .mobile-menu.open{display:flex;}
@@ -361,6 +369,7 @@ header .logo-mark{width:160px; height:32px;}
   background:var(--porcelain); color:var(--ink); transition:border-color .15s;
 }
 .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:var(--ink);}
+.field input:read-only{background:var(--line); color:var(--muted); cursor:default;}
 .field input:invalid:not(:focus):not(:placeholder-shown){border-color:#B53A3A;}
 .field textarea{resize:vertical; min-height:70px;}
 .field input[type=number]{-moz-appearance:textfield;}
@@ -523,6 +532,12 @@ footer{background:var(--ink); color:var(--muted-dark); padding:44px 0 28px;}
 .reg-table td:first-child{font-weight:600; white-space:nowrap;}
 .reg-table td{color:var(--muted);}
 .reg-table tr:last-child td{border-bottom:none;}
+.tenders-table th{background:var(--solar); color:var(--ink); font-family:var(--body); font-weight:700; text-transform:none; letter-spacing:0; font-size:13.5px;}
+.tenders-table td{vertical-align:top; color:var(--ink);}
+.tenders-table tr:hover td{background:var(--porcelain-2);}
+.tender-details-link{color:var(--copper-dark); font-weight:600; text-decoration:underline; white-space:nowrap;}
+.tender-details-link:hover{color:var(--copper);}
+.btn-link-reset{background:none; border:none; padding:0; font:inherit; cursor:pointer;}
 
 /* Tender enroll card (TenderDetailsPage) */
 .enroll-card{
@@ -753,20 +768,37 @@ main.admin-page{padding:48px 0 88px;}
 .admin-field-row input:focus, .admin-field-row select:focus{outline:none; border-color:var(--ink);}
 .admin-field-row label.checkbox{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); white-space:nowrap;}
 .admin-field-row .btn{padding:10px 16px; font-size:13px;}
-.admin-field.full{width:100%; margin-bottom:12px;}
-.admin-field.full input[type=text], .admin-field.full input[type=number]{width:100%;}
-.admin-field.full textarea{
+.admin-field{margin-bottom:12px;}
+.admin-field.full{width:100%;}
+.admin-field input[type=text], .admin-field input[type=number]{
+  width:100%; border:1.5px solid var(--line); border-radius:8px; padding:10px 12px; font-family:var(--body); font-size:13.5px;
+  background:var(--porcelain); color:var(--ink); transition:border-color .15s;
+}
+.admin-field input:focus{outline:none; border-color:var(--ink);}
+.admin-field textarea{
   width:100%; border:1.5px solid var(--line); border-radius:8px; padding:11px 12px; font-family:var(--body); font-size:13.5px;
   background:var(--porcelain); color:var(--ink); resize:vertical; transition:border-color .15s;
 }
-.admin-field.full textarea:focus{outline:none; border-color:var(--ink);}
-.admin-field-hint{font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); display:block; margin:0 0 14px;}
+.admin-field textarea:focus{outline:none; border-color:var(--ink);}
+.admin-field-hint{font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); display:block; margin:0 0 6px;}
+.admin-field-row .admin-field-hint{margin:0;}
+
+.admin-field-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;}
+@media (max-width:520px){.admin-field-grid{grid-template-columns:1fr;}}
+.admin-field-grid .admin-field{margin-bottom:0;}
 
 .admin-list{display:flex; flex-direction:column; margin-top:12px; border-top:1px solid var(--line);}
 .admin-list-row{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:12px 2px; border-bottom:1px solid var(--line); font-size:13.5px; flex-wrap:wrap;}
 .admin-list-row .row-main{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
 .admin-list-row .meta{color:var(--muted); font-size:12.5px;}
 .admin-list-empty{padding:16px 2px; color:var(--muted); font-size:13.5px;}
+.doc-field-row{display:flex; flex-direction:column; gap:8px; padding:12px 2px; border-bottom:1px solid var(--line); font-size:13.5px;}
+.doc-field-row-top{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;}
+.doc-field-row-top .row-main{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.doc-field-row-top .meta{color:var(--muted); font-size:12.5px;}
+.doc-field-row-bottom{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+.doc-field-upload{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.doc-field-upload input[type="file"]{font-size:12px; max-width:220px;}
 
 .link-btn{background:none; border:none; padding:0; margin:0; font:inherit; font-size:12.5px; font-weight:600; color:var(--solar-dark); cursor:pointer; text-decoration:underline; text-decoration-color:transparent; transition:text-decoration-color .15s;}
 .link-btn:hover{text-decoration-color:var(--solar-dark);}
@@ -784,9 +816,12 @@ main.admin-page{padding:48px 0 88px;}
 .checklist-envelope .env-label{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:block; margin:20px 0 6px;}
 .checklist-envelope .env-label:first-child{margin-top:0;}
 .checklist-items{display:flex; flex-direction:column;}
-.checklist-row{display:flex; align-items:flex-start; gap:9px; padding:6px 0; font-size:13.5px; color:var(--ink); line-height:1.45;}
+.checklist-row{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:9px; padding:6px 0; font-size:13.5px; color:var(--ink); line-height:1.45;}
 .checklist-row input{margin-top:3px; flex-shrink:0; accent-color:var(--solar-dark);}
 .checklist-row .optional-tag{color:var(--muted);}
+.checklist-row-main{display:flex; align-items:flex-start; gap:9px; flex:1; min-width:220px;}
+.checklist-row label.checkbox{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); white-space:nowrap; flex-shrink:0;}
+.checklist-row input[type="file"]{font-size:12px; max-width:200px;}
 .checklist-extra-list{list-style:none; margin:8px 0 4px; padding:0; display:flex; flex-direction:column; gap:6px;}
 .checklist-extra-list li{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:13px; background:var(--porcelain); border-radius:8px; padding:8px 12px;}
 .req-tag{font-family:var(--mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:var(--solar-dark); margin-left:6px;}
@@ -796,6 +831,27 @@ main.admin-page{padding:48px 0 88px;}
 .doc-status-list li:last-child{border-bottom:none;}
 .doc-uploaded{color:#227C49; font-size:13px;}
 .doc-missing{color:var(--muted); font-size:13px;}
+
+/* Generator bid-submission page (GeneratorBidSubmissionPage) — the document checklist needs a
+   format-download link and an upload control per row on top of the plain status text above, so it
+   gets its own two-line row layout instead of doc-status-list's single space-between line. */
+.bid-doc-list li{display:flex; flex-direction:column; gap:8px;}
+.bid-doc-row-top{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;}
+.bid-doc-row-bottom{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+.bid-doc-row-bottom input[type="file"]{font-size:12px; max-width:220px;}
+.doc-envelope-tag{color:var(--muted); font-size:12px;}
+.doc-format-link{color:var(--copper-dark); font-weight:600; text-decoration:underline; font-size:13px;}
+.doc-format-link:hover{color:var(--copper);}
+
+.bid-submission-wrap{display:flex; flex-direction:column; gap:28px; max-width:760px;}
+.dev-mode-banner{
+  border:2px dashed #E08A00; border-radius:12px; padding:14px 16px; background:#FFF8EC;
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  font-size:13.5px; color:var(--ink);
+}
+.enroll-card h3{font-size:15px; margin:20px 0 6px;}
+.enroll-card h3:first-child{margin-top:0;}
+.enroll-card p.sub{font-size:13.5px; color:var(--muted); margin:0 0 10px; line-height:1.5;}
 
 .emd-list{margin-top:10px; border-top:1px solid var(--line);}
 .emd-row{padding:14px 2px; border-bottom:1px solid var(--line);}

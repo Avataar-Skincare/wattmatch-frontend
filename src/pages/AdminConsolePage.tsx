@@ -42,26 +42,7 @@ interface DocumentField {
   label: string;
   required: boolean;
   hasTemplate: boolean;
-}
-
-interface DocumentStatus {
-  fieldId: number;
-  label: string;
-  uploaded: boolean;
-  originalFilename: string | null;
-  downloadUrl: string | null;
-}
-
-interface EmdSubmissionView {
-  organizationId: number;
-  bankName: string;
-  guaranteeNumber: string;
-  amountPaise: number;
-  validUpto: string;
-  documentUrl: string | null;
-  status: 'submitted' | 'released' | 'invoked';
-  resolvedReason: string | null;
-  dispatchReference: string | null;
+  templateUrl: string | null;
 }
 
 interface TenderSummary {
@@ -118,12 +99,28 @@ function defaultChecklistState(): Record<string, boolean> {
   return Object.fromEntries(DEFAULT_DOCUMENT_CHECKLIST.map((f) => [f.key, true]));
 }
 
+function defaultChecklistRequiredState(): Record<string, boolean> {
+  return Object.fromEntries(DEFAULT_DOCUMENT_CHECKLIST.map((f) => [f.key, f.required]));
+}
+
 interface ExtraDocField {
   envelope: 'technical' | 'financial';
   key: string;
   label: string;
   required: boolean;
   template: File | null;
+}
+
+interface NewFieldRow {
+  envelope: 'technical' | 'financial';
+  key: string;
+  label: string;
+  required: boolean;
+  template: File | null;
+}
+
+function emptyFieldRow(): NewFieldRow {
+  return { envelope: 'technical', key: '', label: '', required: true, template: null };
 }
 
 export default function AdminConsolePage() {
@@ -158,12 +155,13 @@ export default function AdminConsolePage() {
   // (unchecked defaults, added extras) are applied as a follow-up pass right after, over the
   // existing add/delete endpoints — there's no dedicated "create with this exact list" endpoint.
   const [checklistIncluded, setChecklistIncluded] = useState<Record<string, boolean>>(defaultChecklistState());
+  const [checklistRequired, setChecklistRequired] = useState<Record<string, boolean>>(defaultChecklistRequiredState());
+  // Standard-format templates staged for a checklist item before the tender exists — key is the
+  // standard field's key, uploaded as a follow-up pass in applyDocumentChecklist once real field
+  // ids exist, same as the required-override pass.
+  const [standardTemplates, setStandardTemplates] = useState<Record<string, File | null>>({});
   const [extraFields, setExtraFields] = useState<ExtraDocField[]>([]);
-  const [newExtraEnvelope, setNewExtraEnvelope] = useState<'technical' | 'financial'>('technical');
-  const [newExtraKey, setNewExtraKey] = useState('');
-  const [newExtraLabel, setNewExtraLabel] = useState('');
-  const [newExtraRequired, setNewExtraRequired] = useState(true);
-  const [newExtraTemplate, setNewExtraTemplate] = useState<File | null>(null);
+  const [newExtraRows, setNewExtraRows] = useState<NewFieldRow[]>([emptyFieldRow()]);
 
   const [allTenders, setAllTenders] = useState<TenderSummary[] | null>(null);
 
@@ -171,21 +169,12 @@ export default function AdminConsolePage() {
   const [matches, setMatches] = useState<Match[] | null>(null);
 
   const [fields, setFields] = useState<DocumentField[] | null>(null);
-  const [newFieldEnvelope, setNewFieldEnvelope] = useState<'technical' | 'financial'>('technical');
-  const [newFieldKey, setNewFieldKey] = useState('');
-  const [newFieldLabel, setNewFieldLabel] = useState('');
-  const [newFieldRequired, setNewFieldRequired] = useState(true);
-  const [newFieldTemplate, setNewFieldTemplate] = useState<File | null>(null);
+  const [newFieldRows, setNewFieldRows] = useState<NewFieldRow[]>([emptyFieldRow()]);
+  const [standardFieldToAdd, setStandardFieldToAdd] = useState('');
+  const [uploadingTemplateFieldId, setUploadingTemplateFieldId] = useState<number | null>(null);
 
   const [existingRfsDocumentFile, setExistingRfsDocumentFile] = useState<File | null>(null);
   const [existingTenderDocumentFile, setExistingTenderDocumentFile] = useState<File | null>(null);
-
-  const [reviewOrgId, setReviewOrgId] = useState('');
-  const [reviewDocuments, setReviewDocuments] = useState<DocumentStatus[] | null>(null);
-
-  const [emdSubmissions, setEmdSubmissions] = useState<EmdSubmissionView[] | null>(null);
-  const [emdReason, setEmdReason] = useState<Record<number, string>>({});
-  const [emdDispatchReference, setEmdDispatchReference] = useState<Record<number, string>>({});
 
   async function loadRequests() {
     setError(null);
@@ -231,6 +220,13 @@ export default function AdminConsolePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dashboardTab]);
 
+  // The error banner renders once, at the top of this long page — a validation error from a form
+  // buried far down the page (e.g. "Add extra document" clicked without a key/label) otherwise looks
+  // like the button did nothing at all, since the only feedback lands off-screen above the fold.
+  useEffect(() => {
+    if (error) document.querySelector('.admin-alert.error')?.scrollIntoView({ block: 'center' });
+  }, [error]);
+
   function selectRequest(r: PendingRequest) {
     setSelectedRequest(r);
     setTitle(r.title);
@@ -251,20 +247,37 @@ export default function AdminConsolePage() {
     setChecklistIncluded((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
-  function addExtraField() {
-    if (!newExtraKey.trim() || !newExtraLabel.trim()) {
-      setError('An extra document needs both a key and a label');
+  function toggleChecklistRequired(key: string) {
+    setChecklistRequired((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function updateExtraRow(index: number, patch: Partial<NewFieldRow>) {
+    setNewExtraRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  }
+
+  function addExtraRow() {
+    setNewExtraRows((prev) => [...prev, emptyFieldRow()]);
+  }
+
+  function removeExtraRow(index: number) {
+    setNewExtraRows((prev) => (prev.length === 1 ? prev : prev.filter((_, i) => i !== index)));
+  }
+
+  // Stages every filled-in row into extraFields at once — same "+ add a row, fill several, commit
+  // together" pattern as the batch add-field form in View Existing Tenders, just staged locally
+  // instead of posted immediately (the tender doesn't exist yet at this point).
+  function commitExtraRows() {
+    const rowsToAdd = newExtraRows.filter((r) => r.key.trim() && r.label.trim());
+    if (rowsToAdd.length === 0) {
+      setError('Add at least one extra document with a key and a label');
       return;
     }
     setError(null);
     setExtraFields((prev) => [
       ...prev,
-      { envelope: newExtraEnvelope, key: newExtraKey.trim(), label: newExtraLabel.trim(), required: newExtraRequired, template: newExtraTemplate },
+      ...rowsToAdd.map((r) => ({ envelope: r.envelope, key: r.key.trim(), label: r.label.trim(), required: r.required, template: r.template })),
     ]);
-    setNewExtraKey('');
-    setNewExtraLabel('');
-    setNewExtraRequired(true);
-    setNewExtraTemplate(null);
+    setNewExtraRows([emptyFieldRow()]);
   }
 
   function removeExtraField(key: string) {
@@ -276,7 +289,17 @@ export default function AdminConsolePage() {
   // added extras are added here — both over tenderDocuments.ts's existing per-field endpoints.
   async function applyDocumentChecklist(tenderId: number) {
     const uncheckedKeys = new Set(DEFAULT_DOCUMENT_CHECKLIST.filter((f) => !checklistIncluded[f.key]).map((f) => f.key));
-    if (uncheckedKeys.size > 0) {
+    // Standard fields whose required/optional toggle was flipped away from its default — the
+    // server always seeds the default's own `required` value, so these need a follow-up PATCH.
+    const requiredOverrides = new Map(
+      DEFAULT_DOCUMENT_CHECKLIST.filter((f) => checklistIncluded[f.key] && checklistRequired[f.key] !== f.required).map((f) => [f.key, checklistRequired[f.key]])
+    );
+    // Standard-format templates staged before the tender existed — DEFAULT_DOCUMENT_CHECKLIST has
+    // no template of its own, so any of these need a follow-up upload once real field ids exist.
+    const templatesToUpload = new Map(
+      DEFAULT_DOCUMENT_CHECKLIST.filter((f) => checklistIncluded[f.key] && standardTemplates[f.key]).map((f) => [f.key, standardTemplates[f.key] as File])
+    );
+    if (uncheckedKeys.size > 0 || requiredOverrides.size > 0 || templatesToUpload.size > 0) {
       const res = await fetch(`${API_BASE}/api/tenders/${tenderId}/document-fields`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -287,6 +310,23 @@ export default function AdminConsolePage() {
             await fetch(`${API_BASE}/api/tenders/${tenderId}/document-fields/${f.id}`, {
               method: 'DELETE',
               headers: { Authorization: `Bearer ${token}` },
+            });
+            continue;
+          }
+          if (requiredOverrides.has(f.key)) {
+            await fetch(`${API_BASE}/api/tenders/${tenderId}/document-fields/${f.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ required: requiredOverrides.get(f.key) }),
+            });
+          }
+          if (templatesToUpload.has(f.key)) {
+            const templateForm = new FormData();
+            templateForm.append('template', templatesToUpload.get(f.key) as File);
+            await fetch(`${API_BASE}/api/tenders/${tenderId}/document-fields/${f.id}/template`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}` },
+              body: templateForm,
             });
           }
         }
@@ -365,7 +405,10 @@ export default function AdminConsolePage() {
       setSelectedRequest(null);
       setTenderRefInput(String(tenderId));
       setChecklistIncluded(defaultChecklistState());
+      setChecklistRequired(defaultChecklistRequiredState());
+      setStandardTemplates({});
       setExtraFields([]);
+      setNewExtraRows([emptyFieldRow()]);
       setRfsDocumentFile(null);
       setTenderDocumentFile(null);
       await loadRequests();
@@ -380,19 +423,28 @@ export default function AdminConsolePage() {
     }
   }
 
-  function viewExistingTender(id: number) {
-    setTenderRefInput(String(id));
+  // Selecting a tender (from the dropdown below, or "View details" in the list above) loads both
+  // its matched generators and its document checklist right away — previously both needed a
+  // separate manual "Load" click even after picking a tender, which was pure friction, not a real
+  // choice point.
+  async function selectTenderDetail(idStr: string) {
+    setTenderRefInput(idStr);
     setMatches(null);
     setFields(null);
-    setReviewDocuments(null);
-    setEmdSubmissions(null);
+    if (!idStr) return;
+    await Promise.all([loadMatches(idStr), loadFields(idStr)]);
   }
 
-  async function loadMatches() {
+  function viewExistingTender(id: number) {
+    void selectTenderDetail(String(id));
+  }
+
+  async function loadMatches(idOverride?: string) {
     setError(null);
     setMatches(null);
     try {
-      const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/matches`, {
+      const id = idOverride ?? tenderRefInput;
+      const res = await fetch(`${API_BASE}/api/tenders/${id}/matches`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -418,17 +470,64 @@ export default function AdminConsolePage() {
     }
   }
 
-  async function addField(e: FormEvent) {
+  function updateFieldRow(index: number, patch: Partial<NewFieldRow>) {
+    setNewFieldRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  }
+
+  function addFieldRow() {
+    setNewFieldRows((prev) => [...prev, emptyFieldRow()]);
+  }
+
+  function removeFieldRow(index: number) {
+    setNewFieldRows((prev) => (prev.length === 1 ? prev : prev.filter((_, i) => i !== index)));
+  }
+
+  // Submits every row that has both a key and a label in one go — added so the admin can stage
+  // several new checklist documents at once instead of re-filling and submitting the form per field.
+  async function submitFieldRows(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    const rowsToAdd = newFieldRows.filter((r) => r.key.trim() && r.label.trim());
+    if (rowsToAdd.length === 0) {
+      setError('Add at least one document field with a key and a label');
+      return;
+    }
+    try {
+      for (const row of rowsToAdd) {
+        const form = new FormData();
+        form.append('envelope', row.envelope);
+        form.append('key', row.key.trim());
+        form.append('label', row.label.trim());
+        form.append('required', String(row.required));
+        if (row.template) form.append('template', row.template);
+        const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/document-fields`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || `Failed to add document field "${row.label}"`);
+      }
+      setNewFieldRows([emptyFieldRow()]);
+      await loadFields();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add document field(s)');
+    }
+  }
+
+  // Re-adds a document that was originally part of the standard checklist (DEFAULT_DOCUMENT_CHECKLIST)
+  // but got deleted from this specific tender — looks up its exact key/label/envelope/required from
+  // the standard list so the admin doesn't have to retype them by hand in the generic add-field form.
+  async function addStandardField() {
+    setError(null);
+    const standard = DEFAULT_DOCUMENT_CHECKLIST.find((f) => f.key === standardFieldToAdd);
+    if (!standard) return;
     try {
       const form = new FormData();
-      form.append('envelope', newFieldEnvelope);
-      form.append('key', newFieldKey);
-      form.append('label', newFieldLabel);
-      form.append('required', String(newFieldRequired));
-      if (newFieldTemplate) form.append('template', newFieldTemplate);
-
+      form.append('envelope', standard.envelope);
+      form.append('key', standard.key);
+      form.append('label', standard.label);
+      form.append('required', String(standard.required));
       const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/document-fields`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
@@ -436,12 +535,10 @@ export default function AdminConsolePage() {
       });
       const data = await res.json();
       if (!data.success) return setError(data.error);
-      setNewFieldKey('');
-      setNewFieldLabel('');
-      setNewFieldTemplate(null);
+      setStandardFieldToAdd('');
       await loadFields();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add document field');
+      setError(err instanceof Error ? err.message : 'Failed to re-add document field');
     }
   }
 
@@ -460,52 +557,48 @@ export default function AdminConsolePage() {
     }
   }
 
-  async function loadReviewDocuments() {
+  // Flips required/optional on an already-posted tender's field in place — keeps whatever uploads
+  // already exist against it, unlike delete-then-re-add which cascades those away.
+  async function toggleFieldRequired(fieldId: number, required: boolean) {
     setError(null);
-    setReviewDocuments(null);
+    setFields((prev) => (prev ? prev.map((f) => (f.id === fieldId ? { ...f, required } : f)) : prev));
     try {
-      const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/documents/${reviewOrgId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!data.success) return setError(data.error);
-      setReviewDocuments(data.documents);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load that generator's documents");
-    }
-  }
-
-  async function loadEmdSubmissions() {
-    setError(null);
-    setEmdSubmissions(null);
-    try {
-      const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/emd-submissions`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!data.success) return setError(data.error);
-      setEmdSubmissions(data.submissions);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load EMD submissions');
-    }
-  }
-
-  async function resolveEmd(organizationId: number, action: 'release' | 'invoke') {
-    setError(null);
-    try {
-      const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/emd-submissions/${organizationId}/${action}`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/document-fields/${fieldId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          reason: emdReason[organizationId] || '',
-          ...(action === 'release' && emdDispatchReference[organizationId] ? { dispatchReference: emdDispatchReference[organizationId] } : {}),
-        }),
+        body: JSON.stringify({ required }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error);
+        await loadFields();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update document field');
+      await loadFields();
+    }
+  }
+
+  // Uploads the moment a file is picked — a separate "Upload" click on top of the file picker was
+  // just a redundant second step for what is, from the admin's point of view, one action.
+  async function uploadFieldTemplate(fieldId: number, file: File) {
+    setError(null);
+    setUploadingTemplateFieldId(fieldId);
+    try {
+      const form = new FormData();
+      form.append('template', file);
+      const res = await fetch(`${API_BASE}/api/tenders/${tenderRefInput}/document-fields/${fieldId}/template`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
       });
       const data = await res.json();
       if (!data.success) return setError(data.error);
-      await loadEmdSubmissions();
+      await loadFields();
     } catch (err) {
-      setError(err instanceof Error ? err.message : `Failed to ${action} EMD`);
+      setError(err instanceof Error ? err.message : 'Failed to upload template');
+    } finally {
+      setUploadingTemplateFieldId(null);
     }
   }
 
@@ -569,7 +662,7 @@ export default function AdminConsolePage() {
                       {requests.length === 0 && <li className="admin-list-empty">No pending requests.</li>}
                     </ul>
                   )}
-                  <button type="button" className="link-btn" onClick={startAdHoc} style={{ marginTop: '0.85rem' }}>
+                  <button type="button" className="link-btn" onClick={startAdHoc} style={{ display: 'block', marginTop: '0.85rem' }}>
                     Or create a tender ad hoc (no request)
                   </button>
                 </div>
@@ -581,33 +674,39 @@ export default function AdminConsolePage() {
                   {nextTenderId !== null && <span className="admin-field-hint">Auto-generated id: #{nextTenderId}</span>}
 
                   <div className="admin-field full">
-                    <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                    <label className="admin-field-hint" htmlFor="tenderTitle">Title</label>
+                    <input id="tenderTitle" type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
                   </div>
-                  <div className="admin-field full">
-                    <input
-                      type="number"
-                      min="1"
-                      step="1"
-                      placeholder="Required capacity (MW)"
-                      value={requiredCapacityMw}
-                      onChange={(e) => setRequiredCapacityMw(e.target.value)}
-                      required
-                    />
-                  </div>
-                  {!selectedRequest && (
-                    <div className="admin-field full">
+                  <div className="admin-field-grid">
+                    <div className="admin-field">
+                      <label className="admin-field-hint" htmlFor="tenderCapacity">Required capacity (MW)</label>
                       <input
+                        id="tenderCapacity"
                         type="number"
-                        placeholder="Buyer organization id"
-                        value={buyerOrgId}
-                        onChange={(e) => setBuyerOrgId(e.target.value)}
+                        min="1"
+                        step="1"
+                        value={requiredCapacityMw}
+                        onChange={(e) => setRequiredCapacityMw(e.target.value)}
                         required
                       />
                     </div>
-                  )}
+                    {!selectedRequest && (
+                      <div className="admin-field">
+                        <label className="admin-field-hint" htmlFor="tenderBuyerOrgId">Buyer organization id</label>
+                        <input
+                          id="tenderBuyerOrgId"
+                          type="number"
+                          value={buyerOrgId}
+                          onChange={(e) => setBuyerOrgId(e.target.value)}
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
                   <div className="admin-field full">
+                    <label className="admin-field-hint" htmlFor="tenderRequirements">Full requirements (only visible to invited generators)</label>
                     <textarea
-                      placeholder="Full requirements (only visible to invited generators)"
+                      id="tenderRequirements"
                       value={requirementsDetail}
                       onChange={(e) => setRequirementsDetail(e.target.value)}
                       rows={4}
@@ -615,14 +714,19 @@ export default function AdminConsolePage() {
                   </div>
 
                   <h3>Per-tender pricing (₹)</h3>
-                  <div className="admin-field full">
-                    <input type="number" min="0" step="0.01" placeholder="RfS Document / Bid Purchase Fee" value={rfsDocumentFeeRupees} onChange={(e) => setRfsDocumentFeeRupees(e.target.value)} required />
+                  <div className="admin-field-grid">
+                    <div className="admin-field">
+                      <label className="admin-field-hint" htmlFor="tenderRfsFee">RfS Document / Bid Purchase Fee</label>
+                      <input id="tenderRfsFee" type="number" min="0" step="0.01" value={rfsDocumentFeeRupees} onChange={(e) => setRfsDocumentFeeRupees(e.target.value)} required />
+                    </div>
+                    <div className="admin-field">
+                      <label className="admin-field-hint" htmlFor="tenderBidProcessingFee">Bid Processing Fee</label>
+                      <input id="tenderBidProcessingFee" type="number" min="0" step="0.01" value={bidProcessingFeeRupees} onChange={(e) => setBidProcessingFeeRupees(e.target.value)} required />
+                    </div>
                   </div>
                   <div className="admin-field full">
-                    <input type="number" min="0" step="0.01" placeholder="Bid Processing Fee" value={bidProcessingFeeRupees} onChange={(e) => setBidProcessingFeeRupees(e.target.value)} required />
-                  </div>
-                  <div className="admin-field full">
-                    <input type="number" min="0" step="0.01" placeholder="EMD amount (disclosed only — collected as a Bank Guarantee, not a payment)" value={emdAmountRupees} onChange={(e) => setEmdAmountRupees(e.target.value)} required />
+                    <label className="admin-field-hint" htmlFor="tenderEmdAmount">EMD amount (disclosed only — collected as a Bank Guarantee, not a payment)</label>
+                    <input id="tenderEmdAmount" type="number" min="0" step="0.01" value={emdAmountRupees} onChange={(e) => setEmdAmountRupees(e.target.value)} required />
                   </div>
 
                   <h3>Tender documents</h3>
@@ -650,26 +754,54 @@ export default function AdminConsolePage() {
                     <span className="env-label">Technical envelope</span>
                     <div className="checklist-items">
                       {technicalChecklist.map((f) => (
-                        <label key={f.key} className="checklist-row">
-                          <input type="checkbox" checked={checklistIncluded[f.key] ?? true} onChange={() => toggleChecklistItem(f.key)} />
-                          <span>
-                            {f.label}
-                            {!f.required && <span className="optional-tag"> (optional)</span>}
-                          </span>
-                        </label>
+                        <div key={f.key} className="checklist-row">
+                          <label className="checklist-row-main">
+                            <input type="checkbox" checked={checklistIncluded[f.key] ?? true} onChange={() => toggleChecklistItem(f.key)} />
+                            <span>{f.label}</span>
+                          </label>
+                          <label className="checkbox">
+                            <input
+                              type="checkbox"
+                              checked={checklistRequired[f.key] ?? f.required}
+                              disabled={!(checklistIncluded[f.key] ?? true)}
+                              onChange={() => toggleChecklistRequired(f.key)}
+                            />{' '}
+                            Required
+                          </label>
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            disabled={!(checklistIncluded[f.key] ?? true)}
+                            onChange={(e) => setStandardTemplates((prev) => ({ ...prev, [f.key]: e.target.files?.[0] ?? null }))}
+                          />
+                        </div>
                       ))}
                     </div>
 
                     <span className="env-label">Financial envelope</span>
                     <div className="checklist-items">
                       {financialChecklist.map((f) => (
-                        <label key={f.key} className="checklist-row">
-                          <input type="checkbox" checked={checklistIncluded[f.key] ?? true} onChange={() => toggleChecklistItem(f.key)} />
-                          <span>
-                            {f.label}
-                            {!f.required && <span className="optional-tag"> (optional)</span>}
-                          </span>
-                        </label>
+                        <div key={f.key} className="checklist-row">
+                          <label className="checklist-row-main">
+                            <input type="checkbox" checked={checklistIncluded[f.key] ?? true} onChange={() => toggleChecklistItem(f.key)} />
+                            <span>{f.label}</span>
+                          </label>
+                          <label className="checkbox">
+                            <input
+                              type="checkbox"
+                              checked={checklistRequired[f.key] ?? f.required}
+                              disabled={!(checklistIncluded[f.key] ?? true)}
+                              onChange={() => toggleChecklistRequired(f.key)}
+                            />{' '}
+                            Required
+                          </label>
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            disabled={!(checklistIncluded[f.key] ?? true)}
+                            onChange={(e) => setStandardTemplates((prev) => ({ ...prev, [f.key]: e.target.files?.[0] ?? null }))}
+                          />
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -693,20 +825,34 @@ export default function AdminConsolePage() {
                     </>
                   )}
 
-                  <div className="admin-field-row" style={{ marginTop: '0.5rem' }}>
-                    <select value={newExtraEnvelope} onChange={(e) => setNewExtraEnvelope(e.target.value as 'technical' | 'financial')}>
-                      <option value="technical">Technical</option>
-                      <option value="financial">Financial</option>
-                    </select>
-                    <input type="text" placeholder="key (e.g. site_layout_plan)" value={newExtraKey} onChange={(e) => setNewExtraKey(e.target.value)} />
-                    <input type="text" placeholder="Label" value={newExtraLabel} onChange={(e) => setNewExtraLabel(e.target.value)} />
-                    <label className="checkbox">
-                      <input type="checkbox" checked={newExtraRequired} onChange={(e) => setNewExtraRequired(e.target.checked)} /> Required
-                    </label>
-                    <input type="file" accept="application/pdf" onChange={(e) => setNewExtraTemplate(e.target.files?.[0] ?? null)} />
-                    <button type="button" className="btn btn-outline" onClick={addExtraField}>
-                      Add extra document
-                    </button>
+                  <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {newExtraRows.map((row, i) => (
+                      <div className="admin-field-row" key={i}>
+                        <select value={row.envelope} onChange={(e) => updateExtraRow(i, { envelope: e.target.value as 'technical' | 'financial' })}>
+                          <option value="technical">Technical</option>
+                          <option value="financial">Financial</option>
+                        </select>
+                        <input type="text" placeholder="key (e.g. site_layout_plan)" value={row.key} onChange={(e) => updateExtraRow(i, { key: e.target.value })} />
+                        <input type="text" placeholder="Label" value={row.label} onChange={(e) => updateExtraRow(i, { label: e.target.value })} />
+                        <label className="checkbox">
+                          <input type="checkbox" checked={row.required} onChange={(e) => updateExtraRow(i, { required: e.target.checked })} /> Required
+                        </label>
+                        <input type="file" accept="application/pdf" onChange={(e) => updateExtraRow(i, { template: e.target.files?.[0] ?? null })} />
+                        {newExtraRows.length > 1 && (
+                          <button type="button" className="link-btn danger" onClick={() => removeExtraRow(i)}>
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <div className="admin-field-row">
+                      <button type="button" className="btn btn-outline" onClick={addExtraRow}>
+                        + Add another document field
+                      </button>
+                      <button type="button" className="btn btn-outline" onClick={commitExtraRows}>
+                        Add extra document(s)
+                      </button>
+                    </div>
                   </div>
 
                   <button type="submit" className="btn btn-solar" style={{ marginTop: '1.25rem' }}>
@@ -745,18 +891,20 @@ export default function AdminConsolePage() {
                 <div className="admin-card">
                   <h2>Tender detail</h2>
                   <div className="admin-field-row">
-                    <input
-                      type="text"
-                      placeholder="Tender id"
-                      value={tenderRefInput}
-                      onChange={(e) => setTenderRefInput(e.target.value)}
-                    />
+                    <select value={tenderRefInput} onChange={(e) => void selectTenderDetail(e.target.value)}>
+                      <option value="">Select a tender…</option>
+                      {allTenders?.map((t) => (
+                        <option key={t.id} value={String(t.id)}>
+                          #{t.id} — {t.title} ({t.status})
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <p className="sub sub-tight">Pick a tender above, or type an id directly.</p>
+                  <p className="sub sub-tight">Matched generators and the document checklist load automatically once you pick a tender.</p>
 
                   <h3>Matched generators</h3>
-                  <button type="button" className="btn btn-outline" onClick={loadMatches} disabled={!tenderRefInput}>
-                    Load matches
+                  <button type="button" className="btn btn-outline" onClick={() => loadMatches()} disabled={!tenderRefInput}>
+                    Refresh matches
                   </button>
                   {matches && (
                     <ul className="admin-list">
@@ -800,116 +948,104 @@ export default function AdminConsolePage() {
                   </div>
 
                   <h3>Document checklist</h3>
+                  <p className="sub sub-tight">The documents selected when this tender was created.</p>
                   <button type="button" className="btn btn-outline" onClick={() => loadFields()} disabled={!tenderRefInput}>
-                    Load fields
+                    Refresh checklist
                   </button>
                   {fields && (
                     <ul className="admin-list">
                       {fields.map((f) => (
-                        <li key={f.id} className="admin-list-row">
-                          <span className="row-main">
-                            [{f.envelope}] {f.label}
-                            {f.required && <span className="req-tag">required</span>}
-                            {f.hasTemplate && <span className="meta">has template</span>}
-                          </span>
-                          <button type="button" className="link-btn danger" onClick={() => deleteField(f.id)}>
-                            Delete
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  <div className="admin-field-row" style={{ marginTop: '0.75rem' }}>
-                    <form onSubmit={addField} className="admin-field-row" style={{ margin: 0 }}>
-                      <select value={newFieldEnvelope} onChange={(e) => setNewFieldEnvelope(e.target.value as 'technical' | 'financial')}>
-                        <option value="technical">Technical</option>
-                        <option value="financial">Financial</option>
-                      </select>
-                      <input type="text" placeholder="key (e.g. site_layout_plan)" value={newFieldKey} onChange={(e) => setNewFieldKey(e.target.value)} required />
-                      <input type="text" placeholder="Label" value={newFieldLabel} onChange={(e) => setNewFieldLabel(e.target.value)} required />
-                      <label className="checkbox">
-                        <input type="checkbox" checked={newFieldRequired} onChange={(e) => setNewFieldRequired(e.target.checked)} /> Required
-                      </label>
-                      <input type="file" accept="application/pdf" onChange={(e) => setNewFieldTemplate(e.target.files?.[0] ?? null)} />
-                      <button type="submit" className="btn btn-solar">Add field</button>
-                    </form>
-                  </div>
-
-                  <h3>Review a generator's uploaded documents</h3>
-                  <p className="sub sub-tight">
-                    Only available once the technical envelope's opening ceremony has run for this
-                    tender — these checklist documents are themselves part of the technical bid.
-                  </p>
-                  <div className="admin-field-row">
-                    <input type="text" placeholder="Generator organization id" value={reviewOrgId} onChange={(e) => setReviewOrgId(e.target.value)} />
-                    <button type="button" className="btn btn-outline" onClick={loadReviewDocuments} disabled={!tenderRefInput}>
-                      Load documents
-                    </button>
-                  </div>
-                  {reviewDocuments && (
-                    <ul className="doc-status-list">
-                      {reviewDocuments.map((d) => (
-                        <li key={d.fieldId}>
-                          <span>{d.label}</span>
-                          {d.uploaded ? (
-                            <span className="doc-uploaded">
-                              ✓ {d.originalFilename} {d.downloadUrl && <a href={d.downloadUrl} target="_blank" rel="noreferrer">(view)</a>}
+                        <li key={f.id} className="doc-field-row">
+                          <div className="doc-field-row-top">
+                            <span className="row-main">
+                              [{f.envelope}] {f.label}
+                              {f.templateUrl && (
+                                <a href={f.templateUrl} target="_blank" rel="noreferrer" className="meta">
+                                  view format
+                                </a>
+                              )}
                             </span>
-                          ) : (
-                            <span className="doc-missing">not uploaded</span>
-                          )}
+                            <label className="checkbox">
+                              <input
+                                type="checkbox"
+                                checked={f.required}
+                                onChange={(e) => toggleFieldRequired(f.id, e.target.checked)}
+                              />{' '}
+                              Required
+                            </label>
+                          </div>
+                          <div className="doc-field-row-bottom">
+                            <div className="doc-field-upload">
+                              <input
+                                type="file"
+                                accept="application/pdf"
+                                disabled={uploadingTemplateFieldId === f.id}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) uploadFieldTemplate(f.id, file);
+                                }}
+                              />
+                              {uploadingTemplateFieldId === f.id && <span className="meta">Uploading…</span>}
+                            </div>
+                            <button type="button" className="link-btn danger" onClick={() => deleteField(f.id)}>
+                              Delete
+                            </button>
+                          </div>
                         </li>
                       ))}
+                      {fields.length === 0 && <li className="admin-list-empty">No document fields on this tender.</li>}
                     </ul>
                   )}
 
-                  <h3>EMD submissions</h3>
-                  <p className="sub sub-tight">
-                    EMD is a Bank Guarantee document, not a payment — release it once you've physically
-                    returned the instrument, or invoke it with the issuing bank if the generator backs out.
-                    Both are manual, explicit actions with a required reason.
-                  </p>
-                  <button type="button" className="btn btn-outline" onClick={loadEmdSubmissions} disabled={!tenderRefInput}>
-                    Load EMD submissions
-                  </button>
-                  {emdSubmissions && (
-                    <ul className="emd-list">
-                      {emdSubmissions.map((s) => (
-                        <li key={s.organizationId} className="emd-row">
-                          <div className="row-main">
-                            #{s.organizationId} — {s.bankName} / {s.guaranteeNumber} — ₹{(s.amountPaise / 100).toFixed(2)} — valid till {s.validUpto}
-                            <span className={`status-pill ${s.status}`}>{s.status}</span>
-                            {s.documentUrl && <a href={s.documentUrl} target="_blank" rel="noreferrer">(view document)</a>}
-                          </div>
-                          {s.resolvedReason && <div className="emd-note">Reason: {s.resolvedReason}</div>}
-                          {s.dispatchReference && <div className="emd-note">Dispatch ref: {s.dispatchReference}</div>}
-                          {s.status === 'submitted' && (
-                            <div className="emd-actions">
-                              <input
-                                type="text"
-                                placeholder="Reason"
-                                value={emdReason[s.organizationId] ?? ''}
-                                onChange={(e) => setEmdReason((prev) => ({ ...prev, [s.organizationId]: e.target.value }))}
-                              />
-                              <input
-                                type="text"
-                                placeholder="Dispatch reference (optional)"
-                                value={emdDispatchReference[s.organizationId] ?? ''}
-                                onChange={(e) => setEmdDispatchReference((prev) => ({ ...prev, [s.organizationId]: e.target.value }))}
-                              />
-                              <button type="button" className="btn btn-outline" onClick={() => resolveEmd(s.organizationId, 'release')}>
-                                Release
-                              </button>
-                              <button type="button" className="btn btn-outline" onClick={() => resolveEmd(s.organizationId, 'invoke')}>
-                                Invoke
-                              </button>
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                      {emdSubmissions.length === 0 && <li className="admin-list-empty">No EMD submissions yet for this tender.</li>}
-                    </ul>
-                  )}
+                  {fields && (() => {
+                    const missingStandard = DEFAULT_DOCUMENT_CHECKLIST.filter((sf) => !fields.some((f) => f.key === sf.key));
+                    if (missingStandard.length === 0) return null;
+                    return (
+                      <div className="admin-field-row" style={{ marginTop: '0.75rem' }}>
+                        <select value={standardFieldToAdd} onChange={(e) => setStandardFieldToAdd(e.target.value)}>
+                          <option value="">Re-add a removed standard document…</option>
+                          {missingStandard.map((sf) => (
+                            <option key={sf.key} value={sf.key}>
+                              [{sf.envelope}] {sf.label}
+                            </option>
+                          ))}
+                        </select>
+                        <button type="button" className="btn btn-outline" disabled={!standardFieldToAdd} onClick={addStandardField}>
+                          Add back
+                        </button>
+                      </div>
+                    );
+                  })()}
+
+                  <form onSubmit={submitFieldRows} style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {newFieldRows.map((row, i) => (
+                      <div className="admin-field-row" key={i}>
+                        <select value={row.envelope} onChange={(e) => updateFieldRow(i, { envelope: e.target.value as 'technical' | 'financial' })}>
+                          <option value="technical">Technical</option>
+                          <option value="financial">Financial</option>
+                        </select>
+                        <input type="text" placeholder="key (e.g. site_layout_plan)" value={row.key} onChange={(e) => updateFieldRow(i, { key: e.target.value })} />
+                        <input type="text" placeholder="Label" value={row.label} onChange={(e) => updateFieldRow(i, { label: e.target.value })} />
+                        <label className="checkbox">
+                          <input type="checkbox" checked={row.required} onChange={(e) => updateFieldRow(i, { required: e.target.checked })} /> Required
+                        </label>
+                        <input type="file" accept="application/pdf" onChange={(e) => updateFieldRow(i, { template: e.target.files?.[0] ?? null })} />
+                        {newFieldRows.length > 1 && (
+                          <button type="button" className="link-btn danger" onClick={() => removeFieldRow(i)}>
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <div className="admin-field-row">
+                      <button type="button" className="btn btn-outline" onClick={addFieldRow}>
+                        + Add another document field
+                      </button>
+                      <button type="submit" className="btn btn-solar" disabled={!tenderRefInput}>
+                        Add field(s)
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </>
             )}

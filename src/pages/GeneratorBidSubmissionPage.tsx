@@ -1,9 +1,10 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { indianStates } from '../data/content';
 import { sealPayload } from '../lib/vettingSeal';
 import { useAuth } from '../lib/authContext';
+import { usePayment } from '../hooks/usePayment';
 
 // Internal PoC test tool, same bar as /admin-vetting and /auction-live — unstyled, functional, not
 // linked from site nav. Field set is the WattMatch-adapted subset of SECI RfS Format 7.1 (technical
@@ -28,6 +29,25 @@ import { useAuth } from '../lib/authContext';
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
 
 const TARIFF_PATTERN = /^\d+(\.\d{1,2})?$/;
+
+// Stakeholder-demo aid only — never true in a real deployment unless VITE_DEV_MODE is explicitly
+// set at build time. Lets a presenter populate every field with valid dummy values and auto-upload
+// placeholder documents instead of hand-typing a realistic bid live. Every value it produces still
+// goes through the same validation and the same real endpoints as a normal submission — this never
+// touches the server's gates (payment/EMD/document checks in vettingBids.ts stay untouched), it
+// only saves the presenter from typing.
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
+// A tiny, structurally valid single-page PDF — enough for any "accept application/pdf" input and
+// for the server's own storage, without needing a real scanned document on hand during a demo.
+function createDummyPdfFile(filename: string): File {
+  const pdfBytes =
+    '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n' +
+    '2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n' +
+    '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\n' +
+    'trailer<</Root 1 0 R>>';
+  return new File([pdfBytes], filename, { type: 'application/pdf' });
+}
 
 interface BidDraft {
   contactName: string;
@@ -97,6 +117,8 @@ export default function GeneratorBidSubmissionPage() {
   const [buyer, setBuyer] = useState<{ name: string; contactEmail: string; contactPhone: string } | null>(null);
   const [buyerLockedReason, setBuyerLockedReason] = useState<string | null>(null);
   const [tenderDocument, setTenderDocument] = useState<{ url: string; filename: string | null } | null>(null);
+  const [bidProcessingPaid, setBidProcessingPaid] = useState(false);
+  const payment = usePayment();
 
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -220,6 +242,7 @@ export default function GeneratorBidSubmissionPage() {
       setInvitationStatus(data.invitationStatus);
       setBuyer(data.buyer);
       setBuyerLockedReason(data.buyerLockedReason);
+      setBidProcessingPaid(!!data.bidProcessingPaid);
       // Not gated on invitation status — this is the "saved to your profile" access point for
       // whichever tender document you already paid for, independent of whether you've accepted an
       // invitation yet.
@@ -361,6 +384,59 @@ export default function GeneratorBidSubmissionPage() {
     }
   }
 
+  async function payBidProcessingFee() {
+    const result = await payment.startPayment({
+      purpose: 'bid_processing',
+      tenderId: Number(tenderRef),
+      token: token ?? '',
+      prefill: { name: contactName, email: contactEmail, contact: contactPhone },
+    });
+    if (result) setBidProcessingPaid(true);
+  }
+
+  // Dev-mode only (see DEV_MODE above) — populates every field with valid dummy values and, for
+  // the document checklist, performs real uploads through the same uploadDocument() call a
+  // presenter would trigger by hand, so the resulting records are indistinguishable from a real
+  // submission. The Bid Processing Fee and EMD document still require an explicit click (Razorpay
+  // test-card payment / "Submit EMD") — this only removes the typing, not the walkthrough.
+  async function fillDemoData() {
+    setContactName('Demo Contact');
+    setContactEmail('demo.generator@example.com');
+    setContactPhone('9876543210');
+    setCapacityMw('50');
+    setSolarMw('50');
+    setWindOtherMw('0');
+    setEssMw('0');
+    setEssMwh('0');
+    setVillage('Demo Village');
+    setDistrict('Demo District');
+    setStateName((prev) => prev || indianStates[0] || '');
+    setInterconnectionPoint('132kV Demo Substation');
+    setAcceptsTerms(true);
+    setNoDeviations(true);
+    setTariff('3.45');
+
+    setEmdBankName('Demo Bank Ltd');
+    setEmdGuaranteeNumber('BG-DEMO-0001');
+    setEmdAmountRupees('100000');
+    setEmdValidUpto(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10));
+    setEmdReturnRecipientName('Demo Contact');
+    setEmdReturnAddressLine('123 Demo Street');
+    setEmdReturnCity('Demo City');
+    setEmdReturnState((prev) => prev || indianStates[0] || '');
+    setEmdReturnPincode('110001');
+    setEmdReturnPhone('9876543210');
+    setEmdDocument(createDummyPdfFile('emd-bank-guarantee-demo.pdf'));
+
+    if (documents) {
+      for (const d of documents) {
+        if (d.required && !d.uploaded) {
+          await uploadDocument(d.fieldId, createDummyPdfFile(`${d.label.replace(/\s+/g, '-').toLowerCase()}-demo.pdf`));
+        }
+      }
+    }
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -430,36 +506,51 @@ export default function GeneratorBidSubmissionPage() {
       <main>
         <div className="page-hero">
           <div className="wrap">
-            <span className="eyebrow">Internal PoC</span>
+            <span className="eyebrow">Submit a bid</span>
             <h1>Submit a sealed bid</h1>
             <p>Technical and financial content are sealed in your browser before submission — WattMatch never sees plaintext until an approved custodian ceremony opens it.</p>
           </div>
         </div>
 
         <section>
-          <div className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: 720 }}>
-            {error && <p style={{ color: '#B53A3A' }}>{error}</p>}
+          <div className="wrap bid-submission-wrap">
+            {error && <p className="enroll-message error">{error}</p>}
 
-            <div>
-              <h2>1. View a tender</h2>
-              <input type="text" placeholder="Tender ref (id)" value={tenderRef} onChange={(e) => setTenderRef(e.target.value)} />
-              <button type="button" className="btn btn-solar" onClick={viewTender}>
-                View tender
-              </button>
+            {DEV_MODE && token && invitationStatus === 'accepted' && (
+              <div className="dev-mode-banner">
+                <span>
+                  <strong>Dev mode</strong> — demo use only, populates this form with valid dummy data and
+                  real placeholder document uploads.
+                </span>
+                <button type="button" className="btn btn-outline" onClick={() => void fillDemoData()}>
+                  Fill demo data
+                </button>
+              </div>
+            )}
+
+            <div className="enroll-card">
+              <h2>1. Tender</h2>
+              {!tender && !error && (
+                <p>
+                  No tender selected — pick one from your <Link to="/generator-dashboard">dashboard</Link>.
+                </p>
+              )}
               {tender && (
-                <div>
-                  <p>
-                    <strong>{tender.title}</strong> — requires {tender.requiredCapacityMw} MW — status: {tender.status}
-                  </p>
+                <>
+                  <table className="reg-table">
+                    <tbody>
+                      <tr><th>Tender</th><td>{tender.title}</td></tr>
+                      <tr><th>Required capacity</th><td>{tender.requiredCapacityMw} MW</td></tr>
+                      <tr><th>Status</th><td>{tender.status}</td></tr>
+                      <tr><th>Invitation status</th><td><span className={`status-pill ${invitationStatus}`}>{invitationStatus}</span></td></tr>
+                    </tbody>
+                  </table>
                   {tender.requirementsDetail && <p>{tender.requirementsDetail}</p>}
                   {tenderDocument && (
-                    <p>
-                      <a href={tenderDocument.url} className="btn btn-outline">
-                        Download tender document
-                      </a>
-                    </p>
+                    <a href={tenderDocument.url} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ alignSelf: 'flex-start' }}>
+                      Download tender document
+                    </a>
                   )}
-                  <p>Invitation status: {invitationStatus}</p>
                   {buyer ? (
                     <p>
                       Buyer: <strong>{buyer.name}</strong> — {buyer.contactEmail} — {buyer.contactPhone}
@@ -470,78 +561,97 @@ export default function GeneratorBidSubmissionPage() {
                     </p>
                   )}
                   {invitationStatus === 'invited' && (
-                    <>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
                       <button type="button" className="btn btn-solar" onClick={() => respond(true)}>
                         Accept invitation
                       </button>
-                      <button type="button" onClick={() => respond(false)}>
+                      <button type="button" className="btn btn-ghost" onClick={() => respond(false)}>
                         Decline
                       </button>
-                    </>
+                    </div>
                   )}
-                </div>
+                </>
               )}
             </div>
 
             {result && (
-              <p style={{ color: '#2F7A3E' }}>
+              <p className="enroll-message success">
                 Submitted as bid #{result.id}. Receipt hashes: <code>{JSON.stringify(result.receipt)}</code>
               </p>
             )}
 
+            {token && invitationStatus === 'accepted' && (
+              <div className="enroll-card">
+                <h2>2. Bid Processing Fee</h2>
+                {bidProcessingPaid ? (
+                  <p className="enroll-message success">✓ Bid Processing Fee paid.</p>
+                ) : (
+                  <>
+                    <p className="enroll-message error">Required before you can submit a bid.</p>
+                    {payment.error && <p className="enroll-message error">{payment.error}</p>}
+                    <button
+                      type="button"
+                      className="btn btn-solar"
+                      disabled={payment.isProcessing}
+                      onClick={() => void payBidProcessingFee()}
+                      style={{ alignSelf: 'flex-start' }}
+                    >
+                      {payment.isProcessing ? `${payment.status.replace('_', ' ')}…` : 'Pay Bid Processing Fee'}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
             {token && invitationStatus === 'accepted' && documents && (
-              <div>
-                <h2>2. Document checklist</h2>
-                <p>Download the blank format where one exists, then upload your filled PDF. Fields marked * are required before you can submit.</p>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <tbody>
-                    {documents.map((d) => (
-                      <tr key={d.fieldId} style={{ borderBottom: '1px solid #ddd' }}>
-                        <td style={{ padding: '0.4rem 0.5rem 0.4rem 0' }}>
+              <div className="enroll-card">
+                <h2>3. Document checklist</h2>
+                <p className="sub">Download the blank format where one exists, then upload your filled PDF. Fields marked * are required before you can submit.</p>
+                <ul className="doc-status-list bid-doc-list">
+                  {documents.map((d) => (
+                    <li key={d.fieldId}>
+                      <div className="bid-doc-row-top">
+                        <span>
                           {d.label}
-                          {d.required ? ' *' : ''} <span style={{ fontSize: '0.8rem', color: '#888' }}>({d.envelope})</span>
-                        </td>
-                        <td style={{ padding: '0.4rem' }}>
-                          {d.templateUrl ? (
-                            <a href={d.templateUrl} target="_blank" rel="noreferrer">
-                              View format
-                            </a>
-                          ) : (
-                            <span style={{ color: '#999' }}>No format provided</span>
-                          )}
-                        </td>
-                        <td style={{ padding: '0.4rem' }}>
-                          {d.uploaded ? (
-                            <span style={{ color: '#2F7A3E' }}>
-                              ✓ {d.originalFilename} {d.downloadUrl && <a href={d.downloadUrl} target="_blank" rel="noreferrer">(view)</a>}
-                            </span>
-                          ) : (
-                            <span style={{ color: d.required ? '#B53A3A' : '#999' }}>Not uploaded</span>
-                          )}
-                        </td>
-                        <td style={{ padding: '0.4rem' }}>
-                          <input
-                            type="file"
-                            accept="application/pdf"
-                            disabled={uploadingFieldId === d.fieldId}
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) void uploadDocument(d.fieldId, file);
-                              e.target.value = '';
-                            }}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          {d.required ? ' *' : ''} <span className="doc-envelope-tag">({d.envelope})</span>
+                        </span>
+                        {d.uploaded ? (
+                          <span className="doc-uploaded">
+                            ✓ {d.originalFilename} {d.downloadUrl && <a href={d.downloadUrl} target="_blank" rel="noreferrer">(view)</a>}
+                          </span>
+                        ) : (
+                          <span className="doc-missing">{d.required ? 'Required — not uploaded' : 'Not uploaded'}</span>
+                        )}
+                      </div>
+                      <div className="bid-doc-row-bottom">
+                        {d.templateUrl ? (
+                          <a href={d.templateUrl} target="_blank" rel="noreferrer" className="doc-format-link">
+                            View format
+                          </a>
+                        ) : (
+                          <span className="doc-missing">No format provided</span>
+                        )}
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          disabled={uploadingFieldId === d.fieldId}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) void uploadDocument(d.fieldId, file);
+                            e.target.value = '';
+                          }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
             {token && invitationStatus === 'accepted' && (
-              <div>
-                <h2>2b. Submit your EMD (Bank Guarantee)</h2>
-                <p>
+              <div className="enroll-card">
+                <h2>4. Submit your EMD (Bank Guarantee)</h2>
+                <p className="sub">
                   EMD is a physical/scanned Bank Guarantee, not an online payment. Upload it here along
                   with the address WattMatch should return it to once the tender is settled.
                 </p>
@@ -549,32 +659,76 @@ export default function GeneratorBidSubmissionPage() {
                   <p>
                     On file: {emdSubmission.bankName} / {emdSubmission.guaranteeNumber} — ₹
                     {(emdSubmission.amountPaise / 100).toFixed(2)} — valid till {emdSubmission.validUpto} —{' '}
-                    <strong>{emdSubmission.status}</strong>
+                    <span className={`status-pill ${emdSubmission.status}`}>{emdSubmission.status}</span>
                   </p>
                 ) : (
-                  <p style={{ color: '#B53A3A' }}>Not yet submitted — required before you can submit a bid.</p>
+                  <p className="enroll-message error">Not yet submitted — required before you can submit a bid.</p>
                 )}
                 {(!emdSubmission || emdSubmission.status === 'submitted') && (
                   <form onSubmit={submitEmd}>
-                    <input type="text" placeholder="Issuing bank name" value={emdBankName} onChange={(e) => setEmdBankName(e.target.value)} required />
-                    <input type="text" placeholder="Guarantee number" value={emdGuaranteeNumber} onChange={(e) => setEmdGuaranteeNumber(e.target.value)} required />
-                    <input type="number" min="0" step="0.01" placeholder="Amount (₹)" value={emdAmountRupees} onChange={(e) => setEmdAmountRupees(e.target.value)} required />
-                    <input type="date" placeholder="Valid upto" value={emdValidUpto} onChange={(e) => setEmdValidUpto(e.target.value)} required />
+                    <div className="field-row">
+                      <div className="field">
+                        <label htmlFor="emdBankName">Issuing bank name</label>
+                        <input id="emdBankName" type="text" value={emdBankName} onChange={(e) => setEmdBankName(e.target.value)} required />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="emdGuaranteeNumber">Guarantee number</label>
+                        <input id="emdGuaranteeNumber" type="text" value={emdGuaranteeNumber} onChange={(e) => setEmdGuaranteeNumber(e.target.value)} required />
+                      </div>
+                    </div>
+                    <div className="field-row">
+                      <div className="field">
+                        <label htmlFor="emdAmount">Amount (₹)</label>
+                        <input id="emdAmount" type="number" min="0" step="0.01" value={emdAmountRupees} onChange={(e) => setEmdAmountRupees(e.target.value)} required />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="emdValidUpto">Valid upto</label>
+                        <input id="emdValidUpto" type="date" value={emdValidUpto} onChange={(e) => setEmdValidUpto(e.target.value)} required />
+                      </div>
+                    </div>
+
                     <h3>Return address (where we send it back)</h3>
-                    <input type="text" placeholder="Recipient name" value={emdReturnRecipientName} onChange={(e) => setEmdReturnRecipientName(e.target.value)} required />
-                    <input type="text" placeholder="Address line" value={emdReturnAddressLine} onChange={(e) => setEmdReturnAddressLine(e.target.value)} required />
-                    <input type="text" placeholder="City" value={emdReturnCity} onChange={(e) => setEmdReturnCity(e.target.value)} required />
-                    <select value={emdReturnState} onChange={(e) => setEmdReturnState(e.target.value)} required>
-                      <option value="">Select state</option>
-                      {indianStates.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                    <input type="text" placeholder="Pincode" value={emdReturnPincode} onChange={(e) => setEmdReturnPincode(e.target.value)} required />
-                    <input type="tel" placeholder="Phone" value={emdReturnPhone} onChange={(e) => setEmdReturnPhone(e.target.value)} required />
-                    <input type="file" accept="application/pdf" onChange={(e) => setEmdDocument(e.target.files?.[0] ?? null)} />
+                    <div className="field-row">
+                      <div className="field">
+                        <label htmlFor="emdRecipient">Recipient name</label>
+                        <input id="emdRecipient" type="text" value={emdReturnRecipientName} onChange={(e) => setEmdReturnRecipientName(e.target.value)} required />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="emdAddress">Address line</label>
+                        <input id="emdAddress" type="text" value={emdReturnAddressLine} onChange={(e) => setEmdReturnAddressLine(e.target.value)} required />
+                      </div>
+                    </div>
+                    <div className="field-row">
+                      <div className="field">
+                        <label htmlFor="emdCity">City</label>
+                        <input id="emdCity" type="text" value={emdReturnCity} onChange={(e) => setEmdReturnCity(e.target.value)} required />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="emdState">State</label>
+                        <select id="emdState" value={emdReturnState} onChange={(e) => setEmdReturnState(e.target.value)} required>
+                          <option value="">Select state</option>
+                          {indianStates.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="field-row">
+                      <div className="field">
+                        <label htmlFor="emdPincode">Pincode</label>
+                        <input id="emdPincode" type="text" value={emdReturnPincode} onChange={(e) => setEmdReturnPincode(e.target.value)} required />
+                      </div>
+                      <div className="field">
+                        <label htmlFor="emdPhone">Phone</label>
+                        <input id="emdPhone" type="tel" value={emdReturnPhone} onChange={(e) => setEmdReturnPhone(e.target.value)} required />
+                      </div>
+                    </div>
+                    <div className="field">
+                      <label htmlFor="emdDoc">Scanned Bank Guarantee (PDF)</label>
+                      <input id="emdDoc" type="file" accept="application/pdf" onChange={(e) => setEmdDocument(e.target.files?.[0] ?? null)} />
+                    </div>
                     <button type="submit" className="btn btn-solar" disabled={submittingEmd}>
                       {submittingEmd ? 'Submitting…' : emdSubmission ? 'Replace EMD submission' : 'Submit EMD'}
                     </button>
@@ -584,65 +738,115 @@ export default function GeneratorBidSubmissionPage() {
             )}
 
             {token && invitationStatus === 'accepted' && (
-              <>
+              <div className="enroll-card">
+                <h2>5. Bid details</h2>
                 {draftRestored && (
-                  <p style={{ fontSize: '0.85rem' }}>
+                  <p className="enroll-message success">
                     Restored a saved draft from this browser.{' '}
-                    <button type="button" onClick={discardDraft}>
+                    <button type="button" className="btn-link-reset" style={{ textDecoration: 'underline' }} onClick={discardDraft}>
                       Discard draft &amp; start over
                     </button>
                   </p>
                 )}
-                <p style={{ fontSize: '0.8rem', color: '#888' }}>
+                <p className="sub">
                   Your progress below is saved automatically in this browser only — never sent to
                   our servers until you submit — so it won't follow you to a different device.
                 </p>
-              </>
-            )}
 
-            {token && invitationStatus === 'accepted' && (
-              <form onSubmit={handleSubmit}>
-                <h2>3. Contact person</h2>
-                <input type="text" placeholder="Name" value={contactName} onChange={(e) => setContactName(e.target.value)} required />
-                <input type="email" placeholder="Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required />
-                <input type="tel" placeholder="Phone" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
+                <form onSubmit={handleSubmit}>
+                  <h3>Contact person</h3>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="bidContactName">Name</label>
+                      <input id="bidContactName" type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="bidContactEmail">Email</label>
+                      <input id="bidContactEmail" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="bidContactPhone">Phone</label>
+                    <input id="bidContactPhone" type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
+                  </div>
 
-                <h2>Project — capacity &amp; technology mix</h2>
-                <input type="number" min="1" step="1" placeholder="Contracted capacity offered (MW)" value={capacityMw} onChange={(e) => setCapacityMw(e.target.value)} required />
-                <input type="number" min="0" step="0.1" placeholder="Solar installed (MW)" value={solarMw} onChange={(e) => setSolarMw(e.target.value)} />
-                <input type="number" min="0" step="0.1" placeholder="Wind / other RE installed (MW)" value={windOtherMw} onChange={(e) => setWindOtherMw(e.target.value)} />
-                <input type="number" min="0" step="0.1" placeholder="Storage (ESS) — MW" value={essMw} onChange={(e) => setEssMw(e.target.value)} />
-                <input type="number" min="0" step="0.1" placeholder="Storage (ESS) — MWh" value={essMwh} onChange={(e) => setEssMwh(e.target.value)} />
+                  <h3>Project — capacity &amp; technology mix</h3>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="bidCapacity">Contracted capacity offered (MW)</label>
+                      <input id="bidCapacity" type="number" min="1" step="1" value={capacityMw} onChange={(e) => setCapacityMw(e.target.value)} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="bidSolar">Solar installed (MW)</label>
+                      <input id="bidSolar" type="number" min="0" step="0.1" value={solarMw} onChange={(e) => setSolarMw(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="bidWind">Wind / other RE installed (MW)</label>
+                      <input id="bidWind" type="number" min="0" step="0.1" value={windOtherMw} onChange={(e) => setWindOtherMw(e.target.value)} />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="bidEssMw">Storage (ESS) — MW</label>
+                      <input id="bidEssMw" type="number" min="0" step="0.1" value={essMw} onChange={(e) => setEssMw(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="bidEssMwh">Storage (ESS) — MWh</label>
+                    <input id="bidEssMwh" type="number" min="0" step="0.1" value={essMwh} onChange={(e) => setEssMwh(e.target.value)} />
+                  </div>
 
-                <h2>Project — location &amp; connectivity</h2>
-                <input type="text" placeholder="Village / site" value={village} onChange={(e) => setVillage(e.target.value)} required />
-                <input type="text" placeholder="District" value={district} onChange={(e) => setDistrict(e.target.value)} required />
-                <select value={stateName} onChange={(e) => setStateName(e.target.value)} required>
-                  <option value="">Select state</option>
-                  {indianStates.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                <input type="text" placeholder="Interconnection point" value={interconnectionPoint} onChange={(e) => setInterconnectionPoint(e.target.value)} required />
+                  <h3>Project — location &amp; connectivity</h3>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="bidVillage">Village / site</label>
+                      <input id="bidVillage" type="text" value={village} onChange={(e) => setVillage(e.target.value)} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="bidDistrict">District</label>
+                      <input id="bidDistrict" type="text" value={district} onChange={(e) => setDistrict(e.target.value)} required />
+                    </div>
+                  </div>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="bidState">State</label>
+                      <select id="bidState" value={stateName} onChange={(e) => setStateName(e.target.value)} required>
+                        <option value="">Select state</option>
+                        {indianStates.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="field">
+                      <label htmlFor="bidInterconnection">Interconnection point</label>
+                      <input id="bidInterconnection" type="text" value={interconnectionPoint} onChange={(e) => setInterconnectionPoint(e.target.value)} required />
+                    </div>
+                  </div>
 
-                <h2>Declarations</h2>
-                <label style={{ display: 'block' }}>
-                  <input type="checkbox" checked={acceptsTerms} onChange={(e) => setAcceptsTerms(e.target.checked)} /> We unconditionally accept the tender's terms and PPA.
-                </label>
-                <label style={{ display: 'block' }}>
-                  <input type="checkbox" checked={noDeviations} onChange={(e) => setNoDeviations(e.target.checked)} /> Our submission has no deviations from the prescribed forms.
-                </label>
+                  <h3>Declarations</h3>
+                  <label className="consent-field">
+                    <input type="checkbox" checked={acceptsTerms} onChange={(e) => setAcceptsTerms(e.target.checked)} />
+                    <span>We unconditionally accept the tender's terms and PPA.</span>
+                  </label>
+                  <label className="consent-field">
+                    <input type="checkbox" checked={noDeviations} onChange={(e) => setNoDeviations(e.target.checked)} />
+                    <span>Our submission has no deviations from the prescribed forms.</span>
+                  </label>
 
-                <h2>Financial bid</h2>
-                <p>Single fixed tariff, ₹/kWh, exactly two decimal places. No ranges, formulas, or conditions.</p>
-                <input type="text" inputMode="decimal" placeholder="e.g. 3.45" value={tariff} onChange={(e) => setTariff(e.target.value)} required />
+                  <h3>Financial bid</h3>
+                  <p className="sub">Single fixed tariff, ₹/kWh, exactly two decimal places. No ranges, formulas, or conditions.</p>
+                  <div className="field">
+                    <label htmlFor="bidTariff">Tariff (₹/kWh)</label>
+                    <input id="bidTariff" type="text" inputMode="decimal" placeholder="e.g. 3.45" value={tariff} onChange={(e) => setTariff(e.target.value)} required />
+                  </div>
 
-                <button type="submit" className="btn btn-solar" disabled={submitting}>
-                  {submitting ? 'Sealing & submitting…' : 'Seal and submit bid'}
-                </button>
-              </form>
+                  <button type="submit" className="btn btn-solar" disabled={submitting} style={{ marginTop: '0.5rem' }}>
+                    {submitting ? 'Sealing & submitting…' : 'Seal and submit bid'}
+                  </button>
+                </form>
+              </div>
             )}
           </div>
         </section>

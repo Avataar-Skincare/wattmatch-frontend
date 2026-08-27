@@ -19,6 +19,7 @@ import AuctionLivePage from './pages/AuctionLivePage';
 import AuctionPage from './pages/AuctionPage';
 import AdminVettingDashboardPage from './pages/AdminVettingDashboardPage';
 import GeneratorBidSubmissionPage from './pages/GeneratorBidSubmissionPage';
+import GeneratorDashboardPage from './pages/GeneratorDashboardPage';
 import BuyerTenderConsolePage from './pages/BuyerTenderConsolePage';
 import AdminConsolePage from './pages/AdminConsolePage';
 import LoginPage from './pages/LoginPage';
@@ -74,7 +75,10 @@ export const routes: RouteRecord[] = [
       },
       {
         Component: () => <DashboardShell allow={['generator']} />,
-        children: [{ path: '/submit-bid', Component: GeneratorBidSubmissionPage }],
+        children: [
+          { path: '/generator-dashboard', Component: GeneratorDashboardPage },
+          { path: '/submit-bid', Component: GeneratorBidSubmissionPage },
+        ],
       },
       { path: '/rfs-document-purchase', Component: RfsDocumentPurchasePage },
       { path: '/tenders', Component: PublicTendersPage },

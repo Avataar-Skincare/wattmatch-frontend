@@ -29,7 +29,8 @@ export default function TenderDetailsPage() {
   const [searchParams] = useSearchParams();
   const tenderId = searchParams.get('tenderId');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { auth, login } = useAuth();
+  const token = auth?.token ?? null;
 
   const [tender, setTender] = useState<TenderDetail | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -37,7 +38,6 @@ export default function TenderDetailsPage() {
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [token, setToken] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const [checkEmail, setCheckEmail] = useState('');
@@ -102,7 +102,6 @@ export default function TenderDetailsPage() {
       });
       const data = await res.json();
       if (!data.success) return setLoginError(data.error);
-      setToken(data.token);
       login({ token: data.token, organizationId: data.organizationId, type: data.type });
     } catch (err) {
       setLoginError(err instanceof Error ? err.message : 'Login failed');

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LogoMark from './icons/LogoMark';
 import { navLinks } from '../data/content';
+import { useAuth, HOME_BY_TYPE, LABEL_BY_TYPE } from '../lib/authContext';
 
 const tenderLinks = [
   { href: '/tenders?view=live', label: 'Live' },
@@ -11,6 +12,10 @@ const tenderLinks = [
 
 export default function Header({ minimal = false }: { minimal?: boolean }) {
   const [open, setOpen] = useState(false);
+  const { auth, hydrated, logout } = useAuth();
+  // Before the client-only localStorage read resolves (see authContext.tsx), fall back to the
+  // logged-out CTAs — that's what SSG's server-rendered pass shows too, so there's no mismatch.
+  const loggedIn = hydrated && auth;
 
   const closeMenu = () => setOpen(false);
 
@@ -56,9 +61,19 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
           ))}
         </div>
         <div className="nav-cta">
-          <Link to="/login" className="btn btn-ghost">Log in</Link>
-          <Link to="/for-ci" className="btn btn-ghost">I buy power</Link>
-          <Link to="/for-generators" className="btn btn-solar">I generate power</Link>
+          {loggedIn ? (
+            <>
+              <span>{LABEL_BY_TYPE[auth.type]} account</span>
+              <Link to={HOME_BY_TYPE[auth.type]} className="btn btn-ghost">Dashboard</Link>
+              <button type="button" className="btn btn-ghost" onClick={logout}>Log out</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="btn btn-ghost">Log in</Link>
+              <Link to="/for-ci" className="btn btn-ghost">I buy power</Link>
+              <Link to="/for-generators" className="btn btn-solar">I generate power</Link>
+            </>
+          )}
         </div>
         <button
           className="burger"
@@ -80,9 +95,24 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
         {navLinks.slice(2).map((link) => (
           <Link key={link.href} to={link.href} onClick={closeMenu}>{link.label}</Link>
         ))}
-        <Link to="/login" className="btn btn-ghost" onClick={closeMenu}>Log in</Link>
-        <Link to="/for-ci" className="btn btn-ghost" onClick={closeMenu}>I buy power</Link>
-        <Link to="/for-generators" className="btn btn-solar" onClick={closeMenu}>I generate power</Link>
+        {loggedIn ? (
+          <>
+            <Link to={HOME_BY_TYPE[auth.type]} className="btn btn-ghost" onClick={closeMenu}>Dashboard</Link>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => { logout(); closeMenu(); }}
+            >
+              Log out
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="btn btn-ghost" onClick={closeMenu}>Log in</Link>
+            <Link to="/for-ci" className="btn btn-ghost" onClick={closeMenu}>I buy power</Link>
+            <Link to="/for-generators" className="btn btn-solar" onClick={closeMenu}>I generate power</Link>
+          </>
+        )}
       </div>
     </header>
   );

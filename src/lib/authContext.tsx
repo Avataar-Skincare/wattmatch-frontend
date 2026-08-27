@@ -8,6 +8,18 @@ export interface AuthState {
   type: OrgType;
 }
 
+export const HOME_BY_TYPE: Record<OrgType, string> = {
+  buyer: '/buyer-console',
+  generator: '/generator-dashboard',
+  admin: '/admin-console',
+};
+
+export const LABEL_BY_TYPE: Record<OrgType, string> = {
+  buyer: 'Buyer',
+  generator: 'Generator',
+  admin: 'Admin',
+};
+
 const STORAGE_KEY = 'wattmatch:auth';
 
 interface AuthContextValue {

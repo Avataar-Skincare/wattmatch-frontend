@@ -30,20 +30,27 @@ interface TenderTeaser {
   status: string;
 }
 
-function TenderCard({ tender }: { tender: TenderTeaser }) {
-  return (
-    <div className="stat-card" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <div>
-        <strong>{tender.title}</strong>
-        <div style={{ fontSize: '0.85rem', color: '#666' }}>
-          #{tender.id} · {tender.requiredCapacityMw} MW required · {tender.status}
-        </div>
-      </div>
+const STATUS_LABELS: Record<string, string> = {
+  open: 'Open',
+  vetting: 'Under vetting',
+  live: 'Live',
+  closed: 'Closed',
+};
 
-      <a href={`/tender-details?tenderId=${tender.id}`} className="btn btn-solar" style={{ alignSelf: 'flex-start' }}>
-        View tender
-      </a>
-    </div>
+function TenderRow({ tender, index }: { tender: TenderTeaser; index: number }) {
+  return (
+    <tr>
+      <td>{index + 1}</td>
+      <td>#{tender.id}</td>
+      <td>{tender.title}</td>
+      <td>{tender.requiredCapacityMw} MW</td>
+      <td>{STATUS_LABELS[tender.status] || tender.status}</td>
+      <td>
+        <a href={`/tender-details?tenderId=${tender.id}`} className="tender-details-link">
+          View Details
+        </a>
+      </td>
+    </tr>
   );
 }
 
@@ -94,7 +101,7 @@ export default function PublicTendersPage() {
                 <button
                   key={v}
                   type="button"
-                  className={v === view ? 'btn btn-solar' : 'btn btn-outline'}
+                  className={v === view ? 'btn btn-solar' : 'btn btn-ghost'}
                   onClick={() => { setView(v); setSearchParams({ view: v }); }}
                 >
                   {VIEW_LABELS[v]}
@@ -107,10 +114,24 @@ export default function PublicTendersPage() {
             {tenders !== null && tenders.length === 0 && <p>No {view} tenders right now.</p>}
 
             {tenders && tenders.length > 0 && (
-              <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-                {tenders.map((t) => (
-                  <TenderCard key={t.id} tender={t} />
-                ))}
+              <div className="reg-table-wrap" style={{ maxWidth: 'none' }}>
+                <table className="reg-table tenders-table">
+                  <thead>
+                    <tr>
+                      <th>S No.</th>
+                      <th>Tender ID</th>
+                      <th>Tender Title</th>
+                      <th>Capacity Required</th>
+                      <th>Status</th>
+                      <th>Tender Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tenders.map((t, i) => (
+                      <TenderRow key={t.id} tender={t} index={i} />
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
