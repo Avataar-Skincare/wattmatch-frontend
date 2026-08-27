@@ -27,12 +27,6 @@ export default function TermsOfServicePage() {
 
         <section>
           <div className="wrap prose">
-            <div className="legal-notice">
-              <strong>Template notice:</strong> This page is a working draft. It is not a substitute
-              for review by qualified legal counsel: please have a lawyer review and finalise this
-              before publishing it live, particularly the liability and dispute-resolution sections.
-            </div>
-
             <Reveal className="legal-block">
               <h3>1. Who we are</h3>
               <p>
@@ -100,8 +94,8 @@ export default function TermsOfServicePage() {
 
               <h3>7. Governing law</h3>
               <p>
-                These terms are governed by the laws of India. [Jurisdiction / dispute resolution
-                clause to be finalised with counsel.]
+                These terms are governed by the laws of India, and the courts of New Delhi shall
+                have exclusive jurisdiction over any dispute arising from them.
               </p>
             </Reveal>
           </div>

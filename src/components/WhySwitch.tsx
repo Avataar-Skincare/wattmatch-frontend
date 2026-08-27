@@ -26,7 +26,7 @@ export default function WhySwitch() {
 
             <div className="tariff-card solar-tariff">
               <span className="tc-label">Solar C&amp;I (open access)</span>
-              <span className="tc-value">₹4 – ₹6 <small>/ unit</small></span>
+              <span className="tc-value">₹4 – ₹6.5 <small>/ unit</small></span>
               <span className="tc-note">Landed cost incl. wheeling &amp; other charges</span>
             </div>
 
