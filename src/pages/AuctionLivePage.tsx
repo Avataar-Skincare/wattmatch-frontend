@@ -1,12 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { io, type Socket } from 'socket.io-client';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Seo from '../components/Seo';
+import { useAuth } from '../lib/authContext';
 
-// Internal PoC test tool (see AUCTION_MVP_PLAN.md) — not linked from site nav/footer. Joins a real
-// auction on the wattmatch-server backend via a signed token; other bidders are actual other
-// people in their own tabs, not client-side simulation.
+// Real auction join tool — other bidders are actual other people in their own tabs, not client-side
+// simulation. Two ways to arrive here:
+//  - New mode (?auctionId=N): the production path. The join link is a generic pointer, not a bearer
+//    credential — requires the visitor's real org login, then POST /api/auctions/:id/join mints a
+//    short-lived socket token scoped to their pre-assigned seat. See routes/auctions.ts.
+//  - Legacy mode (?token=...): auctionAdmin.ts's manual /auctions/seed demo tool, which has no real
+//    Organization to log in as — the emailed link embeds the bearer token directly, exactly as
+//    before. Both modes end up handing the socket the same token shape, so everything past the
+//    join step (auctionSocket.ts, the UI below) is identical either way.
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
 
 // Matches the countdown ring already used by the /auction demo page — same radius/circumference,
@@ -14,14 +22,13 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http:/
 const RING_RADIUS = 52;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-type ConnectionState = 'connecting' | 'connected' | 'error';
+type ConnectionState = 'connecting' | 'connected' | 'reconnecting' | 'error' | 'not-invited' | 'not-found' | 'session-expired';
 type ParticipantRole = 'generator' | 'buyer';
 
-// Reads the auctionId claim out of the join token's payload segment — not a verification (the
-// server re-verifies the token's signature on every real request), just enough to know which
-// auction to ask /winner-identity about. A malformed/unreadable token here just means the reveal
-// call never fires; the socket connection itself (which does verify the token) already handles
-// the real "is this token valid" case.
+// Legacy-mode only — reads the auctionId claim out of the join token's payload segment, just enough
+// to know which auction to ask /winner-identity about. New mode never needs this: the auctionId is
+// already known directly from the URL. Not a verification either way — the server re-verifies the
+// token's signature on every real request.
 function decodeAuctionIdFromToken(token: string): number | null {
   try {
     const payload = token.split('.')[1];
@@ -47,9 +54,42 @@ interface AuctionState {
   maxExtensions: number;
   minUndercut: number;
   leaderAlias: string | null;
+  // Landed-rate formula inputs (see auctionEngine.ts's computeLandedRate on the server) — constant
+  // for the auction, forwarded as-is so a bidder's own landed-rate preview below matches what the
+  // server will actually compute. Only meaningful when useLandedRate is true below.
+  equityValue: number;
+  totalUnitsPerYear: number;
+  // Per-auction switch, decided at tender creation (see Tender.useLandedRate on the server) — a
+  // normal-rate auction shows the original single-rate bid form and never runs the formula at all.
+  useLandedRate: boolean;
+}
+
+function computeLandedRate(rate: number, returnPercent: number, equityValue: number, totalUnitsPerYear: number): number {
+  return rate - ((returnPercent / 100) * equityValue) / totalUnitsPerYear;
+}
+
+interface JoinError extends Error {
+  status: number;
+}
+
+async function joinAuction(auctionId: number, orgToken: string): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/auctions/${auctionId}/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${orgToken}` },
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    const err = new Error(data.error || 'Failed to join auction') as JoinError;
+    err.status = res.status;
+    throw err;
+  }
+  return data.token as string;
 }
 
 export default function AuctionLivePage() {
+  const { auth, hydrated } = useAuth();
+  const navigate = useNavigate();
+
   const [connection, setConnection] = useState<ConnectionState>('connecting');
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [myAlias, setMyAlias] = useState<string | null>(null);
@@ -61,17 +101,23 @@ export default function AuctionLivePage() {
   // simpler (a boolean, not per-bidder), since only the current leading bid is shown, not a
   // per-bidder history feed.
   const [priceFlash, setPriceFlash] = useState(false);
-  const [bidInput, setBidInput] = useState('');
+  const [rateInput, setRateInput] = useState('');
+  const [returnInput, setReturnInput] = useState('');
   const [bidError, setBidError] = useState<string | null>(null);
   const [winner, setWinner] = useState<{ alias: string | null; amount: number; disclosure: string } | null>(null);
   // Real identity (organizationName), not just alias — populated only if the /winner-identity
   // reveal succeeds, which the backend restricts to the winning generator and the buyer only (see
-  // auctionAdmin.ts). Every other role gets a 403 there, so this simply stays null for them — not
+  // routes/auctions.ts). Every other role gets a 403 there, so this simply stays null for them — not
   // an error state, just nothing to show.
   const [revealedCounterparty, setRevealedCounterparty] = useState<{ alias: string; organizationName: string } | null>(null);
   const [sessionReplaced, setSessionReplaced] = useState(false);
   const socketRef = useRef<Socket | null>(null);
+  // The credential actually presented to the socket: the URL's bearer token in legacy mode, or a
+  // freshly /join-minted one in new mode — refreshed on every reconnect attempt via the socket's
+  // async `auth` callback below, not just set once at connect time.
   const tokenRef = useRef<string | null>(null);
+  const auctionIdRef = useRef<number | null>(null);
+  const isFirstAttemptRef = useRef(true);
   // Socket event handlers below are wired up once (empty-deps effect), so they'd otherwise close
   // over the initial null `state` forever — this ref gives them a live read of the latest value.
   const stateRef = useRef<AuctionState | null>(null);
@@ -79,23 +125,27 @@ export default function AuctionLivePage() {
     stateRef.current = state;
   }, [state]);
 
+  // Parsed once, client-side only, into state rather than read directly in the render body — this
+  // page is pre-rendered at build time via vite-react-ssg, which runs component code in Node with no
+  // `window` at all. Every effect below gates on `urlParams !== null` the same way they already have
+  // to gate on `hydrated` (authContext's own client-only localStorage read), so nothing here ever
+  // touches `window` outside a browser.
+  const [urlParams, setUrlParams] = useState<{ token: string | null; auctionId: number | null } | null>(null);
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get('token');
-    if (!token) {
-      setConnection('error');
-      setConnectionError('No join token in the URL — use the link generated for you.');
-      return;
-    }
-    tokenRef.current = token;
+    const parsed = new URLSearchParams(window.location.search);
+    const auctionIdParam = parsed.get('auctionId');
+    setUrlParams({ token: parsed.get('token'), auctionId: auctionIdParam ? Number(auctionIdParam) : null });
+  }, []);
+  const legacyToken = urlParams?.token ?? null;
+  const newModeAuctionId = urlParams?.auctionId ?? null;
 
-    // Default Socket.io path — kept separate from /api/*; needs its own CloudFront routing rule
-    // in production rather than piggybacking on the REST API. See AUCTION_PLAN.md.
-    const socket = io(API_BASE, { auth: { token } });
-    socketRef.current = socket;
-
+  // Shared by both modes — attaches every socket event handler once a Socket instance exists.
+  // Defined once per render, called from whichever effect below actually creates the socket, so the
+  // ~15 event bindings aren't duplicated between the legacy and new-mode connection paths.
+  function wireSocket(socket: Socket) {
     socket.on('connect', () => setConnection('connected'));
     socket.on('connect_error', (err) => {
-      setConnection('error');
+      setConnection((prev) => (prev === 'session-expired' ? prev : 'error'));
       setConnectionError(err.message || 'Could not connect.');
     });
     socket.on('you:info', (payload: { alias: string; role: ParticipantRole; rulesAccepted: boolean }) => {
@@ -122,6 +172,8 @@ export default function AuctionLivePage() {
           ? 'This auction is no longer live.'
           : payload.reason === 'RULES_NOT_ACCEPTED'
           ? 'Accept the auction rules before bidding.'
+          : payload.reason === 'INVALID_RETURN_PERCENT'
+          ? 'Returns must be a percentage between 0 and 100.'
           : payload.reason === 'INTERNAL_ERROR'
           ? 'Something went wrong processing that bid — try again.'
           : payload.reason === 'RATE_LIMITED'
@@ -145,11 +197,131 @@ export default function AuctionLivePage() {
       setSessionReplaced(true);
       socket.disconnect();
     });
+    // A dropped connection (transport lost, ping timeout, server restart) previously left the room
+    // UI — countdown still ticking locally, bid form still enabled — looking exactly like a live
+    // connection, while socket.io's automatic reconnect ran silently in the background and any
+    // `emit('bid:new', ...)` attempt in the meantime went nowhere with no error. Hiding the room and
+    // showing this instead makes that state visible; the 'connect' handler above already flips back
+    // to 'connected' (and the server re-sends state:sync) the moment reconnection succeeds. The one
+    // disconnect reason to ignore is 'io client disconnect' — that's always a disconnect THIS code
+    // itself already triggered on purpose (session:replaced above, or unmount cleanup), which has
+    // its own, more specific handling already.
+    socket.on('disconnect', (reason) => {
+      if (reason === 'io client disconnect') return;
+      setConnection((prev) => (prev === 'session-expired' || prev === 'error' ? prev : 'reconnecting'));
+    });
+  }
+
+  // Legacy mode: exactly today's behavior — a bearer token embedded in the URL is the whole
+  // credential, connect immediately, no login involved.
+  useEffect(() => {
+    if (!legacyToken) return;
+    tokenRef.current = legacyToken;
+
+    // Default Socket.io path — kept separate from /api/*; needs its own CloudFront routing rule
+    // in production rather than piggybacking on the REST API. See AUCTION_PLAN.md.
+    const socket = io(API_BASE, { auth: { token: legacyToken } });
+    socketRef.current = socket;
+    wireSocket(socket);
 
     return () => {
       socket.disconnect();
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [legacyToken]);
+
+  // New mode: requires a real org login, then POST /join to mint the socket credential. Waits for
+  // `hydrated` (the client-only localStorage read — see authContext.tsx) before deciding whether the
+  // visitor is logged in, so SSG's server-rendered pass never flashes a false "not logged in" state.
+  useEffect(() => {
+    if (legacyToken || !newModeAuctionId || !Number.isFinite(newModeAuctionId)) return;
+    if (!hydrated) return;
+
+    auctionIdRef.current = newModeAuctionId;
+
+    if (!auth) {
+      navigate(`/login?next=${encodeURIComponent(`/auction-live?auctionId=${newModeAuctionId}`)}`, { replace: true });
+      return;
+    }
+
+    let cancelled = false;
+    let socket: Socket | null = null;
+
+    (async () => {
+      try {
+        const token = await joinAuction(newModeAuctionId, auth.token);
+        if (cancelled) return;
+        tokenRef.current = token;
+        isFirstAttemptRef.current = true;
+
+        socket = io(API_BASE, {
+          // A function, not a plain object — socket.io calls this fresh on every connection AND
+          // every automatic reconnect attempt, and waits for the callback before proceeding. The
+          // very first attempt reuses the token just minted above; every attempt after that
+          // (a dropped connection resuming, possibly hours or days later) re-runs the full /join
+          // handshake against the current org session, so a stale/expired socket token never
+          // strands an otherwise-still-invited participant.
+          auth: (cb) => {
+            if (isFirstAttemptRef.current) {
+              isFirstAttemptRef.current = false;
+              cb({ token: tokenRef.current });
+              return;
+            }
+            joinAuction(newModeAuctionId, auth.token)
+              .then((fresh) => {
+                tokenRef.current = fresh;
+                cb({ token: fresh });
+              })
+              .catch((err: JoinError) => {
+                // Mirrors the initial-join catch below — previously only a 401 got a specific
+                // message here; any other reconnect failure (403 invite revoked, 404 auction gone,
+                // a network error) just called cb({}) with nothing else, so the only thing the user
+                // ever saw was socket.io's own generic "connect_error" text, not the actual reason.
+                // 401/403/404 are all terminal — retrying won't fix a revoked invite or a gone
+                // auction, so the socket is closed rather than left to keep silently retrying. A
+                // plain network error (no status at all) is left alone: socket.io's own automatic
+                // reconnect will call this same callback again, and a transient blip may well
+                // recover on its own — this just makes sure the interim state is visible too.
+                if (err.status === 401) {
+                  setConnection('session-expired');
+                  socket?.close();
+                } else if (err.status === 403) {
+                  setConnection('not-invited');
+                  socket?.close();
+                } else if (err.status === 404) {
+                  setConnection('not-found');
+                  socket?.close();
+                } else {
+                  setConnection((prev) => (prev === 'session-expired' || prev === 'error' ? prev : 'reconnecting'));
+                }
+                cb({});
+              });
+          },
+        });
+        socketRef.current = socket;
+        wireSocket(socket);
+      } catch (err) {
+        if (cancelled) return;
+        const status = (err as JoinError).status;
+        setConnection(status === 403 ? 'not-invited' : status === 404 ? 'not-found' : status === 401 ? 'session-expired' : 'error');
+        if (status !== 403 && status !== 404 && status !== 401) {
+          setConnectionError(err instanceof Error ? err.message : 'Failed to join auction.');
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      socket?.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [legacyToken, newModeAuctionId, hydrated, auth?.token]);
+
+  useEffect(() => {
+    if (!urlParams || legacyToken || newModeAuctionId) return;
+    setConnection('error');
+    setConnectionError('No auction link — use the link generated for you.');
+  }, [urlParams, legacyToken, newModeAuctionId]);
 
   // Countdown ticks locally between server updates, but windowEndsAt itself only ever comes
   // from the server — this just renders it, never decides it.
@@ -166,17 +338,19 @@ export default function AuctionLivePage() {
 
   // Fires once the auction closes — asks the backend to reveal the counterparty's real identity.
   // Harmless to call regardless of role: the endpoint itself restricts this to the winning
-  // generator and the buyer (auctionAdmin.ts), so a losing generator's request just comes back
-  // 403 and revealedCounterparty simply stays null — no separate role check needed here.
+  // generator and the buyer (routes/auctions.ts), so a losing generator's request just comes back
+  // 403 and revealedCounterparty simply stays null — no separate role check needed here. Uses the
+  // org login in new mode (the durable credential — this can fire long after any socket token has
+  // expired) or the legacy URL token in legacy mode, against the same endpoint either way.
   useEffect(() => {
     if (!winner) return;
-    const token = tokenRef.current;
-    const auctionId = token ? decodeAuctionIdFromToken(token) : null;
-    if (!token || auctionId === null) return;
+    const auctionId = legacyToken ? decodeAuctionIdFromToken(legacyToken) : auctionIdRef.current;
+    const credential = legacyToken ?? auth?.token;
+    if (!credential || auctionId === null) return;
 
     let cancelled = false;
-    fetch(`${API_BASE}/api/auction-admin/auctions/${auctionId}/winner-identity`, {
-      headers: { Authorization: `Bearer ${token}` },
+    fetch(`${API_BASE}/api/auctions/${auctionId}/winner-identity`, {
+      headers: { Authorization: `Bearer ${credential}` },
     })
       .then((res) => res.json())
       .then((result) => {
@@ -191,19 +365,40 @@ export default function AuctionLivePage() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [winner]);
 
   function submitBid(e: React.FormEvent) {
     e.preventDefault();
     setBidError(null);
-    const amount = Number(bidInput);
-    if (!bidInput.trim() || Number.isNaN(amount) || amount <= 0) {
-      setBidError('Enter a valid amount.');
+    const rate = Number(rateInput);
+    if (!rateInput.trim() || Number.isNaN(rate) || rate <= 0) {
+      setBidError('Enter a valid rate.');
       return;
     }
-    socketRef.current?.emit('bid:new', { amount });
-    setBidInput('');
+    // A normal-rate auction never shows the returns input at all (see the form below) — always
+    // send 0 for it, matching what the server ignores anyway for a non-landed-rate auction.
+    let returnPercent = 0;
+    if (state?.useLandedRate) {
+      returnPercent = Number(returnInput);
+      if (!returnInput.trim() || Number.isNaN(returnPercent) || returnPercent < 0 || returnPercent > 100) {
+        setBidError('Enter a returns percentage between 0 and 100.');
+        return;
+      }
+    }
+    socketRef.current?.emit('bid:new', { rate, returnPercent });
+    setRateInput('');
+    setReturnInput('');
   }
+
+  // Client-side only — a live preview so a bidder sees what they're about to submit; the server
+  // independently recomputes and is the sole authority on what actually gets compared.
+  const previewRate = Number(rateInput);
+  const previewReturn = Number(returnInput);
+  const previewLandedRate =
+    state?.useLandedRate && rateInput.trim() && returnInput.trim() && Number.isFinite(previewRate) && Number.isFinite(previewReturn)
+      ? computeLandedRate(previewRate, previewReturn, state.equityValue, state.totalUnitsPerYear)
+      : null;
 
   function acceptRules() {
     socketRef.current?.emit('rules:accept');
@@ -232,6 +427,27 @@ export default function AuctionLivePage() {
             ) : (
               <>
                 {connection === 'connecting' && <p style={{ textAlign: 'center' }}>Connecting…</p>}
+                {connection === 'reconnecting' && (
+                  <p style={{ textAlign: 'center' }}>
+                    Connection lost — reconnecting… any bid you submit right now won't go through until this
+                    reconnects.
+                  </p>
+                )}
+                {connection === 'not-invited' && (
+                  <p style={{ textAlign: 'center', color: '#B53A3A' }}>You're not invited to this auction.</p>
+                )}
+                {connection === 'not-found' && (
+                  <p style={{ textAlign: 'center', color: '#B53A3A' }}>Auction not found.</p>
+                )}
+                {connection === 'session-expired' && (
+                  <p style={{ textAlign: 'center', color: '#B53A3A' }}>
+                    Your session expired.{' '}
+                    <a href={`/login?next=${encodeURIComponent(`/auction-live?auctionId=${auctionIdRef.current ?? ''}`)}`}>
+                      Log back in
+                    </a>{' '}
+                    to rejoin.
+                  </p>
+                )}
                 {connection === 'error' && (
                   <p style={{ textAlign: 'center', color: '#B53A3A' }}>{connectionError}</p>
                 )}
@@ -274,7 +490,7 @@ export default function AuctionLivePage() {
                         </div>
                       )}
                       <div className="auction-price">
-                        <span className="ac-label">Current lowest bid</span>
+                        <span className="ac-label">{state.useLandedRate ? 'Current lowest landed rate' : 'Current lowest bid'}</span>
                         <div className={`pv${priceFlash ? ' pulse' : ''}`}>
                           ₹{state.currentBid.toFixed(2)}<sup className="auction-live-price-sup">/unit</sup>
                         </div>
@@ -296,10 +512,23 @@ export default function AuctionLivePage() {
                         <div className="auction-rules-box">
                           <span className="ac-label">Before you bid</span>
                           <ul>
-                            <li>
-                              Current lowest bid is ₹{state.currentBid.toFixed(2)}/unit — bids only go down, and a
-                              valid bid must be at least ₹{state.minUndercut.toFixed(2)} below it.
-                            </li>
+                            {state.useLandedRate ? (
+                              <>
+                                <li>
+                                  Current lowest landed rate is ₹{state.currentBid.toFixed(2)}/unit — landed rates only
+                                  go down, and a valid bid must land at least ₹{state.minUndercut.toFixed(2)} below it.
+                                </li>
+                                <li>
+                                  Your landed rate = rate − (returns% × equity value) / total units per year — enter
+                                  both rate and returns, and you'll see your own landed rate before submitting.
+                                </li>
+                              </>
+                            ) : (
+                              <li>
+                                Current lowest bid is ₹{state.currentBid.toFixed(2)}/unit — bids only go down, and a
+                                valid bid must be at least ₹{state.minUndercut.toFixed(2)} below it.
+                              </li>
+                            )}
                             <li>
                               Any accepted bid resets the countdown to {Math.round(state.windowMs / 1000)}s for
                               everyone, up to {state.maxExtensions} times.
@@ -323,18 +552,43 @@ export default function AuctionLivePage() {
                               step="0.01"
                               min="0.01"
                               inputMode="decimal"
-                              placeholder={`below ${state.currentBid.toFixed(2)}`}
-                              value={bidInput}
-                              onChange={(e) => setBidInput(e.target.value)}
+                              placeholder={state.useLandedRate ? 'rate' : `below ${state.currentBid.toFixed(2)}`}
+                              aria-label="Rate"
+                              value={rateInput}
+                              onChange={(e) => setRateInput(e.target.value)}
                               onWheel={(e) => e.currentTarget.blur()}
                             />
                           </span>
+                          {state.useLandedRate && (
+                            <span className="auction-human-form-field auction-live-form-field">
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                max="100"
+                                inputMode="decimal"
+                                placeholder="returns"
+                                aria-label="Returns"
+                                value={returnInput}
+                                onChange={(e) => setReturnInput(e.target.value)}
+                                onWheel={(e) => e.currentTarget.blur()}
+                              />
+                              <span className="auction-human-prefix">%</span>
+                            </span>
+                          )}
                           <button type="submit" className="btn btn-solar">
                             Submit bid <span className="btn-arrow">→</span>
                           </button>
                         </form>
+                        {previewLandedRate !== null && (
+                          <p className="auction-human-hint">
+                            Your landed rate: <strong>₹{previewLandedRate.toFixed(2)}/unit</strong>
+                          </p>
+                        )}
                         <p className="auction-human-hint">
-                          Must be at least ₹{state.minUndercut.toFixed(2)} below the current lowest bid.
+                          {state.useLandedRate
+                            ? `Your landed rate must be at least ₹${state.minUndercut.toFixed(2)} below the current lowest landed rate.`
+                            : `Must be at least ₹${state.minUndercut.toFixed(2)} below the current lowest bid.`}
                         </p>
                         {bidError && <p className="auction-human-error">{bidError}</p>}
                       </div>

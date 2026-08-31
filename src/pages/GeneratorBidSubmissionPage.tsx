@@ -114,10 +114,13 @@ export default function GeneratorBidSubmissionPage() {
   const [tenderRef, setTenderRef] = useState('');
   const [tender, setTender] = useState<TenderView | null>(null);
   const [invitationStatus, setInvitationStatus] = useState<string | null>(null);
-  const [buyer, setBuyer] = useState<{ name: string; contactEmail: string; contactPhone: string } | null>(null);
-  const [buyerLockedReason, setBuyerLockedReason] = useState<string | null>(null);
   const [tenderDocument, setTenderDocument] = useState<{ url: string; filename: string | null } | null>(null);
   const [bidProcessingPaid, setBidProcessingPaid] = useState(false);
+  // Set when accepting hits the RfS-fee gate (POST /invitations/respond, 402) — an auto-invited
+  // generator otherwise had no path on this page to the purchase step at all (see tenders.ts's own
+  // comment on this route). A plain error string leaves them stuck; this drives an actual link.
+  const [needsRfsPayment, setNeedsRfsPayment] = useState(false);
+  const [responding, setResponding] = useState<'accept' | 'decline' | null>(null);
   const payment = usePayment();
 
   const [contactName, setContactName] = useState('');
@@ -141,7 +144,10 @@ export default function GeneratorBidSubmissionPage() {
   const [tariff, setTariff] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ id: number; receipt: unknown } | null>(null);
+  // receipt is null when restored from a page reload (GET /tenders/:id's bidId) rather than a fresh
+  // submission in this session — the receipt hashes only ever existed client-side at submission time,
+  // there's nowhere to fetch them back from afterward.
+  const [result, setResult] = useState<{ id: number; receipt: unknown | null } | null>(null);
 
   const [documents, setDocuments] = useState<DocumentStatus[] | null>(null);
   const [uploadingFieldId, setUploadingFieldId] = useState<number | null>(null);
@@ -228,21 +234,31 @@ export default function GeneratorBidSubmissionPage() {
   async function viewTender(refOverride?: string) {
     const ref = refOverride ?? tenderRef;
     setError(null);
+    setNeedsRfsPayment(false);
     setTender(null);
     setInvitationStatus(null);
-    setBuyer(null);
-    setBuyerLockedReason(null);
     setDocuments(null);
     setTenderDocument(null);
+    setResult(null);
     try {
       const res = await fetch(`${API_BASE}/api/tenders/${ref}`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       if (!data.success) return setError(data.error);
       setTender(data.tender);
       setInvitationStatus(data.invitationStatus);
-      setBuyer(data.buyer);
-      setBuyerLockedReason(data.buyerLockedReason);
       setBidProcessingPaid(!!data.bidProcessingPaid);
+      // Restores the "already submitted" confirmation across a reload — GET /tenders/:id's bidId is
+      // the same one-bid-per-generator-per-tender fact vetting-bids.ts's duplicate-submission guard
+      // enforces server-side; without this the form would look fillable again after a reload even
+      // though a resubmit attempt would just 409.
+      if (data.bidId) setResult({ id: data.bidId, receipt: null });
+      // Surfaces even for an invitation accepted long before this check existed (or before the fee
+      // was ever paid under some earlier gap) — accept-time isn't the only place this can be true,
+      // so it's re-derived fresh from the tender itself every time this page loads, same as the
+      // server re-checks it fresh on every request rather than trusting a one-time accept-time gate.
+      if ((data.invitationStatus === 'invited' || data.invitationStatus === 'accepted') && !data.rfsDocumentPaid) {
+        setNeedsRfsPayment(true);
+      }
       // Not gated on invitation status — this is the "saved to your profile" access point for
       // whichever tender document you already paid for, independent of whether you've accepted an
       // invitation yet.
@@ -283,6 +299,8 @@ export default function GeneratorBidSubmissionPage() {
 
   async function respond(accept: boolean) {
     setError(null);
+    setNeedsRfsPayment(false);
+    setResponding(accept ? 'accept' : 'decline');
     try {
       const res = await fetch(`${API_BASE}/api/tenders/${tenderRef}/invitations/respond`, {
         method: 'POST',
@@ -290,7 +308,10 @@ export default function GeneratorBidSubmissionPage() {
         body: JSON.stringify({ accept }),
       });
       const data = await res.json();
-      if (!data.success) return setError(data.error);
+      if (!data.success) {
+        if (res.status === 402) setNeedsRfsPayment(true);
+        return setError(data.error);
+      }
       setInvitationStatus(data.status);
       if (data.status === 'accepted') {
         await loadDocuments();
@@ -299,6 +320,8 @@ export default function GeneratorBidSubmissionPage() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to respond to invitation');
+    } finally {
+      setResponding(null);
     }
   }
 
@@ -442,6 +465,20 @@ export default function GeneratorBidSubmissionPage() {
     setError(null);
     setResult(null);
 
+    // Mirrors the server's own gates (vetting-bids' missingFees + EMD check) — catches them before
+    // the generator spends time filling out and sealing the whole form, not just after a 402 comes
+    // back once it's already sealed.
+    if (needsRfsPayment) {
+      setError('The RfS Document fee must be paid before submitting a bid.');
+      return;
+    }
+    const missing: string[] = [];
+    if (!bidProcessingPaid) missing.push('Bid Processing Fee');
+    if (!emdSubmission) missing.push('EMD (Bank Guarantee)');
+    if (missing.length > 0) {
+      setError(`The following must be completed before submitting a bid: ${missing.join(', ')}`);
+      return;
+    }
     if (!TARIFF_PATTERN.test(tariff.trim())) {
       setError('Tariff must be a single fixed number with at most two decimal places (e.g. 3.45) — no ranges, no formulas.');
       return;
@@ -458,7 +495,7 @@ export default function GeneratorBidSubmissionPage() {
 
     setSubmitting(true);
     try {
-      const keysRes = await fetch(`${API_BASE}/api/vetting-bids/public-keys`);
+      const keysRes = await fetch(`${API_BASE}/api/vetting-bids/public-keys`, { headers: { Authorization: `Bearer ${token}` } });
       const keysData = (await keysRes.json()) as { success: boolean; error?: string } & Partial<PublicKeys>;
       if (!keysData.success || !keysData.technical || !keysData.financial) {
         throw new Error(keysData.error || 'Failed to fetch custodian public keys');
@@ -516,7 +553,7 @@ export default function GeneratorBidSubmissionPage() {
           <div className="wrap bid-submission-wrap">
             {error && <p className="enroll-message error">{error}</p>}
 
-            {DEV_MODE && token && invitationStatus === 'accepted' && (
+            {DEV_MODE && token && invitationStatus === 'accepted' && !needsRfsPayment && !result && (
               <div className="dev-mode-banner">
                 <span>
                   <strong>Dev mode</strong> — demo use only, populates this form with valid dummy data and
@@ -551,36 +588,61 @@ export default function GeneratorBidSubmissionPage() {
                       Download tender document
                     </a>
                   )}
-                  {buyer ? (
-                    <p>
-                      Buyer: <strong>{buyer.name}</strong> — {buyer.contactEmail} — {buyer.contactPhone}
-                    </p>
-                  ) : (
+                  {needsRfsPayment && (
                     <p style={{ fontStyle: 'italic' }}>
-                      Buyer identity locked until RfS fee is paid and a bid is submitted{buyerLockedReason ? ` (${buyerLockedReason})` : ''}.
+                      Purchase the bid document for detailed tender information and to be able to fill out the enrollment form.
                     </p>
                   )}
-                  {invitationStatus === 'invited' && (
+                  {invitationStatus === 'invited' && needsRfsPayment && (
+                    <>
+                      <p>Purchase this tender's bid document before accepting, then come back to accept.</p>
+                      <Link to={`/rfs-document-purchase?tenderId=${tenderRef}`} className="btn btn-solar" style={{ alignSelf: 'flex-start' }}>
+                        Purchase bid document
+                      </Link>
+                    </>
+                  )}
+                  {invitationStatus === 'invited' && !needsRfsPayment && (
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <button type="button" className="btn btn-solar" onClick={() => respond(true)}>
-                        Accept invitation
+                      <button type="button" className="btn btn-solar" onClick={() => respond(true)} disabled={responding !== null}>
+                        {responding === 'accept' ? 'Accepting…' : 'Accept invitation'}
                       </button>
-                      <button type="button" className="btn btn-ghost" onClick={() => respond(false)}>
-                        Decline
+                      <button type="button" className="btn btn-ghost" onClick={() => respond(false)} disabled={responding !== null}>
+                        {responding === 'decline' ? 'Declining…' : 'Decline'}
                       </button>
                     </div>
+                  )}
+                  {invitationStatus === 'accepted' && needsRfsPayment && (
+                    <>
+                      <p>The rest of this form opens once the bid document fee is paid.</p>
+                      <Link to={`/rfs-document-purchase?tenderId=${tenderRef}`} className="btn btn-solar" style={{ alignSelf: 'flex-start' }}>
+                        Purchase bid document
+                      </Link>
+                    </>
                   )}
                 </>
               )}
             </div>
 
             {result && (
-              <p className="enroll-message success">
-                Submitted as bid #{result.id}. Receipt hashes: <code>{JSON.stringify(result.receipt)}</code>
-              </p>
+              <div className="enroll-card">
+                <h2>Bid submitted</h2>
+                <p className="enroll-message success">
+                  Your sealed bid #{result.id} has been submitted for this tender. It stays sealed —
+                  unreadable even to WattMatch — until the scheduled custodian ceremony opens it.
+                </p>
+                {result.receipt != null && (
+                  <p className="sub sub-tight">
+                    Receipt hashes (proof of exactly what was sealed, for your own records):{' '}
+                    <code>{JSON.stringify(result.receipt)}</code>
+                  </p>
+                )}
+                <Link to="/generator-dashboard" className="btn btn-solar" style={{ alignSelf: 'flex-start' }}>
+                  Back to dashboard
+                </Link>
+              </div>
             )}
 
-            {token && invitationStatus === 'accepted' && (
+            {token && invitationStatus === 'accepted' && !needsRfsPayment && !result && (
               <div className="enroll-card">
                 <h2>2. Bid Processing Fee</h2>
                 {bidProcessingPaid ? (
@@ -603,7 +665,7 @@ export default function GeneratorBidSubmissionPage() {
               </div>
             )}
 
-            {token && invitationStatus === 'accepted' && documents && (
+            {token && invitationStatus === 'accepted' && !needsRfsPayment && !result && documents && (
               <div className="enroll-card">
                 <h2>3. Document checklist</h2>
                 <p className="sub">Download the blank format where one exists, then upload your filled PDF. Fields marked * are required before you can submit.</p>
@@ -648,7 +710,7 @@ export default function GeneratorBidSubmissionPage() {
               </div>
             )}
 
-            {token && invitationStatus === 'accepted' && (
+            {token && invitationStatus === 'accepted' && !needsRfsPayment && !result && (
               <div className="enroll-card">
                 <h2>4. Submit your EMD (Bank Guarantee)</h2>
                 <p className="sub">
@@ -737,7 +799,7 @@ export default function GeneratorBidSubmissionPage() {
               </div>
             )}
 
-            {token && invitationStatus === 'accepted' && (
+            {token && invitationStatus === 'accepted' && !needsRfsPayment && !result && (
               <div className="enroll-card">
                 <h2>5. Bid details</h2>
                 {draftRestored && (
@@ -842,8 +904,21 @@ export default function GeneratorBidSubmissionPage() {
                     <input id="bidTariff" type="text" inputMode="decimal" placeholder="e.g. 3.45" value={tariff} onChange={(e) => setTariff(e.target.value)} required />
                   </div>
 
-                  <button type="submit" className="btn btn-solar" disabled={submitting} style={{ marginTop: '0.5rem' }}>
-                    {submitting ? 'Sealing & submitting…' : 'Seal and submit bid'}
+                  <button
+                    type="submit"
+                    className="btn btn-solar"
+                    disabled={submitting || needsRfsPayment || !bidProcessingPaid || !emdSubmission}
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    {submitting
+                      ? 'Sealing & submitting…'
+                      : needsRfsPayment
+                        ? 'Pay the RfS Document fee first'
+                        : !bidProcessingPaid
+                          ? 'Pay the Bid Processing Fee first'
+                          : !emdSubmission
+                            ? 'Submit your EMD first'
+                            : 'Seal and submit bid'}
                   </button>
                 </form>
               </div>

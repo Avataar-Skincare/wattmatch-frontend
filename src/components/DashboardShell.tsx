@@ -27,6 +27,7 @@ export default function DashboardShell({ allow }: { allow: OrgType[] }) {
           <div className="nav-links">
             <Link to={HOME_BY_TYPE[auth.type]}>Dashboard</Link>
             {auth.type === 'admin' && <Link to="/admin-vetting">Vetting</Link>}
+            {auth.type === 'admin' && <Link to="/admin-leads">Leads</Link>}
           </div>
           <div className="nav-cta">
             <span>{LABEL_BY_TYPE[auth.type]} account</span>

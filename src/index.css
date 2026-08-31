@@ -744,6 +744,18 @@ main.admin-page .btn-outline{color:var(--ink); border-color:var(--line); backgro
 main.admin-page .btn-outline:hover{border-color:var(--ink); background:rgba(20,24,28,0.05);}
 main.admin-page{padding:48px 0 88px;}
 
+/* Same white-on-dark-by-default .btn-outline problem as above — these pages' actual content sits
+   below a dark .page-hero banner, on the regular light body background, not inside the hero itself.
+   Found via a real screenshot report: "Download RfS document" on /tender-details was rendering as
+   invisible near-white-on-cream text. .bid-submission-wrap (GeneratorBidSubmissionPage.tsx) already
+   exists as a class on its own wrapper div, so it's reused here rather than adding a redundant one. */
+.tender-details-page .btn-outline,
+.buyer-console-page .btn-outline,
+.bid-submission-wrap .btn-outline{color:var(--ink); border-color:var(--line); background:transparent;}
+.tender-details-page .btn-outline:hover,
+.buyer-console-page .btn-outline:hover,
+.bid-submission-wrap .btn-outline:hover{border-color:var(--ink); background:rgba(20,24,28,0.05);}
+
 .admin-alert{border-radius:10px; padding:13px 16px; font-size:13.5px; line-height:1.5;}
 .admin-alert.error{background:rgba(181,58,58,0.08); border:1px solid rgba(181,58,58,0.25); color:#B53A3A;}
 .admin-alert.success{background:rgba(242,169,59,0.12); border:1px solid rgba(242,169,59,0.35); color:#2F7A3E;}

@@ -39,6 +39,7 @@ export default function TenderDetailsPage() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const [checkEmail, setCheckEmail] = useState('');
   const [purchased, setPurchased] = useState<boolean | null>(null);
@@ -94,6 +95,7 @@ export default function TenderDetailsPage() {
   async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoginError(null);
+    setLoggingIn(true);
     try {
       const res = await fetch(`${API_BASE}/api/organizations/login`, {
         method: 'POST',
@@ -105,6 +107,8 @@ export default function TenderDetailsPage() {
       login({ token: data.token, organizationId: data.organizationId, type: data.type });
     } catch (err) {
       setLoginError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setLoggingIn(false);
     }
   }
 
@@ -193,7 +197,7 @@ export default function TenderDetailsPage() {
     <div className="content-page">
       <Seo title={tender ? tender.title : 'Tender details'} description="Tender basic details, financial instruments, and enrollment." path="/tender-details" />
       <Header />
-      <main>
+      <main className="tender-details-page">
         <div className="page-hero">
           <div className="wrap">
             <span className="eyebrow">Tenders</span>
@@ -257,7 +261,7 @@ export default function TenderDetailsPage() {
                           <input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
                         </div>
                       </div>
-                      <button type="submit" className="btn btn-solar">Log in</button>
+                      <button type="submit" className="btn btn-solar" disabled={loggingIn}>{loggingIn ? 'Logging in…' : 'Log in'}</button>
                     </form>
                   </details>
                 )}
@@ -267,7 +271,7 @@ export default function TenderDetailsPage() {
 
                 {token && purchased === true && (
                   <button type="button" className="btn btn-solar" onClick={handleSelfEnroll} disabled={enrollBusy} style={{ alignSelf: 'flex-start' }}>
-                    Enroll with my account
+                    {enrollBusy ? 'Enrolling…' : 'Enroll with my account'}
                   </button>
                 )}
                 {token && purchased === false && (
@@ -288,7 +292,7 @@ export default function TenderDetailsPage() {
                             required
                           />
                         </div>
-                        <button type="submit" className="btn btn-outline" disabled={checking}>Check status</button>
+                        <button type="submit" className="btn btn-outline" disabled={checking}>{checking ? 'Checking…' : 'Check status'}</button>
                       </form>
 
                       {purchased === false && (
@@ -306,7 +310,7 @@ export default function TenderDetailsPage() {
                               required
                             />
                           </div>
-                          <button type="submit" className="btn btn-solar" disabled={enrollBusy}>Enroll</button>
+                          <button type="submit" className="btn btn-solar" disabled={enrollBusy}>{enrollBusy ? 'Enrolling…' : 'Enroll'}</button>
                         </form>
                       )}
                     </div>

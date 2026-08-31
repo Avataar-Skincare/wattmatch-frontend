@@ -8,10 +8,9 @@ import Seo from '../components/Seo';
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
 
 // Consumes the one 'password_reset'-purpose token/link organizations.ts issues from two different
-// places — the forgot-password flow, and the account-created email the lead-capture forms now
+// places — ForgotPasswordPage's request form, and the account-created email the lead-capture forms
 // trigger (registrations.ts) — the backend route treats both indistinguishably, so one page serves
-// both. There is no "forgot password" request form yet (nothing calls /organizations/forgot-
-// password from the frontend) — out of scope here, this page only ever consumes an existing link.
+// both. This page only ever consumes an existing link.
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

@@ -1,11 +1,12 @@
-import { useState, type FormEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
 import Seo from '../components/Seo';
 import CheckIcon from '../components/icons/CheckIcon';
 import { usePayment } from '../hooks/usePayment';
+import { useAuth } from '../lib/authContext';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
 
@@ -31,7 +32,33 @@ export default function RfsDocumentPurchasePage() {
   const [isGenerator, setIsGenerator] = useState<'yes' | 'no'>('no');
   const [consentGiven, setConsentGiven] = useState(false);
 
+  const { auth } = useAuth();
+  const token = auth?.token;
+  const isLoggedInGenerator = auth?.type === 'generator';
+  const [enrolled, setEnrolled] = useState(false);
+
   const { status, error, isProcessing, startPayment, reset } = usePayment();
+
+  // Prefills from the logged-in generator's own account (GET /organizations/me) rather than leaving
+  // a blank form for someone who's already told this platform who they are — email/mobile/company
+  // are the fields Organization actually stores; name/designation have no equivalent on that model,
+  // so those stay blank for manual entry. isGenerator is set outright, not just prefilled, since it's
+  // a known fact here, not a guess.
+  useEffect(() => {
+    if (!isLoggedInGenerator || !token) return;
+    fetch(`${API_BASE}/api/organizations/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) return;
+        setCompany(data.organization.name ?? '');
+        setEmail(data.organization.contactEmail ?? '');
+        setMobile(data.organization.contactPhone ?? '');
+        setIsGenerator('yes');
+      })
+      .catch(() => {
+        // best-effort — the form just stays blank/manual on failure
+      });
+  }, [isLoggedInGenerator, token]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,7 +76,27 @@ export default function RfsDocumentPurchasePage() {
       consentGiven: true,
       prefill: { name, email, contact: mobile },
     });
-    if (result) await downloadTenderDocument();
+    if (result) {
+      await downloadTenderDocument();
+      // A purchase alone creates no TenderInvitation row — without this, "continue to the enrollment
+      // form" would be a dead end (GET /tenders/:id 403s with no invitation at all). Self-enroll is
+      // the same action TenderDetailsPage's logged-in path already runs; account-less purchasers have
+      // no account to self-enroll as, so this only fires for someone actually logged in as a
+      // generator right now.
+      if (isLoggedInGenerator && token) {
+        try {
+          const res = await fetch(`${API_BASE}/api/tenders/${tenderId}/self-enroll`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          if (data.success) setEnrolled(true);
+        } catch {
+          // best-effort — the payment itself already succeeded; enrollment can still be completed
+          // later from the generator dashboard's "Continue enrollment" link.
+        }
+      }
+    }
   }
 
   // Fires the moment payment verifies — the tender document isn't tied to an account yet at this
@@ -89,6 +136,11 @@ export default function RfsDocumentPurchasePage() {
                   Your tender document should have opened in a new tab. You can also come back for it
                   any time by enrolling and visiting your generator dashboard.
                 </p>
+                {enrolled && (
+                  <Link to={`/submit-bid?tenderId=${tenderId}`} className="btn btn-solar" style={{ marginTop: '12px' }}>
+                    Continue to enrollment form
+                  </Link>
+                )}
               </div>
             ) : (
               <form onSubmit={handleSubmit}>

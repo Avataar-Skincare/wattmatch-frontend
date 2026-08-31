@@ -18,11 +18,15 @@ import BlogPostPage from './pages/BlogPostPage';
 import AuctionLivePage from './pages/AuctionLivePage';
 import AuctionPage from './pages/AuctionPage';
 import AdminVettingDashboardPage from './pages/AdminVettingDashboardPage';
+import AdminLeadsPage from './pages/AdminLeadsPage';
+import AdminVettingBidDetailPage from './pages/AdminVettingBidDetailPage';
+import CustodianCeremonyPage from './pages/CustodianCeremonyPage';
 import GeneratorBidSubmissionPage from './pages/GeneratorBidSubmissionPage';
 import GeneratorDashboardPage from './pages/GeneratorDashboardPage';
 import BuyerTenderConsolePage from './pages/BuyerTenderConsolePage';
 import AdminConsolePage from './pages/AdminConsolePage';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import RfsDocumentPurchasePage from './pages/RfsDocumentPurchasePage';
 import PublicTendersPage from './pages/PublicTendersPage';
@@ -57,7 +61,11 @@ export const routes: RouteRecord[] = [
       { path: '/blog', Component: BlogIndexPage },
       { path: '/auction-live', Component: AuctionLivePage },
       { path: '/auction', Component: AuctionPage },
+      // Not under DashboardShell — a custodian's emailed link is its own credential, no org login
+      // involved. See CustodianCeremonyPage's own comment.
+      { path: '/custodian-ceremony', Component: CustodianCeremonyPage },
       { path: '/login', Component: LoginPage },
+      { path: '/forgot-password', Component: ForgotPasswordPage },
       { path: '/reset-password', Component: ResetPasswordPage },
       // Three role-scoped branches under the shared shell — one login, redirected to whichever of
       // these actually matches the account's type; the wrong-role case redirects sideways instead
@@ -71,6 +79,8 @@ export const routes: RouteRecord[] = [
         children: [
           { path: '/admin-console', Component: AdminConsolePage },
           { path: '/admin-vetting', Component: AdminVettingDashboardPage },
+          { path: '/admin-vetting-bid', Component: AdminVettingBidDetailPage },
+          { path: '/admin-leads', Component: AdminLeadsPage },
         ],
       },
       {

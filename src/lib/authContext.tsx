@@ -34,6 +34,13 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Exact text middleware/auth.ts's authRequired sends for an expired/invalid/missing org JWT — the
+// one and only signal this app has that a session, not just one particular request, has gone bad.
+// Matched verbatim rather than on status code alone: a 401 with a DIFFERENT message means something
+// else entirely (wrong password on the login form itself, a custodian's separate ceremony-link
+// token expiring on CustodianCeremonyPage.tsx) and must not silently wipe out a real session.
+const EXPIRED_SESSION_ERROR = 'Missing or invalid organization token';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -47,6 +54,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // out rather than breaking the app.
     }
     setHydrated(true);
+  }, []);
+
+  // Every page in this app makes its own raw fetch() calls directly — there's no shared API client
+  // to hook into, so every dashboard's session-expiry handling was previously identical to any other
+  // error: setError(data.error), shown inline wherever the click happened. The stored token was
+  // never cleared and nobody was ever sent back to /login — an expired 12h session just looked like
+  // a broken app until the person manually logged out and back in themselves. Patching window.fetch
+  // once, globally, catches this everywhere without touching the ~10 pages that call fetch directly,
+  // the same "one global side effect" approach RootProviders.tsx already uses for the number-input
+  // wheel-scroll fix. response.clone() is required: every caller still does its own res.json() right
+  // after this runs, and a Response body can only be read once.
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (response.status === 401) {
+        response
+          .clone()
+          .json()
+          .then((data) => {
+            if (data?.error === EXPIRED_SESSION_ERROR && window.location.pathname !== '/login') {
+              setAuth(null);
+              try {
+                localStorage.removeItem(STORAGE_KEY);
+              } catch {
+                // best-effort
+              }
+              window.location.href = `/login?reason=expired&next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+            }
+          })
+          .catch(() => {
+            // Not a JSON body (or already consumed elsewhere) — nothing this handler can act on.
+          });
+      }
+      return response;
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
   }, []);
 
   function login(next: AuthState) {
