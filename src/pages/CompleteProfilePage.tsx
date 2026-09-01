@@ -30,10 +30,13 @@ export default function CompleteProfilePage() {
   const [name, setName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [capacityMw, setCapacityMw] = useState('');
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   async function login(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setLoggingIn(true);
     try {
       const res = await fetch(`${API_BASE}/api/organizations/login`, {
         method: 'POST',
@@ -46,6 +49,8 @@ export default function CompleteProfilePage() {
       await loadProfile(data.token);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setLoggingIn(false);
     }
   }
 
@@ -67,6 +72,7 @@ export default function CompleteProfilePage() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setSaving(true);
     try {
       const res = await fetch(`${API_BASE}/api/organizations/me`, {
         method: 'PATCH',
@@ -83,6 +89,8 @@ export default function CompleteProfilePage() {
       setSuccess('Profile updated.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save your profile');
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -111,7 +119,7 @@ export default function CompleteProfilePage() {
               <form onSubmit={login} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                <button type="submit" className="btn btn-solar">Log in</button>
+                <button type="submit" className="btn btn-solar" disabled={loggingIn}>{loggingIn ? 'Logging in…' : 'Log in'}</button>
               </form>
             ) : profile ? (
               <form onSubmit={saveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -129,7 +137,7 @@ export default function CompleteProfilePage() {
                     <input type="number" min="0" step="0.1" value={capacityMw} onChange={(e) => setCapacityMw(e.target.value)} required />
                   </label>
                 )}
-                <button type="submit" className="btn btn-solar">Save</button>
+                <button type="submit" className="btn btn-solar" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
               </form>
             ) : (
               <p>Loading your profile…</p>

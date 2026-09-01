@@ -4,7 +4,8 @@ import Seo from '../components/Seo';
 import { indianStates } from '../data/content';
 import { sealPayload } from '../lib/vettingSeal';
 import { useAuth } from '../lib/authContext';
-import { usePayment } from '../hooks/usePayment';
+import { usePayment, hasPendingPayment } from '../hooks/usePayment';
+import { isValidEmail, isValidPhone } from '../lib/validators';
 
 // Internal PoC test tool, same bar as /admin-vetting and /auction-live — unstyled, functional, not
 // linked from site nav. Field set is the WattMatch-adapted subset of SECI RfS Format 7.1 (technical
@@ -122,6 +123,11 @@ export default function GeneratorBidSubmissionPage() {
   const [needsRfsPayment, setNeedsRfsPayment] = useState(false);
   const [responding, setResponding] = useState<'accept' | 'decline' | null>(null);
   const payment = usePayment();
+  // Set from viewTender below when a previous Bid Processing Fee payment attempt for this tender
+  // never reached a terminal state in this browser (tab closed/refreshed mid-verify) — warns before
+  // paying again rather than risking a duplicate charge. Cleared implicitly once bidProcessingPaid
+  // is true, since the warning is only ever rendered alongside the unpaid state below.
+  const [pendingPaymentWarning, setPendingPaymentWarning] = useState(false);
 
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -247,6 +253,7 @@ export default function GeneratorBidSubmissionPage() {
       setTender(data.tender);
       setInvitationStatus(data.invitationStatus);
       setBidProcessingPaid(!!data.bidProcessingPaid);
+      setPendingPaymentWarning(!data.bidProcessingPaid && hasPendingPayment('bid_processing', Number(ref)));
       // Restores the "already submitted" confirmation across a reload — GET /tenders/:id's bidId is
       // the same one-bid-per-generator-per-tender fact vetting-bids.ts's duplicate-submission guard
       // enforces server-side; without this the form would look fillable again after a reload even
@@ -408,13 +415,20 @@ export default function GeneratorBidSubmissionPage() {
   }
 
   async function payBidProcessingFee() {
-    const result = await payment.startPayment({
+    const outcome = await payment.startPayment({
       purpose: 'bid_processing',
       tenderId: Number(tenderRef),
       token: token ?? '',
       prefill: { name: contactName, email: contactEmail, contact: contactPhone },
     });
-    if (result) setBidProcessingPaid(true);
+    if (outcome.outcome === 'success') {
+      setBidProcessingPaid(true);
+    } else if (outcome.outcome === 'already_paid') {
+      // The order-creation call 409'd because an earlier attempt already paid this fee (most likely
+      // a stale page after paying in another tab) — re-derive full status from the server rather
+      // than just flipping the local flag, since other tender state may be stale too.
+      await viewTender();
+    }
   }
 
   // Dev-mode only (see DEV_MODE above) — populates every field with valid dummy values and, for
@@ -490,6 +504,16 @@ export default function GeneratorBidSubmissionPage() {
     const capacity = Number(capacityMw);
     if (!Number.isInteger(capacity) || capacity <= 0) {
       setError('Contracted capacity must be a whole number of MW greater than zero.');
+      return;
+    }
+    // Contact details are sealed client-side below — the server can never see or validate them, so
+    // a malformed value here would become a permanent, silent defect inside the sealed envelope.
+    if (!isValidEmail(contactEmail)) {
+      setError('Enter a valid contact email address — this cannot be corrected after sealing.');
+      return;
+    }
+    if (!isValidPhone(contactPhone)) {
+      setError('Enter a valid contact phone number — this cannot be corrected after sealing.');
       return;
     }
 
@@ -650,7 +674,25 @@ export default function GeneratorBidSubmissionPage() {
                 ) : (
                   <>
                     <p className="enroll-message error">Required before you can submit a bid.</p>
-                    {payment.error && <p className="enroll-message error">{payment.error}</p>}
+                    {pendingPaymentWarning && (
+                      <p className="enroll-message error">
+                        A previous payment attempt for this fee may still be processing — wait a
+                        few minutes, then refresh status below before paying again to avoid a
+                        duplicate charge.{' '}
+                        <button type="button" className="btn-link-reset" style={{ textDecoration: 'underline' }} onClick={() => void viewTender()}>
+                          Refresh status
+                        </button>
+                      </p>
+                    )}
+                    {payment.status === 'cancelled' && <p className="enroll-message">Payment cancelled — you can try again below.</p>}
+                    {payment.status === 'verify_unconfirmed' && <p className="enroll-message">{payment.error}</p>}
+                    {payment.status === 'failed' && payment.error && (
+                      <p className="enroll-message error">
+                        {payment.errorKind === 'card'
+                          ? payment.error
+                          : `${payment.error} — this looks like a temporary issue on our side; nothing should have been charged for this attempt.`}
+                      </p>
+                    )}
                     <button
                       type="button"
                       className="btn btn-solar"

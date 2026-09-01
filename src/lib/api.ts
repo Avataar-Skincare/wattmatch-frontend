@@ -1,7 +1,24 @@
 const API_BASE = import.meta.env.VITE_API_URL as string | undefined;
 
-async function submit(path: string, payload: unknown): Promise<boolean> {
-  if (!API_BASE) return true; // No backend configured: form succeeds locally (standalone demo mode).
+if (!API_BASE && import.meta.env.PROD) {
+  // Not a functional guard (the standalone-demo-mode fallback below is intentional and documented
+  // in .env.example) — just a heads-up in case this is unset by accident in a real deployment,
+  // where it would otherwise silently report success without ever reaching the backend.
+  console.warn(
+    '[api] VITE_API_URL is not set in a production build — contact/lead/registration forms will report success without actually reaching the backend (standalone demo mode).'
+  );
+}
+
+export interface SubmitResult {
+  ok: boolean;
+  // Present when the backend rejected the request with a specific, user-facing reason (e.g. the
+  // validation messages contact.ts/registrations.ts return on a 400) — absent on a network failure
+  // or a non-JSON error body, where there's nothing specific to show.
+  error?: string;
+}
+
+async function submit(path: string, payload: unknown): Promise<SubmitResult> {
+  if (!API_BASE) return { ok: true }; // No backend configured: form succeeds locally (standalone demo mode).
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'POST',
@@ -9,22 +26,22 @@ async function submit(path: string, payload: unknown): Promise<boolean> {
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      console.error(`API ${path} responded with ${res.status}:`, await res.text());
-      return false;
+      const text = await res.text();
+      console.error(`API ${path} responded with ${res.status}:`, text);
+      let error: string | undefined;
+      try {
+        const parsed = JSON.parse(text) as { error?: unknown };
+        if (typeof parsed.error === 'string') error = parsed.error;
+      } catch {
+        // Non-JSON error body (e.g. an infra-level gateway page) — nothing specific to surface.
+      }
+      return { ok: false, error };
     }
-    return true;
+    return { ok: true };
   } catch (err) {
     console.error(`API ${path} request failed:`, err);
-    return false;
+    return { ok: false };
   }
-}
-
-export function submitCILead(payload: unknown) {
-  return submit('/api/leads/ci', payload);
-}
-
-export function submitGeneratorLead(payload: unknown) {
-  return submit('/api/leads/generator', payload);
 }
 
 export function submitContact(payload: unknown) {

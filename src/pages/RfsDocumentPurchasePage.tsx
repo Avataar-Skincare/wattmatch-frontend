@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import Reveal from '../components/Reveal';
 import Seo from '../components/Seo';
 import CheckIcon from '../components/icons/CheckIcon';
-import { usePayment } from '../hooks/usePayment';
+import { usePayment, hasPendingPayment } from '../hooks/usePayment';
 import { useAuth } from '../lib/authContext';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:4000';
@@ -37,7 +37,18 @@ export default function RfsDocumentPurchasePage() {
   const isLoggedInGenerator = auth?.type === 'generator';
   const [enrolled, setEnrolled] = useState(false);
 
-  const { status, error, isProcessing, startPayment, reset } = usePayment();
+  const { status, error, errorKind, isProcessing, startPayment, reset } = usePayment();
+  // null = not attempted yet, true = the document actually opened, false = the fetch failed or the
+  // document isn't uploaded yet — tracked explicitly so the post-payment screen never claims the
+  // document opened when it didn't (see downloadTenderDocument below).
+  const [documentAvailable, setDocumentAvailable] = useState<boolean | null>(null);
+  // Best-effort warning if a previous purchase attempt for this same tender never reached a
+  // terminal state in this browser (tab closed/refreshed between paying and verify resolving) —
+  // this flow has no account to check a fresh "already paid" status against, so this is the only
+  // local signal available. See usePayment.ts's hasPendingPayment.
+  const [pendingPaymentWarning] = useState(
+    () => !!tenderIdFromLink && hasPendingPayment('rfs_document', Number(tenderIdFromLink))
+  );
 
   // Prefills from the logged-in generator's own account (GET /organizations/me) rather than leaving
   // a blank form for someone who's already told this platform who they are — email/mobile/company
@@ -64,7 +75,7 @@ export default function RfsDocumentPurchasePage() {
     e.preventDefault();
     reset();
     if (!consentGiven) return;
-    const result = await startPayment({
+    const outcome = await startPayment({
       purpose: 'rfs_document',
       tenderId: Number(tenderId),
       payerName: name,
@@ -76,7 +87,10 @@ export default function RfsDocumentPurchasePage() {
       consentGiven: true,
       prefill: { name, email, contact: mobile },
     });
-    if (result) {
+    // 'already_paid' means an earlier attempt already completed this exact purchase (a 409 from
+    // order-creation, most likely a stale page after a previous successful purchase) — treated the
+    // same as a fresh success rather than an error, since the fee genuinely has been paid.
+    if (outcome.outcome === 'success' || outcome.outcome === 'already_paid') {
       await downloadTenderDocument();
       // A purchase alone creates no TenderInvitation row — without this, "continue to the enrollment
       // form" would be a dead end (GET /tenders/:id 403s with no invitation at all). Self-enroll is
@@ -103,13 +117,22 @@ export default function RfsDocumentPurchasePage() {
   // point (this whole flow is deliberately account-less), so it's fetched by the email just paid
   // with, same as hasRfsDocumentPaid does everywhere else. Once they enroll, it stays fetchable
   // from their generator dashboard too (GeneratorBidSubmissionPage) — this isn't the only copy.
+  // Sets documentAvailable explicitly rather than silently no-opping on failure: a 404 here almost
+  // always means the tender document hasn't been uploaded by an admin yet, which the payment flow
+  // can't detect ahead of time or retry automatically — the post-payment screen needs to say so
+  // honestly instead of implying the document always opens immediately.
   async function downloadTenderDocument() {
     try {
       const res = await fetch(`${API_BASE}/api/tenders/${tenderId}/tender-document?email=${encodeURIComponent(email)}`);
       const data = await res.json();
-      if (data.success) window.open(data.url, '_blank');
+      if (data.success) {
+        window.open(data.url, '_blank');
+        setDocumentAvailable(true);
+      } else {
+        setDocumentAvailable(false);
+      }
     } catch {
-      // best-effort — nothing to show the user if this fails, the doc is still safely re-fetchable later
+      setDocumentAvailable(false);
     }
   }
 
@@ -126,16 +149,31 @@ export default function RfsDocumentPurchasePage() {
           </div>
 
           <Reveal className="form-card register-form-card">
-            {status === 'success' ? (
+            {status === 'success' || status === 'already_paid' ? (
               <div className="form-success show">
                 <div className="check">
                   <CheckIcon size={20} />
                 </div>
-                <h3>Payment successful</h3>
-                <p>
-                  Your tender document should have opened in a new tab. You can also come back for it
-                  any time by enrolling and visiting your generator dashboard.
-                </p>
+                <h3>{status === 'already_paid' ? "You've already purchased this document" : 'Payment successful'}</h3>
+                {documentAvailable === true && (
+                  <p>
+                    Your tender document should have opened in a new tab. You can also come back for it
+                    any time by enrolling and visiting your generator dashboard.
+                  </p>
+                )}
+                {documentAvailable === false && (
+                  <>
+                    <p>
+                      Your payment is confirmed, but the tender document isn't available to download yet
+                      — the tender's admin may not have uploaded it. Check back shortly, or try the
+                      button below.
+                    </p>
+                    <button type="button" className="btn btn-outline" style={{ marginTop: '8px' }} onClick={() => void downloadTenderDocument()}>
+                      Try downloading again
+                    </button>
+                  </>
+                )}
+                {documentAvailable === null && <p>Fetching your tender document…</p>}
                 {enrolled && (
                   <Link to={`/submit-bid?tenderId=${tenderId}`} className="btn btn-solar" style={{ marginTop: '12px' }}>
                     Continue to enrollment form
@@ -148,6 +186,20 @@ export default function RfsDocumentPurchasePage() {
                 <p className="sub">Fill in your details below to unlock the full tender document.</p>
 
                 {status === 'cancelled' && <p className="form-note">Payment cancelled — you can try again below.</p>}
+                {status === 'verify_unconfirmed' && <p className="form-note">{error}</p>}
+                {status === 'failed' && error && (
+                  <p className="form-error">
+                    {errorKind === 'card'
+                      ? error
+                      : `${error} — this looks like a temporary issue on our side; nothing should have been charged for this attempt.`}
+                  </p>
+                )}
+                {pendingPaymentWarning && status === 'idle' && (
+                  <p className="form-note">
+                    A previous payment attempt for this tender may still be processing — wait a
+                    few minutes before paying again to avoid a duplicate charge.
+                  </p>
+                )}
 
                 <div className="field">
                   <label htmlFor="rfsTenderId">Tender id</label>
@@ -210,7 +262,6 @@ export default function RfsDocumentPurchasePage() {
                 <button type="submit" className="btn btn-solar" disabled={isProcessing || !consentGiven}>
                   {isProcessing ? `${status.replace('_', ' ')}…` : 'Pay & buy document'}
                 </button>
-                {error && <p className="form-error">{error}</p>}
               </form>
             )}
           </Reveal>

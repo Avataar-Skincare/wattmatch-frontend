@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LogoMark from './icons/LogoMark';
 import { navLinks } from '../data/content';
@@ -12,12 +12,15 @@ const tenderLinks = [
 
 export default function Header({ minimal = false }: { minimal?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [tendersOpen, setTendersOpen] = useState(false);
   const { auth, hydrated, logout } = useAuth();
   // Before the client-only localStorage read resolves (see authContext.tsx), fall back to the
   // logged-out CTAs — that's what SSG's server-rendered pass shows too, so there's no mismatch.
   const loggedIn = hydrated && auth;
 
   const closeMenu = () => setOpen(false);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+  const tendersRef = useRef<HTMLDivElement>(null);
 
   // Every page mounts its own Header, so this fires on each navigation —
   // without it the new page keeps the previous page's scroll offset
@@ -25,6 +28,40 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Escape closes the mobile menu and returns focus to the button that opened it — otherwise a
+  // keyboard user has to tab through the entire underlying page to escape it.
+  useEffect(() => {
+    if (!open) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        burgerRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [open]);
+
+  // The Tenders dropdown already opens on hover/focus-within via CSS (untouched below); this adds
+  // click/keyboard operability on top of that — the trigger used to be a plain <span>, which a
+  // keyboard user cannot activate or reliably reach at all (visibility:hidden on the closed panel
+  // removes its links from the tab order until something else already reveals it).
+  useEffect(() => {
+    if (!tendersOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (tendersRef.current && !tendersRef.current.contains(e.target as Node)) setTendersOpen(false);
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setTendersOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [tendersOpen]);
 
   if (minimal) {
     return (
@@ -48,11 +85,19 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
           {navLinks.slice(0, 2).map((link) => (
             <Link key={link.href} to={link.href}>{link.label}</Link>
           ))}
-          <div className="nav-dropdown">
-            <span className="nav-dropdown-trigger">Tenders</span>
+          <div className={`nav-dropdown${tendersOpen ? ' open' : ''}`} ref={tendersRef}>
+            <button
+              type="button"
+              className="nav-dropdown-trigger"
+              aria-haspopup="true"
+              aria-expanded={tendersOpen}
+              onClick={() => setTendersOpen((o) => !o)}
+            >
+              Tenders
+            </button>
             <div className="nav-dropdown-panel">
               {tenderLinks.map((link) => (
-                <Link key={link.href} to={link.href}>{link.label}</Link>
+                <Link key={link.href} to={link.href} onClick={() => setTendersOpen(false)}>{link.label}</Link>
               ))}
             </div>
           </div>
@@ -76,6 +121,7 @@ export default function Header({ minimal = false }: { minimal?: boolean }) {
           )}
         </div>
         <button
+          ref={burgerRef}
           className="burger"
           aria-label="Open menu"
           aria-expanded={open}

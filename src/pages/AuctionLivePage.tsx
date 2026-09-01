@@ -155,6 +155,15 @@ export default function AuctionLivePage() {
     });
     socket.on('rules:accepted', () => setRulesAccepted(true));
     socket.on('state:sync', (payload: AuctionState | null) => setState(payload));
+    // The server emits this when a Redis/DB blip happens during its own post-connect setup — the
+    // one case where state:sync/you:info never arrive at all. Without this, the client's 'connect'
+    // event (which fires before that async setup completes) has already flipped connection to
+    // 'connected' by the time this would show up, leaving the room screen rendering nothing with no
+    // indication anything went wrong and no recovery short of a manual reload.
+    socket.on('session:error', (payload: { message: string }) => {
+      setConnection((prev) => (prev === 'session-expired' ? prev : 'error'));
+      setConnectionError(payload.message || 'Something went wrong loading this auction — please refresh.');
+    });
     socket.on(
       'state:update',
       (payload: { currentBid: number; windowEndsAt: number; alias: string }) => {
@@ -185,8 +194,55 @@ export default function AuctionLivePage() {
     });
     socket.on(
       'auction:closed',
-      (payload: { winnerAlias: string | null; winningBid: number; resultType: string; disclosure: string }) => {
-        setState((prev) => (prev ? { ...prev, status: 'closed' } : prev));
+      (payload: {
+        winnerAlias: string | null;
+        winningBid: number;
+        resultType: string;
+        disclosure: string;
+        useLandedRate: boolean;
+        extensionCount: number;
+        maxExtensions: number;
+        minUndercut: number;
+      }) => {
+        // `prev` can legitimately still be null here: state:sync arrives null when the server's
+        // Redis auction state is gone (now that closed auctions carry a 24h TTL — see the server's
+        // markAuctionClosed), which happens for anyone who joins after that TTL has expired. The
+        // server still sends a correct auction:closed from its own DB fallback in that case, so
+        // this must be able to establish the closed view from scratch, not just patch an existing
+        // one — silently dropping the update (as the old `prev ? {...} : prev` did) left a late
+        // joiner on a blank page with no way to ever see the result.
+        //
+        // useLandedRate/extensionCount/maxExtensions/minUndercut now come from the payload itself
+        // (the server always has them — see auctionSocket.ts) rather than being hardcoded to
+        // 0/false: this auction-room view renders "Current lowest bid" vs "landed rate" and
+        // "Extensions used: X / Y" unconditionally, even for a closed auction, so a late joiner used
+        // to see fabricated zeros presented as if they were real history.
+        setState((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: 'closed',
+                currentBid: payload.winningBid,
+                leaderAlias: payload.winnerAlias,
+                useLandedRate: payload.useLandedRate,
+                extensionCount: payload.extensionCount,
+                maxExtensions: payload.maxExtensions,
+                minUndercut: payload.minUndercut,
+              }
+            : {
+                status: 'closed',
+                currentBid: payload.winningBid,
+                windowEndsAt: null,
+                windowMs: 0,
+                extensionCount: payload.extensionCount,
+                maxExtensions: payload.maxExtensions,
+                minUndercut: payload.minUndercut,
+                leaderAlias: payload.winnerAlias,
+                equityValue: 0,
+                totalUnitsPerYear: 0,
+                useLandedRate: payload.useLandedRate,
+              }
+        );
         setWinner({ alias: payload.winnerAlias, amount: payload.winningBid, disclosure: payload.disclosure });
       }
     );
@@ -450,6 +506,12 @@ export default function AuctionLivePage() {
                 )}
                 {connection === 'error' && (
                   <p style={{ textAlign: 'center', color: '#B53A3A' }}>{connectionError}</p>
+                )}
+
+                {connection === 'connected' && !state && (
+                  <p style={{ textAlign: 'center' }}>
+                    Loading auction — if this doesn't update in a moment, try refreshing.
+                  </p>
                 )}
 
                 {connection === 'connected' && state && (

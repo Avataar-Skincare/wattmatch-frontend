@@ -23,9 +23,23 @@ export interface RazorpayCheckoutOptions {
   modal?: { ondismiss?: () => void };
 }
 
+// Fired when Razorpay itself reports a failed attempt (card declined, bank timeout, etc.) — distinct
+// from the user simply closing the modal (modal.ondismiss) and from our own /verify call failing.
+// error.description is Razorpay's own human-readable reason, safe to show directly.
+export interface RazorpayPaymentFailedResponse {
+  error: {
+    code?: string;
+    description?: string;
+    reason?: string;
+    source?: string;
+    step?: string;
+  };
+}
+
 export interface RazorpayCheckoutInstance {
   open: () => void;
   close: () => void;
+  on: (event: 'payment.failed', handler: (response: RazorpayPaymentFailedResponse) => void) => void;
 }
 
 let loadPromise: Promise<void> | null = null;

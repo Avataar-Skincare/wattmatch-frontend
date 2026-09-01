@@ -8,7 +8,7 @@ import { AuthProvider } from '../lib/authContext';
 // number inputs scattered across the app (AdminConsolePage, registration forms, bid submission,
 // ...): blurring the field on wheel lets the scroll fall through to the page as normal, with no
 // value change, and covers every number input including ones added later.
-function blurFocusedNumberInputOnWheel(e: WheelEvent) {
+function blurFocusedNumberInputOnWheel() {
   const active = document.activeElement;
   if (active instanceof HTMLInputElement && active.type === 'number') {
     active.blur();

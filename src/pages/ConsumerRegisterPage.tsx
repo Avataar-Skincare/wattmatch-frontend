@@ -6,6 +6,7 @@ import Seo from '../components/Seo';
 import CheckIcon from '../components/icons/CheckIcon';
 import { indianStates } from '../data/content';
 import { submitCiRegistration } from '../lib/api';
+import { isValidEmail, isValidPhone } from '../lib/validators';
 import type { CIRegistrationFormData } from '../types/forms';
 
 type Step = 'details' | 'review' | 'success';
@@ -20,15 +21,29 @@ export default function ConsumerRegisterPage() {
   const [form, setForm] = useState<CIRegistrationFormData>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [detailsError, setDetailsError] = useState('');
 
   function handleDetailsSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+    const email = String(data.get('email') ?? '');
+    const phone = String(data.get('phone') ?? '');
+    // Catches the same class of malformed input the backend now rejects with a 400 (see
+    // wattmatch-server/src/lib/validators.ts) before spending a review step and a round trip on it.
+    if (!isValidEmail(email)) {
+      setDetailsError('Enter a valid email address.');
+      return;
+    }
+    if (!isValidPhone(phone)) {
+      setDetailsError('Enter a valid 10-digit phone number.');
+      return;
+    }
+    setDetailsError('');
     setForm({
       name: String(data.get('name') ?? ''),
       company: String(data.get('company') ?? ''),
-      email: String(data.get('email') ?? ''),
-      phone: String(data.get('phone') ?? ''),
+      email,
+      phone,
       state: String(data.get('state') ?? ''),
       load: String(data.get('load') ?? ''),
       siteLocation: String(data.get('siteLocation') ?? ''),
@@ -43,12 +58,12 @@ export default function ConsumerRegisterPage() {
   async function handleFinalSubmit() {
     setSubmitting(true);
     setError('');
-    const ok = await submitCiRegistration(form);
+    const result = await submitCiRegistration(form);
     setSubmitting(false);
-    if (ok) {
+    if (result.ok) {
       setStep('success');
     } else {
-      setError('Something went wrong submitting your registration. Please try again, or email hello@wattmatch.in.');
+      setError(result.error ?? 'Something went wrong submitting your registration. Please try again, or email hello@wattmatch.in.');
     }
   }
 
@@ -139,6 +154,7 @@ export default function ConsumerRegisterPage() {
                   <input type="checkbox" name="consent" required defaultChecked={form.consent} />
                   <span>I agree to be contacted by Wattmatch and consent to my details being shared with vetted generators for matching purposes.</span>
                 </label>
+                {detailsError && <p className="form-error">{detailsError}</p>}
                 <button type="submit" className="btn btn-solar">
                   Continue to review <span className="btn-arrow">→</span>
                 </button>

@@ -14,20 +14,20 @@ export default function Contact({
   body?: string;
 }) {
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
     const payload: ContactFormData = { email: String(data.get('email') ?? '') };
-    setError(false);
-    const ok = await submitContact(payload);
-    if (ok) {
+    setError(null);
+    const result = await submitContact(payload);
+    if (result.ok) {
       setSent(true);
       form.reset();
     } else {
-      setError(true);
+      setError(result.error ?? 'Something went wrong. Please try again, or email hello@wattmatch.in directly.');
     }
   }
 
@@ -48,7 +48,7 @@ export default function Contact({
           </div>
         </form>
         <p className={`contact-success${sent ? ' show' : ''}`} id="contactSuccess">Message sent: we'll get back to you shortly.</p>
-        {error && <p className="form-error">Something went wrong. Please try again, or email hello@wattmatch.in directly.</p>}
+        {error && <p className="form-error">{error}</p>}
         <p className="contact-alt">or write to us directly at <a href="mailto:hello@wattmatch.in">hello@wattmatch.in</a></p>
       </div>
     </section>
